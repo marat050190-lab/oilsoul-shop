@@ -11,7 +11,9 @@ function renderCatalog() {
     card.className = 'card';
     const inCart = cart.find(i => i.id === product.id);
     card.innerHTML = `
-      <div class="placeholder-img">${product.emoji}</div>
+     ${product.image 
+  ? `<img src="${product.image}" alt="${product.title}">` 
+  : `<div class="placeholder-img">${product.emoji}</div>`}
       <div class="card-body">
         <div class="card-title">${product.title}</div>
         <div class="card-price">₽${product.price.toLocaleString()}</div>
