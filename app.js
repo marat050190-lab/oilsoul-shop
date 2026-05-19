@@ -49,18 +49,36 @@ function updateCartBar() {
   }
 }
 
-document.getElementById('checkout-btn').addEventListener('click', () => {
+document.getElementById('checkout-btn').addEventListener('click', async () => {
   if (cart.length === 0) return;
-  
-  const orderData = JSON.stringify({
-    action: 'order',
-    items: cart.map(i => ({ id: i.id, title: i.title, price: i.price, stars: i.stars }))
-  });
 
-  if (tg && tg.sendData) {
-    tg.sendData(orderData);
-  } else {
-    alert('Пожалуйста откройте магазин через бота @OilSoulBot в Telegram');
+  const user = tg?.initDataUnsafe?.user;
+  const chatId = user?.id;
+
+  const orderData = {
+    action: 'order',
+    chat_id: chatId,
+    user_name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Неизвестен',
+    items: cart.map(i => ({ id: i.id, title: i.title, price: i.price, stars: i.stars }))
+  };
+
+  try {
+    const res = await fetch('https://oilsoul-bot.onrender.com/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    });
+    const result = await res.json();
+    if (result.ok) {
+      alert('✅ Заказ принят! Мы свяжемся с вами.');
+      cart = [];
+      updateCartBar();
+      renderCatalog();
+    } else {
+      alert('Ошибка при оформлении заказа.');
+    }
+  } catch (e) {
+    alert('Ошибка соединения. Попробуйте ещё раз.');
   }
 });
 
