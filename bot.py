@@ -1,6 +1,7 @@
 import os
 import json
 from flask import Flask, request
+from flask_cors import CORS
 import requests
 
 TOKEN = os.environ.get('BOT_TOKEN')
@@ -8,6 +9,7 @@ ADMIN_ID = 364102600
 WEBHOOK_URL = os.environ.get('WEBHOOK_URL')
 
 app = Flask(__name__)
+CORS(app)
 
 def send_message(chat_id, text):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
@@ -43,8 +45,11 @@ def webhook():
 
     return 'ok'
 
-@app.route('/order', methods=['POST'])
+@app.route('/order', methods=['POST', 'OPTIONS'])
 def order():
+    if request.method == 'OPTIONS':
+        return '', 204
+    
     data = request.json
     if not data:
         return {'ok': False}
