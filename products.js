@@ -5,6 +5,7 @@ const products = [
     description: "Картина маслом в стиле официального подарка Telegram",
     price: 2500,
     stars: 125,
+    ton: 2.5,
     emoji: "🚀",
     image: null
   },
@@ -14,6 +15,7 @@ const products = [
     description: "Золотой кубок — символ победы в стиле TG gifts",
     price: 3000,
     stars: 150,
+    ton: 3.0,
     emoji: "🏆",
     image: 'IMAGE 2026-05-19 14:47:33.jpg'
   },
@@ -23,6 +25,7 @@ const products = [
     description: "Уникальная работа в стиле редкого подарка Telegram",
     price: 5000,
     stars: 250,
+    ton: 5.0,
     emoji: "🌟",
     image: null
   },
@@ -32,7 +35,10 @@ const products = [
     description: "Легендарная кепка — ручная работа маслом",
     price: 4500,
     stars: 225,
+    ton: 4.5,
     emoji: "🧢",
     image: null
   }
 ];
+
+const TON_WALLET = "UQCbHnRC6iUeksoheBxy2Xo_Lh0qGkr98J10nUCzHsG8KLq_";
