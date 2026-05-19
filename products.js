@@ -15,7 +15,7 @@ const products = [
     price: 3000,
     stars: 150,
     emoji: "🏆",
-    image: null
+    image: 'IMAGE 2026-05-19 14:47:33.jpg'
   },
   {
     id: 3,
