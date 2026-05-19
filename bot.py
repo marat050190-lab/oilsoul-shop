@@ -41,31 +41,35 @@ def webhook():
                 'в стиле Telegram-подарков.\n\n'
                 'Нажмите кнопку <b>🎨 Магазин</b> внизу чтобы открыть каталог.')
 
-    if 'web_app_data' in data.get('message', {}):
-        msg = data['message']
-        chat_id = msg['chat']['id']
-        user = msg['chat']
-        order_data = json.loads(msg['web_app_data']['data'])
-
-        if order_data.get('action') == 'order':
-            items = order_data['items']
-            total = sum(i['price'] for i in items)
-
-            order_text = '✅ <b>Ваш заказ принят!</b>\n\n'
-            for item in items:
-                order_text += f'🎨 {item["title"]} — ₽{item["price"]}\n'
-            order_text += f'\n💰 Итого: ₽{total}\n\nМы свяжемся с вами в ближайшее время!'
-            send_message(chat_id, order_text)
-
-            admin_text = f'🛍 <b>НОВЫЙ ЗАКАЗ!</b>\n\n'
-            admin_text += f'👤 {user.get("first_name", "")} {user.get("last_name", "")}\n'
-            admin_text += f'🆔 ID: {chat_id}\n\n'
-            for item in items:
-                admin_text += f'🎨 {item["title"]} — ₽{item["price"]}\n'
-            admin_text += f'\n💰 Итого: ₽{total}'
-            send_message(ADMIN_ID, admin_text)
-
     return 'ok'
+
+@app.route('/order', methods=['POST'])
+def order():
+    data = request.json
+    if not data:
+        return {'ok': False}
+
+    chat_id = data.get('chat_id')
+    user_name = data.get('user_name', 'Неизвестен')
+    items = data.get('items', [])
+    total = sum(i['price'] for i in items)
+
+    if chat_id:
+        order_text = '✅ <b>Ваш заказ принят!</b>\n\n'
+        for item in items:
+            order_text += f'🎨 {item["title"]} — ₽{item["price"]}\n'
+        order_text += f'\n💰 Итого: ₽{total}\n\nМы свяжемся с вами в ближайшее время!'
+        send_message(chat_id, order_text)
+
+    admin_text = '🛍 <b>НОВЫЙ ЗАКАЗ!</b>\n\n'
+    admin_text += f'👤 {user_name}\n'
+    admin_text += f'🆔 ID: {chat_id}\n\n'
+    for item in items:
+        admin_text += f'🎨 {item["title"]} — ₽{item["price"]}\n'
+    admin_text += f'\n💰 Итого: ₽{total}'
+    send_message(ADMIN_ID, admin_text)
+
+    return {'ok': True}
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
