@@ -6,9 +6,17 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--tg-theme-bg-color, #1a1a2e);
-  color: var(--tg-theme-text-color, #ffffff);
+  background: #1a1a2e;
+  color: #ffffff;
   min-height: 100vh;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* КАТАЛОГ */
+#page-catalog {
   padding-bottom: 80px;
 }
 
@@ -20,13 +28,13 @@ header {
 }
 
 header h1 {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   margin-bottom: 4px;
 }
 
 header p {
-  font-size: 14px;
+  font-size: 13px;
   opacity: 0.7;
 }
 
@@ -42,19 +50,23 @@ header p {
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.1);
-  transition: transform 0.2s;
   cursor: pointer;
-}
-
-.card:active {
-  transform: scale(0.97);
 }
 
 .card img {
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
-  background: #2a2a4a;
+}
+
+.placeholder-img {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #2a2a4a, #1a1a3e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
 }
 
 .card-body {
@@ -64,24 +76,24 @@ header p {
 .card-title {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 6px;
-  line-height: 1.3;
+  margin-bottom: 4px;
 }
 
 .card-price {
-  font-size: 14px;
+  font-size: 12px;
   color: #f0c040;
   font-weight: 700;
+  margin-bottom: 2px;
 }
 
 .card-stars {
-  font-size: 12px;
+  font-size: 11px;
   color: #f0c040;
+  margin-bottom: 8px;
 }
 
 .card-btn {
   width: 100%;
-  margin-top: 8px;
   padding: 8px;
   border: none;
   border-radius: 10px;
@@ -90,11 +102,6 @@ header p {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-.card-btn:active {
-  background: #1a5276;
 }
 
 .card-btn.in-cart {
@@ -114,10 +121,6 @@ header p {
   border-top: 1px solid rgba(255,255,255,0.2);
 }
 
-.cart-bar.hidden {
-  display: none;
-}
-
 #cart-info {
   font-size: 14px;
   font-weight: 600;
@@ -134,12 +137,145 @@ header p {
   cursor: pointer;
 }
 
-.placeholder-img {
-  width: 100%;
-  aspect-ratio: 1;
-  background: linear-gradient(135deg, #2a2a4a, #1a1a3e);
+/* ОФОРМЛЕНИЕ ЗАКАЗА */
+#page-checkout {
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+#page-checkout header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 48px;
+  gap: 12px;
+  padding: 16px;
+  text-align: left;
+}
+
+#page-checkout header h1 {
+  font-size: 20px;
+}
+
+#back-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.checkout-form {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-summary {
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.order-summary h3 {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #f0c040;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 700;
+  padding-top: 12px;
+  color: #f0c040;
+}
+
+.form-section {
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-section h3 {
+  font-size: 15px;
+  color: #f0c040;
+  margin-bottom: 4px;
+}
+
+.form-section input,
+.form-section textarea {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+}
+
+.form-section input::placeholder,
+.form-section textarea::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+.form-section input:focus,
+.form-section textarea:focus {
+  border-color: #f0c040;
+}
+
+.form-section textarea {
+  height: 80px;
+  resize: none;
+}
+
+.payment-info {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ton-address {
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 12px;
+  word-break: break-all;
+  color: #f0c040;
+  margin: 8px 0;
+  font-family: monospace;
+}
+
+.payment-note {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 8px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: #f0c040;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
 }
