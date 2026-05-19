@@ -1,5 +1,5 @@
-const tg = window.Telegram.WebApp;
-tg.expand();
+const tg = window.Telegram?.WebApp;
+if (tg) tg.expand();
 
 let cart = [];
 
@@ -51,11 +51,17 @@ function updateCartBar() {
 
 document.getElementById('checkout-btn').addEventListener('click', () => {
   if (cart.length === 0) return;
-  const order = cart.map(i => `${i.title} — ₽${i.price}`).join('\n');
-  tg.sendData(JSON.stringify({
+  
+  const orderData = JSON.stringify({
     action: 'order',
     items: cart.map(i => ({ id: i.id, title: i.title, price: i.price, stars: i.stars }))
-  }));
+  });
+
+  if (tg && tg.sendData) {
+    tg.sendData(orderData);
+  } else {
+    alert('Пожалуйста откройте магазин через бота @OilSoulBot в Telegram');
+  }
 });
 
 renderCatalog();
