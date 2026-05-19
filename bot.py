@@ -14,6 +14,7 @@ def send_message(chat_id, text):
 
 @app.route('/')
 def index():
+    set_webhook()
     return 'Oil&Soul Bot is running'
 
 @app.route(f'/webhook', methods=['POST'])
