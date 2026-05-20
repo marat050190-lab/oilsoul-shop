@@ -279,3 +279,109 @@ header p {
   font-weight: 700;
   cursor: pointer;
 }
+/* СТРАНИЦА ДЕТАЛИ */
+#page-detail {
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+#page-detail header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #16213e, #0f3460);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#page-detail header button {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#page-detail header h1 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.detail-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-img {
+  width: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.detail-placeholder {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #2a2a4a, #1a1a3e);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+}
+
+.detail-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f0c040;
+  text-align: center;
+}
+
+.detail-desc {
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.9);
+  white-space: pre-line;
+}
+
+.in-cart-btn {
+  background: #27ae60 !important;
+}
+
+/* КНОПКИ КАРТОЧКИ */
+.card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.card-btn-detail {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  background: transparent;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.card-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  background: #0f3460;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}3
