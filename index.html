@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <div id="page-catalog">
     <header>
       <h1>🎨 Oil&Soul</h1>
@@ -22,6 +23,8 @@
     </div>
   </div>
 
+  <div id="page-detail" class="hidden"></div>
+
   <div id="page-checkout" class="hidden">
     <header>
       <button id="back-btn">← Назад</button>
@@ -29,7 +32,6 @@
     </header>
     <div class="checkout-form">
       <div id="order-summary" class="order-summary"></div>
-      
       <div class="form-section">
         <h3>📦 Данные для доставки</h3>
         <input type="text" id="field-name" placeholder="Имя и фамилия *" required>
@@ -40,7 +42,6 @@
         <input type="text" id="field-phone" placeholder="Телефон или email для связи *" required>
         <textarea id="field-comment" placeholder="Комментарий к заказу (необязательно)"></textarea>
       </div>
-
       <div class="form-section">
         <h3>💎 Оплата</h3>
         <div class="payment-info">
@@ -49,7 +50,6 @@
           <p class="payment-note">После оплаты нажмите кнопку ниже и пришлите скриншот транзакции боту</p>
         </div>
       </div>
-
       <button id="submit-btn" class="submit-btn">✅ Подтвердить заказ</button>
     </div>
   </div>
