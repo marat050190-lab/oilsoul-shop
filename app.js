@@ -2,6 +2,25 @@ const tg = window.Telegram?.WebApp;
 if (tg) tg.expand();
 
 let cart = [];
+let tonPrice = null;
+
+// Подгружаем курс TON
+async function fetchTonPrice() {
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd,rub');
+    const data = await res.json();
+    tonPrice = data['the-open-network'];
+    renderCatalog();
+  } catch (e) {
+    console.log('Курс не загружен');
+  }
+}
+
+function formatPrice(ton) {
+  if (!tonPrice) return `${ton} TON`;
+  const rub = Math.round(ton * tonPrice.rub);
+  return `${ton} TON (~${rub.toLocaleString('ru-RU')} ₽)`;
+}
 
 const descriptions = {
   2: `🏆 Golden Trophy #1
@@ -58,7 +77,7 @@ function renderCatalog() {
         : `<div class="placeholder-img">${product.emoji}</div>`}
       <div class="card-body">
         <div class="card-title">${product.emoji} ${product.title}</div>
-        <div class="card-price">${product.ton} TON</div>
+        <div class="card-price">${formatPrice(product.ton)}</div>
         <div class="card-actions">
           <button class="card-btn-detail" onclick="showDetail(${product.id})">Подробнее</button>
           <button class="card-btn ${inCart ? 'in-cart' : ''}" onclick="toggleCart(${product.id})">
@@ -86,11 +105,11 @@ function showDetail(id) {
       ${product.image 
         ? `<img src="${product.image}" alt="${product.title}" class="detail-img">` 
         : `<div class="detail-placeholder">${product.emoji}</div>`}
-      <div class="detail-price">${product.ton} TON</div>
+      <div class="detail-price">${formatPrice(product.ton)}</div>
       ${desc 
         ? `<div class="detail-desc">${desc.replace(/\n/g, '<br>')}</div>`
         : `<div class="detail-desc">${product.description}</div>`}
-      <button class="submit-btn ${inCart ? 'in-cart-btn' : ''}" onclick="toggleCart(${product.id}); renderCatalog();">
+      <button class="submit-btn ${inCart ? 'in-cart-btn' : ''}" onclick="toggleCart(${product.id}); renderCatalog(); this.className='submit-btn in-cart-btn'; this.textContent='✓ В корзине';">
         ${inCart ? '✓ В корзине' : '+ Добавить в корзину'}
       </button>
     </div>
@@ -118,7 +137,8 @@ function updateCartBar() {
   } else {
     bar.classList.remove('hidden');
     const totalTon = cart.reduce((sum, i) => sum + i.ton, 0);
-    info.textContent = `${cart.length} шт. — ${totalTon} TON`;
+    const totalRub = tonPrice ? Math.round(totalTon * tonPrice.rub).toLocaleString('ru-RU') + ' ₽' : '';
+    info.textContent = `${cart.length} шт. — ${totalTon} TON ${totalRub ? '(~' + totalRub + ')' : ''}`;
   }
 }
 
@@ -135,7 +155,7 @@ function renderCheckout() {
     `).join('')}
     <div class="order-total">
       <span>Итого:</span>
-      <span>${totalTon} TON</span>
+      <span>${totalTon} TON${tonPrice ? ` (~${Math.round(totalTon * tonPrice.rub).toLocaleString('ru-RU')} ₽)` : ''}</span>
     </div>
   `;
   document.getElementById('ton-amount').textContent = totalTon;
@@ -197,4 +217,5 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   }
 });
 
+fetchTonPrice();
 renderCatalog();
