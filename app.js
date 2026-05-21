@@ -45,6 +45,7 @@ const i18n = {
     other_wallet: 'Другой кошелёк — скопируйте адрес:',
     amount: 'Сумма:',
     copy: 'Копировать',
+    copied: 'Скопировано',
     payment_page_title: 'Оплата заказа',
     after_payment: 'После перевода напишите нам в',
     after_payment2: '— мы подтвердим получение и приступим к упаковке.',
@@ -88,6 +89,7 @@ const i18n = {
     other_wallet: 'Other wallet — copy the address:',
     amount: 'Amount:',
     copy: 'Copy',
+    copied: 'Copied',
     payment_page_title: 'Payment',
     after_payment: 'After sending, message us at',
     after_payment2: '— we will confirm receipt and start packing.',
@@ -129,9 +131,9 @@ async function fetchTonPrice() {
 }
 
 function formatPrice(ton) {
-  if (!tonPrice) return `${ton} TON`;
+  if (!tonPrice) return ton + ' TON';
   const usd = (ton * tonPrice.usd).toFixed(0);
-  return `${ton} TON (~$${Number(usd).toLocaleString('en-US')})`;
+  return ton + ' TON (~$' + Number(usd).toLocaleString('en-US') + ')';
 }
 
 const descriptions = {
@@ -214,59 +216,66 @@ function showPage(pageId) {
 function renderCatalog() {
   const catalog = document.getElementById('catalog');
   catalog.innerHTML = '';
-  products.forEach(product => {
+  products.forEach(function(product) {
     const card = document.createElement('div');
     card.className = 'card';
-    const inCart = cart.find(i => i.id === product.id);
-    card.innerHTML = `
-      ${product.image
-        ? `<img src="${product.image}" alt="${product.title}">`
-        : `<div class="placeholder-img">${product.emoji}</div>`}
-      <div class="card-body">
-        <div class="card-title">${product.emoji} ${product.title}</div>
-        <div class="card-price">${formatPrice(product.ton)}</div>
-        <div class="card-actions">
-          <button class="card-btn-detail" onclick="showDetail(${product.id})">${t('btn_details')}</button>
-          <button class="card-btn ${inCart ? 'in-cart' : ''}" onclick="toggleCart(${product.id})">
-            ${inCart ? t('btn_in_cart') : t('btn_buy')}
-          </button>
-        </div>
-      </div>
-    `;
+    const inCart = cart.find(function(i) { return i.id === product.id; });
+    card.innerHTML =
+      (product.image
+        ? '<img src="' + product.image + '" alt="' + product.title + '">'
+        : '<div class="placeholder-img">' + product.emoji + '</div>') +
+      '<div class="card-body">' +
+        '<div class="card-title">' + product.emoji + ' ' + product.title + '</div>' +
+        '<div class="card-price">' + formatPrice(product.ton) + '</div>' +
+        '<div class="card-actions">' +
+          '<button class="card-btn-detail" onclick="showDetail(' + product.id + ')">' + t('btn_details') + '</button>' +
+          '<button class="card-btn ' + (inCart ? 'in-cart' : '') + '" onclick="toggleCart(' + product.id + ')">' +
+            (inCart ? t('btn_in_cart') : t('btn_buy')) +
+          '</button>' +
+        '</div>' +
+      '</div>';
     catalog.appendChild(card);
   });
 }
 
 function showDetail(id) {
-  const product = products.find(p => p.id === id);
-  const inCart = cart.find(i => i.id === id);
-  const desc = descriptions[lang]?.[id] || descriptions['ru']?.[id];
+  const product = products.find(function(p) { return p.id === id; });
+  const inCart = cart.find(function(i) { return i.id === id; });
+  const desc = (descriptions[lang] && descriptions[lang][id]) || (descriptions['ru'] && descriptions['ru'][id]);
 
   const page = document.getElementById('page-detail');
-  page.innerHTML = `
-    <header>
-      <button onclick="showPage('page-catalog')">${t('back')}</button>
-      <h1>${product.title}</h1>
-    </header>
-    <div class="detail-content">
-      ${product.image
-        ? `<img src="${product.image}" alt="${product.title}" class="detail-img">`
-        : `<div class="detail-placeholder">${product.emoji}</div>`}
-      <div class="detail-price">${formatPrice(product.ton)}</div>
-      ${desc
-        ? `<div class="detail-desc">${desc.replace(/\n/g, '<br>')}</div>`
-        : `<div class="detail-desc">${product.description}</div>`}
-      <button class="submit-btn ${inCart ? 'in-cart-btn' : ''}" onclick="toggleCart(${product.id}); renderCatalog(); this.className='submit-btn in-cart-btn'; this.textContent='${t('btn_in_cart_full')}';">
-        ${inCart ? t('btn_in_cart_full') : t('btn_add_cart')}
-      </button>
-    </div>
-  `;
+  page.innerHTML =
+    '<header>' +
+      '<button onclick="showPage(\'page-catalog\')">' + t('back') + '</button>' +
+      '<h1>' + product.title + '</h1>' +
+    '</header>' +
+    '<div class="detail-content">' +
+      (product.image
+        ? '<img src="' + product.image + '" alt="' + product.title + '" class="detail-img">'
+        : '<div class="detail-placeholder">' + product.emoji + '</div>') +
+      '<div class="detail-price">' + formatPrice(product.ton) + '</div>' +
+      (desc
+        ? '<div class="detail-desc">' + desc.replace(/\n/g, '<br>') + '</div>'
+        : '<div class="detail-desc">' + product.description + '</div>') +
+      '<button id="detail-cart-btn" class="submit-btn ' + (inCart ? 'in-cart-btn' : '') + '" onclick="detailToggleCart(' + id + ')">' +
+        (inCart ? t('btn_in_cart_full') : t('btn_add_cart')) +
+      '</button>' +
+    '</div>';
   showPage('page-detail');
 }
 
+function detailToggleCart(id) {
+  toggleCart(id);
+  const btn = document.getElementById('detail-cart-btn');
+  if (!btn) return;
+  const inCart = cart.find(function(i) { return i.id === id; });
+  btn.className = 'submit-btn ' + (inCart ? 'in-cart-btn' : '');
+  btn.textContent = inCart ? t('btn_in_cart_full') : t('btn_add_cart');
+}
+
 function toggleCart(id) {
-  const product = products.find(p => p.id === id);
-  const index = cart.findIndex(i => i.id === id);
+  const product = products.find(function(p) { return p.id === id; });
+  const index = cart.findIndex(function(i) { return i.id === id; });
   if (index === -1) {
     cart.push(product);
   } else {
@@ -283,28 +292,24 @@ function updateCartBar() {
     bar.classList.add('hidden');
   } else {
     bar.classList.remove('hidden');
-    const totalTon = cart.reduce((sum, i) => sum + i.ton, 0);
+    const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
     const totalUsd = tonPrice ? '$' + (totalTon * tonPrice.usd).toFixed(0) : '';
-    info.textContent = `${cart.length} — ${totalTon} TON ${totalUsd ? '(~' + totalUsd + ')' : ''}`;
+    info.textContent = cart.length + ' — ' + totalTon + ' TON ' + (totalUsd ? '(~' + totalUsd + ')' : '');
   }
 }
 
 function renderCheckout() {
-  const totalTon = cart.reduce((sum, i) => sum + i.ton, 0);
+  const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
   const summary = document.getElementById('order-summary');
-  summary.innerHTML = `
-    <h3>${t('order_title')}</h3>
-    ${cart.map(i => `
-      <div class="order-item">
-        <span>${i.emoji} ${i.title}</span>
-        <span>${i.ton} TON</span>
-      </div>
-    `).join('')}
-    <div class="order-total">
-      <span>${t('order_total')}</span>
-      <span>${totalTon} TON${tonPrice ? ` (~$${(totalTon * tonPrice.usd).toFixed(0)})` : ''}</span>
-    </div>
-  `;
+  summary.innerHTML =
+    '<h3>' + t('order_title') + '</h3>' +
+    cart.map(function(i) {
+      return '<div class="order-item"><span>' + i.emoji + ' ' + i.title + '</span><span>' + i.ton + ' TON</span></div>';
+    }).join('') +
+    '<div class="order-total">' +
+      '<span>' + t('order_total') + '</span>' +
+      '<span>' + totalTon + ' TON' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '') + '</span>' +
+    '</div>';
   document.getElementById('ton-amount').textContent = totalTon;
   document.getElementById('ton-address-display').textContent = TON_WALLET;
   document.querySelector('#page-checkout header h1').textContent = t('checkout_title');
@@ -313,17 +318,17 @@ function renderCheckout() {
   document.getElementById('submit-btn').textContent = t('submit_btn');
 }
 
-document.getElementById('checkout-btn').addEventListener('click', () => {
+document.getElementById('checkout-btn').addEventListener('click', function() {
   if (cart.length === 0) return;
   renderCheckout();
   showPage('page-checkout');
 });
 
-document.getElementById('back-btn').addEventListener('click', () => {
+document.getElementById('back-btn').addEventListener('click', function() {
   showPage('page-catalog');
 });
 
-document.getElementById('submit-btn').addEventListener('click', async () => {
+document.getElementById('submit-btn').addEventListener('click', async function() {
   const name = document.getElementById('field-name').value.trim();
   const country = document.getElementById('field-country').value.trim();
   const city = document.getElementById('field-city').value.trim();
@@ -338,16 +343,16 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     return;
   }
 
-  const user = tg?.initDataUnsafe?.user;
-  const totalTon = cart.reduce((sum, i) => sum + i.ton, 0);
+  const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
 
   const orderData = {
     action: 'order',
-    chat_id: user?.id,
-    user_name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : name,
-    items: cart.map(i => ({ id: i.id, title: i.title, ton: i.ton })),
+    chat_id: user ? user.id : null,
+    user_name: user ? ((user.first_name || '') + ' ' + (user.last_name || '')).trim() : name,
+    items: cart.map(function(i) { return { id: i.id, title: i.title, ton: i.ton }; }),
     total_ton: totalTon,
-    delivery: { name, country, city, address, postal, phone, email, comment }
+    delivery: { name: name, country: country, city: city, address: address, postal: postal, phone: phone, email: email, comment: comment }
   };
 
   try {
@@ -365,55 +370,72 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   }
 });
 
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(function() {
+    const original = btn.textContent;
+    btn.textContent = '✓';
+    btn.style.background = '#27ae60';
+    setTimeout(function() {
+      btn.textContent = original;
+      btn.style.background = '';
+    }, 2000);
+  });
+}
+
 function showPayment(totalTon) {
   cart = [];
   updateCartBar();
 
-  const walletLink = `ton://transfer/${TON_WALLET}?amount=${Math.round(totalTon * 1e9)}&text=OilSoul`;
-  const tonkeeperLink = `https://app.tonkeeper.com/transfer/${TON_WALLET}?amount=${Math.round(totalTon * 1e9)}&text=OilSoul`;
+  const walletLink = 'ton://transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=OilSoul';
+  const tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=OilSoul';
+  const amountDisplay = totalTon + ' TON' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
 
   const page = document.getElementById('page-detail');
-  page.innerHTML = `
-    <header>
-      <button onclick="showPage('page-catalog')">${t('back_catalog')}</button>
-      <h1>${t('payment_page_title')}</h1>
-    </header>
-    <div class="detail-content">
-      <div class="payment-success-icon">💎</div>
-      <div class="payment-success-title">${t('payment_done')}</div>
-      <div class="payment-success-sub">${t('payment_sub')} ${totalTon} TON${tonPrice ? ` (~$${(totalTon * tonPrice.usd).toFixed(0)})` : ''}</div>
-      <div class="payment-buttons">
-        <a href="${walletLink}" class="pay-btn pay-btn-wallet">
-          <span class="pay-btn-icon">✈️</span>
-          <span class="pay-btn-text">
-            <strong>${t('pay_wallet')}</strong>
-            <small>${t('pay_wallet_sub')}</small>
-          </span>
-        </a>
-        <a href="${tonkeeperLink}" class="pay-btn pay-btn-tonkeeper">
-          <span class="pay-btn-icon">💎</span>
-          <span class="pay-btn-text">
-            <strong>${t('pay_tonkeeper')}</strong>
-            <small>${t('pay_tonkeeper_sub')}</small>
-          </span>
-        </a>
-      </div>
-      <div class="payment-manual">
-        <div class="payment-manual-label">${t('other_wallet')}</div>
-        <div class="payment-address-row">
-          <div class="payment-address">${TON_WALLET}</div>
-          <button class="copy-btn" onclick="
-            navigator.clipboard.writeText('${TON_WALLET}');
-            this.textContent='✓';
-            this.style.background='#27ae60';
-            setTimeout(()=>{this.textContent='${t('copy')}';this.style.background='';},2000)
-          ">${t('copy')}</button>
-        </div>
-        <div class="payment-amount-row">
-          <span>${t('amount')}</span>
-          <strong>${totalTon} TON</strong>
-          <button class="copy-btn" onclick="
-            navigator.clipboard.writeText('${totalTon}');
-            this.textContent='✓';
-            this.style.background='#27ae60';
-            setTimeout(()=>{this.textContent='${t('c
+  page.innerHTML =
+    '<header>' +
+      '<button onclick="showPage(\'page-catalog\')">' + t('back_catalog') + '</button>' +
+      '<h1>' + t('payment_page_title') + '</h1>' +
+    '</header>' +
+    '<div class="detail-content">' +
+      '<div class="payment-success-icon">💎</div>' +
+      '<div class="payment-success-title">' + t('payment_done') + '</div>' +
+      '<div class="payment-success-sub">' + t('payment_sub') + ' ' + amountDisplay + '</div>' +
+      '<div class="payment-buttons">' +
+        '<a href="' + walletLink + '" class="pay-btn pay-btn-wallet">' +
+          '<span class="pay-btn-icon">✈️</span>' +
+          '<span class="pay-btn-text">' +
+            '<strong>' + t('pay_wallet') + '</strong>' +
+            '<small>' + t('pay_wallet_sub') + '</small>' +
+          '</span>' +
+        '</a>' +
+        '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">' +
+          '<span class="pay-btn-icon">💎</span>' +
+          '<span class="pay-btn-text">' +
+            '<strong>' + t('pay_tonkeeper') + '</strong>' +
+            '<small>' + t('pay_tonkeeper_sub') + '</small>' +
+          '</span>' +
+        '</a>' +
+      '</div>' +
+      '<div class="payment-manual">' +
+        '<div class="payment-manual-label">' + t('other_wallet') + '</div>' +
+        '<div class="payment-address-row">' +
+          '<div class="payment-address">' + TON_WALLET + '</div>' +
+          '<button class="copy-btn" onclick="copyToClipboard(\'' + TON_WALLET + '\', this)">' + t('copy') + '</button>' +
+        '</div>' +
+        '<div class="payment-amount-row">' +
+          '<span>' + t('amount') + '</span>' +
+          '<strong>' + totalTon + ' TON</strong>' +
+          '<button class="copy-btn" onclick="copyToClipboard(\'' + totalTon + '\', this)">' + t('copy') + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="payment-after">' +
+        t('after_payment') + ' <a href="https://t.me/OilSoulBot" target="_blank">@OilSoulBot</a> ' + t('after_payment2') +
+      '</div>' +
+    '</div>';
+
+  showPage('page-detail');
+}
+
+// Init
+fetchTonPrice();
+renderCatalog();
