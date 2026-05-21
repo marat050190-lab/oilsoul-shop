@@ -4,7 +4,6 @@ if (tg) tg.expand();
 let cart = [];
 let tonPrice = null;
 
-// Подгружаем курс TON
 async function fetchTonPrice() {
   try {
     const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd,rub');
@@ -72,8 +71,8 @@ function renderCatalog() {
     card.className = 'card';
     const inCart = cart.find(i => i.id === product.id);
     card.innerHTML = `
-      ${product.image 
-        ? `<img src="${product.image}" alt="${product.title}">` 
+      ${product.image
+        ? `<img src="${product.image}" alt="${product.title}">`
         : `<div class="placeholder-img">${product.emoji}</div>`}
       <div class="card-body">
         <div class="card-title">${product.emoji} ${product.title}</div>
@@ -102,11 +101,11 @@ function showDetail(id) {
       <h1>${product.title}</h1>
     </header>
     <div class="detail-content">
-      ${product.image 
-        ? `<img src="${product.image}" alt="${product.title}" class="detail-img">` 
+      ${product.image
+        ? `<img src="${product.image}" alt="${product.title}" class="detail-img">`
         : `<div class="detail-placeholder">${product.emoji}</div>`}
       <div class="detail-price">${formatPrice(product.ton)}</div>
-      ${desc 
+      ${desc
         ? `<div class="detail-desc">${desc.replace(/\n/g, '<br>')}</div>`
         : `<div class="detail-desc">${product.description}</div>`}
       <button class="submit-btn ${inCart ? 'in-cart-btn' : ''}" onclick="toggleCart(${product.id}); renderCatalog(); this.className='submit-btn in-cart-btn'; this.textContent='✓ В корзине';">
@@ -206,16 +205,79 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     });
     const result = await res.json();
     if (result.ok) {
-      alert(`✅ Заказ принят!\n\nПереведите ${totalTon} TON на адрес:\n${TON_WALLET}\n\nПосле оплаты пришлите скриншот боту @OilSoulBot`);
-      cart = [];
-      updateCartBar();
-      showPage('page-catalog');
-      renderCatalog();
+      showPayment(totalTon);
     }
   } catch (e) {
     alert('Ошибка соединения. Попробуйте ещё раз.');
   }
 });
+
+function showPayment(totalTon) {
+  cart = [];
+  updateCartBar();
+
+  const walletLink = `ton://transfer/${TON_WALLET}?amount=${Math.round(totalTon * 1e9)}&text=OilSoul`;
+  const tonkeeperLink = `https://app.tonkeeper.com/transfer/${TON_WALLET}?amount=${Math.round(totalTon * 1e9)}&text=OilSoul`;
+
+  const page = document.getElementById('page-detail');
+  page.innerHTML = `
+    <header>
+      <button onclick="showPage('page-catalog')">← В каталог</button>
+      <h1>Оплата заказа</h1>
+    </header>
+    <div class="detail-content">
+      <div class="payment-success-icon">💎</div>
+      <div class="payment-success-title">Заказ оформлен!</div>
+      <div class="payment-success-sub">Осталось оплатить ${totalTon} TON</div>
+
+      <div class="payment-buttons">
+        <a href="${walletLink}" class="pay-btn pay-btn-wallet">
+          <span class="pay-btn-icon">✈️</span>
+          <span class="pay-btn-text">
+            <strong>Оплатить через @wallet</strong>
+            <small>Telegram кошелёк</small>
+          </span>
+        </a>
+        <a href="${tonkeeperLink}" class="pay-btn pay-btn-tonkeeper">
+          <span class="pay-btn-icon">💎</span>
+          <span class="pay-btn-text">
+            <strong>Оплатить через Tonkeeper</strong>
+            <small>Мобильное приложение</small>
+          </span>
+        </a>
+      </div>
+
+      <div class="payment-manual">
+        <div class="payment-manual-label">Другой кошелёк — скопируйте адрес:</div>
+        <div class="payment-address-row">
+          <div class="payment-address">${TON_WALLET}</div>
+          <button class="copy-btn" onclick="
+            navigator.clipboard.writeText('${TON_WALLET}');
+            this.textContent='✓';
+            this.style.background='#27ae60';
+            setTimeout(()=>{this.textContent='Копировать';this.style.background='';},2000)
+          ">Копировать</button>
+        </div>
+        <div class="payment-amount-row">
+          <span>Сумма:</span>
+          <strong>${totalTon} TON</strong>
+          <button class="copy-btn" onclick="
+            navigator.clipboard.writeText('${totalTon}');
+            this.textContent='✓';
+            this.style.background='#27ae60';
+            setTimeout(()=>{this.textContent='Копировать';this.style.background='';},2000)
+          ">Копировать</button>
+        </div>
+      </div>
+
+      <div class="payment-note-box">
+        <div class="payment-note-icon">ℹ️</div>
+        <div>После перевода напишите нам в <a href="https://t.me/OilSoulBot" style="color:#f0c040">@OilSoulBot</a> — мы подтвердим получение и приступим к упаковке.</div>
+      </div>
+    </div>
+  `;
+  showPage('page-detail');
+}
 
 fetchTonPrice();
 renderCatalog();
