@@ -534,3 +534,38 @@ header p {
   flex-shrink: 0;
   margin-top: 1px;
 }
+/* AUTOCOMPLETE */
+.autocomplete-wrap {
+  position: relative;
+}
+
+.autocomplete-list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #16213e;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 0 0 10px 10px;
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  line-height: 1.4;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background: rgba(255,255,255,0.08);
+}
