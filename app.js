@@ -119,7 +119,7 @@ function setLang(l) {
 
 async function fetchTonPrice() {
   try {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd,rub');
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
     const data = await res.json();
     tonPrice = data['the-open-network'];
     renderCatalog();
@@ -130,10 +130,8 @@ async function fetchTonPrice() {
 
 function formatPrice(ton) {
   if (!tonPrice) return `${ton} TON`;
-  const rub = Math.round(ton * tonPrice.rub);
-  return lang === 'ru'
-    ? `${ton} TON (~${rub.toLocaleString('ru-RU')} ₽)`
-    : `${ton} TON (~${rub.toLocaleString('ru-RU')} ₽)`;
+  const usd = (ton * tonPrice.usd).toFixed(0);
+  return `${ton} TON (~$${Number(usd).toLocaleString('en-US')})`;
 }
 
 const descriptions = {
@@ -286,8 +284,8 @@ function updateCartBar() {
   } else {
     bar.classList.remove('hidden');
     const totalTon = cart.reduce((sum, i) => sum + i.ton, 0);
-    const totalRub = tonPrice ? Math.round(totalTon * tonPrice.rub).toLocaleString('ru-RU') + ' ₽' : '';
-    info.textContent = `${cart.length} — ${totalTon} TON ${totalRub ? '(~' + totalRub + ')' : ''}`;
+    const totalUsd = tonPrice ? '$' + (totalTon * tonPrice.usd).toFixed(0) : '';
+    info.textContent = `${cart.length} — ${totalTon} TON ${totalUsd ? '(~' + totalUsd + ')' : ''}`;
   }
 }
 
@@ -304,7 +302,7 @@ function renderCheckout() {
     `).join('')}
     <div class="order-total">
       <span>${t('order_total')}</span>
-      <span>${totalTon} TON${tonPrice ? ` (~${Math.round(totalTon * tonPrice.rub).toLocaleString('ru-RU')} ₽)` : ''}</span>
+      <span>${totalTon} TON${tonPrice ? ` (~$${(totalTon * tonPrice.usd).toFixed(0)})` : ''}</span>
     </div>
   `;
   document.getElementById('ton-amount').textContent = totalTon;
@@ -383,7 +381,7 @@ function showPayment(totalTon) {
     <div class="detail-content">
       <div class="payment-success-icon">💎</div>
       <div class="payment-success-title">${t('payment_done')}</div>
-      <div class="payment-success-sub">${t('payment_sub')} ${totalTon} TON</div>
+      <div class="payment-success-sub">${t('payment_sub')} ${totalTon} TON${tonPrice ? ` (~$${(totalTon * tonPrice.usd).toFixed(0)})` : ''}</div>
       <div class="payment-buttons">
         <a href="${walletLink}" class="pay-btn pay-btn-wallet">
           <span class="pay-btn-icon">✈️</span>
@@ -418,18 +416,4 @@ function showPayment(totalTon) {
             navigator.clipboard.writeText('${totalTon}');
             this.textContent='✓';
             this.style.background='#27ae60';
-            setTimeout(()=>{this.textContent='${t('copy')}';this.style.background='';},2000)
-          ">${t('copy')}</button>
-        </div>
-      </div>
-      <div class="payment-note-box">
-        <div class="payment-note-icon">ℹ️</div>
-        <div>${t('after_payment')} <a href="https://t.me/OilSoulBot" style="color:#f0c040">@OilSoulBot</a> ${t('after_payment2')}</div>
-      </div>
-    </div>
-  `;
-  showPage('page-detail');
-}
-
-fetchTonPrice();
-renderCatalog();
+            setTimeout(()=>{this.textContent='${t('c
