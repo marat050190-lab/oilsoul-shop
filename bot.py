@@ -57,7 +57,7 @@ def order():
     chat_id = data.get('chat_id')
     user_name = data.get('user_name', 'Неизвестен')
     items = data.get('items', [])
-    total = sum(i['price'] for i in items)
+    total = sum(i.get('ton', 0) for i in items)
 
     if chat_id:
         order_text = '✅ <b>Ваш заказ принят!</b>\n\n'
