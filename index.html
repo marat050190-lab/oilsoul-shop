@@ -11,6 +11,10 @@
 
   <div id="page-catalog">
     <header>
+      <div class="lang-switcher">
+        <button id="lang-ru" class="lang-btn lang-active" onclick="setLang('ru')">RU</button>
+        <button id="lang-en" class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
       <h1>🎨 Oil&Soul</h1>
       <p>Картины маслом в стиле Telegram</p>
     </header>
@@ -35,22 +39,18 @@
       <div class="form-section">
         <h3>📦 Данные для доставки</h3>
         <input type="text" id="field-name" placeholder="Имя и фамилия *" autocomplete="name" required>
-
         <div class="autocomplete-wrap">
           <input type="text" id="field-country" placeholder="Страна *" autocomplete="off" required>
           <div class="autocomplete-list" id="list-country"></div>
         </div>
-
         <div class="autocomplete-wrap">
           <input type="text" id="field-city" placeholder="Город *" autocomplete="off" required>
           <div class="autocomplete-list" id="list-city"></div>
         </div>
-
         <div class="autocomplete-wrap">
           <input type="text" id="field-address" placeholder="Адрес (улица, дом, квартира) *" autocomplete="off" required>
           <div class="autocomplete-list" id="list-address"></div>
         </div>
-
         <input type="text" id="field-postal" placeholder="Почтовый индекс *" autocomplete="postal-code" required>
         <input type="tel" id="field-phone" placeholder="Телефон *" autocomplete="tel" required>
         <input type="email" id="field-email" placeholder="Email *" autocomplete="email" required>
@@ -83,8 +83,6 @@
           limit: 5,
           'accept-language': 'ru,en'
         });
-        if (type === 'country') params.append('featuretype', 'country');
-        if (type === 'city') params.append('featuretype', 'city');
         const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
           headers: { 'Accept-Language': 'ru,en' }
         });
@@ -116,33 +114,29 @@
       document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none');
     }
 
-    // Страна
     document.getElementById('field-country').addEventListener('input', function() {
       clearTimeout(acTimer);
       acTimer = setTimeout(async () => {
         const results = await nominatimSearch(this.value, 'country');
         showList('list-country', results, (item) => {
-          const addr = item.address;
-          document.getElementById('field-country').value = addr.country || item.display_name;
+          document.getElementById('field-country').value = item.address.country || item.display_name;
         });
       }, 400);
     });
 
-    // Город
     document.getElementById('field-city').addEventListener('input', function() {
       clearTimeout(acTimer);
       acTimer = setTimeout(async () => {
         const results = await nominatimSearch(this.value, 'city');
         showList('list-city', results, (item) => {
           const addr = item.address;
-          document.getElementById('field-city').value = addr.city || addr.town || addr.village || addr.municipality || this.value;
+          document.getElementById('field-city').value = addr.city || addr.town || addr.village || this.value;
           if (addr.country) document.getElementById('field-country').value = addr.country;
           if (addr.postcode) document.getElementById('field-postal').value = addr.postcode;
         });
       }, 400);
     });
 
-    // Адрес
     document.getElementById('field-address').addEventListener('input', function() {
       clearTimeout(acTimer);
       const city = document.getElementById('field-city').value;
