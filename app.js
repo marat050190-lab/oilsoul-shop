@@ -178,9 +178,10 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   const address = document.getElementById('field-address').value.trim();
   const postal = document.getElementById('field-postal').value.trim();
   const phone = document.getElementById('field-phone').value.trim();
+  const email = document.getElementById('field-email').value.trim();
   const comment = document.getElementById('field-comment').value.trim();
 
-  if (!name || !country || !city || !address || !postal || !phone) {
+  if (!name || !country || !city || !address || !postal || !phone || !email) {
     alert('Пожалуйста заполните все обязательные поля');
     return;
   }
@@ -194,7 +195,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     user_name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : name,
     items: cart.map(i => ({ id: i.id, title: i.title, ton: i.ton })),
     total_ton: totalTon,
-    delivery: { name, country, city, address, postal, phone, comment }
+    delivery: { name, country, city, address, postal, phone, email, comment }
   };
 
   try {
