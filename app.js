@@ -29,10 +29,6 @@ const i18n = {
     field_phone: 'Телефон *',
     field_email: 'Email *',
     field_comment: 'Комментарий к заказу (необязательно)',
-    payment_title: '💎 Оплата',
-    payment_text: 'Переведите',
-    payment_text2: 'TON на адрес:',
-    payment_note: 'После оплаты нажмите кнопку ниже и пришлите скриншот транзакции боту',
     submit_btn: '✅ Подтвердить заказ',
     fill_fields: 'Пожалуйста заполните все обязательные поля',
     connection_error: 'Ошибка соединения. Попробуйте ещё раз.',
@@ -45,10 +41,19 @@ const i18n = {
     other_wallet: 'Другой кошелёк — скопируйте адрес:',
     amount: 'Сумма:',
     copy: 'Копировать',
-    copied: 'Скопировано',
     payment_page_title: 'Оплата заказа',
     after_payment: 'После перевода напишите нам в',
     after_payment2: '— мы подтвердим получение и приступим к упаковке.',
+    custom_page_title: 'Картина под заказ',
+    custom_heading: '✍️ Напишем для вас',
+    custom_text: 'Любой сюжет, размер, стиль. Пришлите боту фото, ссылку или опишите словами — обсудим детали и стоимость.',
+    custom_timeline: '⏱ Срок: от 21 дня + доставка',
+    custom_btn: 'Написать в @OilSoulBot',
+    custom_how_title: 'Как это работает:',
+    custom_step1: '1. Нажмите кнопку — откроется бот',
+    custom_step2: '2. Пришлите фото, ссылку или описание',
+    custom_step3: '3. Обсудим размер, стиль и цену',
+    custom_step4: '4. После оплаты приступаем к работе',
   },
   en: {
     header_title: '🎨 Oil&Soul',
@@ -73,10 +78,6 @@ const i18n = {
     field_phone: 'Phone *',
     field_email: 'Email *',
     field_comment: 'Order comment (optional)',
-    payment_title: '💎 Payment',
-    payment_text: 'Send',
-    payment_text2: 'TON to address:',
-    payment_note: 'After payment tap the button below and send a screenshot to our bot',
     submit_btn: '✅ Confirm order',
     fill_fields: 'Please fill in all required fields',
     connection_error: 'Connection error. Please try again.',
@@ -89,10 +90,19 @@ const i18n = {
     other_wallet: 'Other wallet — copy the address:',
     amount: 'Amount:',
     copy: 'Copy',
-    copied: 'Copied',
     payment_page_title: 'Payment',
     after_payment: 'After sending, message us at',
     after_payment2: '— we will confirm receipt and start packing.',
+    custom_page_title: 'Custom painting',
+    custom_heading: '✍️ We\'ll paint it for you',
+    custom_text: 'Any subject, size, style. Send the bot a photo, link, or description — we\'ll discuss details and price.',
+    custom_timeline: '⏱ Timeline: 21+ days + shipping',
+    custom_btn: 'Message @OilSoulBot',
+    custom_how_title: 'How it works:',
+    custom_step1: '1. Tap the button — bot opens',
+    custom_step2: '2. Send a photo, link, or description',
+    custom_step3: '3. We discuss size, style and price',
+    custom_step4: '4. After payment we start painting',
   }
 };
 
@@ -138,70 +148,10 @@ function formatPrice(ton) {
 
 const descriptions = {
   ru: {
-    2: `🏆 Golden Trophy #1
-Original Oil Painting
-
-Размер: 30×30 см
-Материал: Масляная живопись на холсте
-Основа: Галерейная натяжка
-Статус: Оригинальная авторская работа
-
-Golden Trophy #1 — художественный объект, вдохновлённый цифровой культурой и символикой победы. Работа объединяет эстетику современных digital-символов с живой фактурой классической масляной живописи.
-
-Картина написана вручную с использованием многослойной техники:
-— глубокий синий градиентный фон
-— скрытый паттерн из еле заметных символов
-— объёмные световые блики
-— фактурная проработка золота
-
-При разном освещении картина раскрывается по-разному: издалека выглядит как минималистичный символ, а вблизи открывает множество деталей и текстур.
-
-Особенности:
-- Полностью ручная работа
-- Масляные краски профессионального уровня
-- Фактурные мазки и живой рельеф
-- Боковые стороны холста прокрашены
-
-В комплекте:
-— Картина
-— Защитная упаковка
-— Сертификат подлинности
-
-Коллекция: Oil & Soul
-Год: 2026`
+    2: '🏆 Golden Trophy #1\nOriginal Oil Painting\n\nРазмер: 30×30 см\nМатериал: Масляная живопись на холсте\nОснова: Галерейная натяжка\nСтатус: Оригинальная авторская работа\n\nGolden Trophy #1 — художественный объект, вдохновлённый цифровой культурой и символикой победы.\n\nКартина написана вручную с использованием многослойной техники:\n— глубокий синий градиентный фон\n— скрытый паттерн из еле заметных символов\n— объёмные световые блики\n— фактурная проработка золота\n\nОсобенности:\n- Полностью ручная работа\n- Масляные краски профессионального уровня\n- Фактурные мазки и живой рельеф\n- Боковые стороны холста прокрашены\n\nВ комплекте:\n— Картина\n— Защитная упаковка\n— Сертификат подлинности\n\nКоллекция: Oil & Soul\nГод: 2026'
   },
   en: {
-    2: `🏆 Golden Trophy #1
-Original Oil Painting
-
-Size: 30×30 cm
-Medium: Oil on canvas
-Support: Gallery-wrapped canvas
-Status: Original artwork
-
-Golden Trophy #1 is an art object inspired by digital culture and the symbolism of victory. The work unites the aesthetics of modern digital symbols with the living texture of classical oil painting.
-
-Hand-painted using a multi-layer technique:
-— deep blue gradient background
-— hidden pattern of subtle symbols
-— volumetric light reflections
-— textured gold rendering
-
-Under different lighting the painting reveals itself differently: from a distance it looks like a minimalist symbol, up close it opens up a world of detail and texture.
-
-Features:
-- Entirely hand-painted
-- Professional-grade oil paints
-- Textured brushwork and live relief
-- Painted sides
-
-Included:
-— Painting
-— Protective packaging
-— Certificate of authenticity
-
-Collection: Oil & Soul
-Year: 2026`
+    2: '🏆 Golden Trophy #1\nOriginal Oil Painting\n\nSize: 30×30 cm\nMedium: Oil on canvas\nSupport: Gallery-wrapped canvas\nStatus: Original artwork\n\nHand-painted using a multi-layer technique:\n— deep blue gradient background\n— hidden pattern of subtle symbols\n— volumetric light reflections\n— textured gold rendering\n\nFeatures:\n- Entirely hand-painted\n- Professional-grade oil paints\n- Textured brushwork and live relief\n- Painted sides\n\nIncluded:\n— Painting\n— Protective packaging\n— Certificate of authenticity\n\nCollection: Oil & Soul\nYear: 2026'
   }
 };
 
@@ -316,6 +266,30 @@ function renderCheckout() {
   document.getElementById('back-btn').textContent = t('back');
   document.querySelector('.form-section h3').textContent = t('delivery_title');
   document.getElementById('submit-btn').textContent = t('submit_btn');
+}
+
+function showCustomPage() {
+  const page = document.getElementById('page-detail');
+  page.innerHTML =
+    '<header>' +
+      '<button onclick="showPage(\'page-catalog\')">' + t('back') + '</button>' +
+      '<h1>' + t('custom_page_title') + '</h1>' +
+    '</header>' +
+    '<div class="detail-content">' +
+      '<div class="custom-hero">🎨</div>' +
+      '<div class="custom-heading">' + t('custom_heading') + '</div>' +
+      '<div class="custom-text">' + t('custom_text') + '</div>' +
+      '<div class="custom-timeline">' + t('custom_timeline') + '</div>' +
+      '<a href="https://t.me/OilSoulBot?start=custom" class="submit-btn custom-submit-btn" target="_blank">' + t('custom_btn') + '</a>' +
+      '<div class="custom-steps">' +
+        '<div class="custom-steps-title">' + t('custom_how_title') + '</div>' +
+        '<div class="custom-step">' + t('custom_step1') + '</div>' +
+        '<div class="custom-step">' + t('custom_step2') + '</div>' +
+        '<div class="custom-step">' + t('custom_step3') + '</div>' +
+        '<div class="custom-step">' + t('custom_step4') + '</div>' +
+      '</div>' +
+    '</div>';
+  showPage('page-detail');
 }
 
 document.getElementById('checkout-btn').addEventListener('click', function() {
@@ -436,6 +410,5 @@ function showPayment(totalTon) {
   showPage('page-detail');
 }
 
-// Init
 fetchTonPrice();
 renderCatalog();
