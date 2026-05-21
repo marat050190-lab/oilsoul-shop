@@ -21,9 +21,12 @@
     <main>
       <div id="catalog" class="catalog"></div>
     </main>
-    <div id="cart-bar" class="cart-bar hidden">
-      <span id="cart-info">0 товаров</span>
-      <button id="checkout-btn">Оформить заказ →</button>
+    <div class="bottom-bar">
+      <button id="custom-btn" class="custom-bar-btn" onclick="showCustomPage()">✍️ Под заказ</button>
+      <div id="cart-bar" class="cart-bar hidden">
+        <span id="cart-info">0 товаров</span>
+        <button id="checkout-btn">Оформить заказ →</button>
+      </div>
     </div>
   </div>
 
@@ -73,34 +76,24 @@
   <script>
     let acTimer = null;
 
-    async function nominatimSearch(query, type) {
+    async function nominatimSearch(query) {
       if (query.length < 2) return [];
       try {
-        const params = new URLSearchParams({
-          q: query,
-          format: 'json',
-          addressdetails: 1,
-          limit: 5,
-          'accept-language': 'ru,en'
-        });
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
-          headers: { 'Accept-Language': 'ru,en' }
-        });
+        const params = new URLSearchParams({ q: query, format: 'json', addressdetails: 1, limit: 5, 'accept-language': 'ru,en' });
+        const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, { headers: { 'Accept-Language': 'ru,en' } });
         return await res.json();
-      } catch (e) {
-        return [];
-      }
+      } catch (e) { return []; }
     }
 
     function showList(listId, items, onSelect) {
       const list = document.getElementById(listId);
       list.innerHTML = '';
       if (!items.length) { list.style.display = 'none'; return; }
-      items.forEach(item => {
+      items.forEach(function(item) {
         const div = document.createElement('div');
         div.className = 'autocomplete-item';
         div.textContent = item.display_name;
-        div.addEventListener('mousedown', (e) => {
+        div.addEventListener('mousedown', function(e) {
           e.preventDefault();
           onSelect(item);
           list.style.display = 'none';
@@ -111,14 +104,15 @@
     }
 
     function hideAllLists() {
-      document.querySelectorAll('.autocomplete-list').forEach(l => l.style.display = 'none');
+      document.querySelectorAll('.autocomplete-list').forEach(function(l) { l.style.display = 'none'; });
     }
 
     document.getElementById('field-country').addEventListener('input', function() {
       clearTimeout(acTimer);
-      acTimer = setTimeout(async () => {
-        const results = await nominatimSearch(this.value, 'country');
-        showList('list-country', results, (item) => {
+      var val = this.value;
+      acTimer = setTimeout(async function() {
+        var results = await nominatimSearch(val);
+        showList('list-country', results, function(item) {
           document.getElementById('field-country').value = item.address.country || item.display_name;
         });
       }, 400);
@@ -126,11 +120,12 @@
 
     document.getElementById('field-city').addEventListener('input', function() {
       clearTimeout(acTimer);
-      acTimer = setTimeout(async () => {
-        const results = await nominatimSearch(this.value, 'city');
-        showList('list-city', results, (item) => {
-          const addr = item.address;
-          document.getElementById('field-city').value = addr.city || addr.town || addr.village || this.value;
+      var val = this.value;
+      acTimer = setTimeout(async function() {
+        var results = await nominatimSearch(val);
+        showList('list-city', results, function(item) {
+          var addr = item.address;
+          document.getElementById('field-city').value = addr.city || addr.town || addr.village || val;
           if (addr.country) document.getElementById('field-country').value = addr.country;
           if (addr.postcode) document.getElementById('field-postal').value = addr.postcode;
         });
@@ -139,15 +134,16 @@
 
     document.getElementById('field-address').addEventListener('input', function() {
       clearTimeout(acTimer);
-      const city = document.getElementById('field-city').value;
-      const query = city ? `${this.value}, ${city}` : this.value;
-      acTimer = setTimeout(async () => {
-        const results = await nominatimSearch(query, 'address');
-        showList('list-address', results, (item) => {
-          const addr = item.address;
-          const road = addr.road || '';
-          const house = addr.house_number || '';
-          document.getElementById('field-address').value = house ? `${road}, ${house}` : road || item.display_name;
+      var val = this.value;
+      var city = document.getElementById('field-city').value;
+      var query = city ? val + ', ' + city : val;
+      acTimer = setTimeout(async function() {
+        var results = await nominatimSearch(query);
+        showList('list-address', results, function(item) {
+          var addr = item.address;
+          var road = addr.road || '';
+          var house = addr.house_number || '';
+          document.getElementById('field-address').value = house ? road + ', ' + house : road || item.display_name;
           if (addr.city || addr.town) document.getElementById('field-city').value = addr.city || addr.town;
           if (addr.country) document.getElementById('field-country').value = addr.country;
           if (addr.postcode) document.getElementById('field-postal').value = addr.postcode;
