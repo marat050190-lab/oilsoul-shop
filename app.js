@@ -284,6 +284,16 @@ function showCustomPage() {
     '<div class="detail-content">' +
       '<img src="Durov\'s%20cap.png" alt="Пример работы" class="detail-img">' +
       '<div class="custom-example-label">Пример работы — Кепка Дурова</div>' +
+      '<div class="custom-heading">' + t('custom_heading') + '</div>' +
+      '<div class="custom-text">' + t('custom_text') + '</div>' +
+      '<div class="custom-timeline">' + t('custom_timeline') + '</div>' +
+      '<div class="custom-steps">' +
+        '<div class="custom-steps-title">' + t('custom_how_title') + '</div>' +
+        '<div class="custom-step">' + t('custom_step1') + '</div>' +
+        '<div class="custom-step">' + t('custom_step2') + '</div>' +
+        '<div class="custom-step">' + t('custom_step3') + '</div>' +
+        '<div class="custom-step">' + t('custom_step4') + '</div>' +
+      '</div>' +
       '<div class="custom-form">' +
         '<div class="custom-section">' +
           '<div class="custom-section-title">' + t('custom_gift_label') + '</div>' +
@@ -293,9 +303,15 @@ function showCustomPage() {
         '<div class="custom-section">' +
           '<div class="custom-section-title">' + t('custom_delivery_label') + '</div>' +
           '<input type="text" id="custom-name" class="custom-input" placeholder="' + t('field_name') + '">' +
-          '<input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '">' +
-          '<input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '">' +
-          '<input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '">' +
+          '<div class="autocomplete-wrap">' +
+            '<input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '">' +
+          '</div>' +
+          '<div class="autocomplete-wrap">' +
+            '<input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '">' +
+          '</div>' +
+          '<div class="autocomplete-wrap">' +
+            '<input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '">' +
+          '</div>' +
           '<input type="text" id="custom-postal" class="custom-input" placeholder="' + t('field_postal') + '">' +
           '<input type="tel" id="custom-phone" class="custom-input" placeholder="' + t('field_phone') + '">' +
           '<input type="email" id="custom-email" class="custom-input" placeholder="' + t('field_email') + '">' +
@@ -312,6 +328,7 @@ function showCustomPage() {
       '</div>' +
     '</div>';
   showPage('page-detail');
+  setTimeout(initCustomAutocomplete, 100);
 }
 
 async function submitCustomOrder() {
