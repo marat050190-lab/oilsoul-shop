@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Oil&Soul</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="style.css">
@@ -22,9 +22,9 @@
       <div id="catalog" class="catalog"></div>
     </main>
     <div class="bottom-bar">
-      <button id="custom-btn" class="custom-bar-btn" onclick="showCustomPage()">✍️ Под заказ</button>
+      <button class="custom-bar-btn" onclick="showCustomPage()">✍️ Под заказ</button>
       <div id="cart-bar" class="cart-bar hidden">
-        <span id="cart-info">0 товаров</span>
+        <span id="cart-info"></span>
         <button id="checkout-btn">Оформить заказ →</button>
       </div>
     </div>
@@ -64,7 +64,7 @@
         <div class="payment-info">
           <p>Переведите <strong id="ton-amount"></strong> TON на адрес:</p>
           <div class="ton-address" id="ton-address-display"></div>
-          <p class="payment-note">После оплаты нажмите кнопку ниже и пришлите скриншот транзакции боту</p>
+          <p class="payment-note">После оплаты пришлите скриншот транзакции боту</p>
         </div>
       </div>
       <button id="submit-btn" class="submit-btn">✅ Подтвердить заказ</button>
@@ -79,10 +79,20 @@
     async function nominatimSearch(query) {
       if (query.length < 2) return [];
       try {
-        const params = new URLSearchParams({ q: query, format: 'json', addressdetails: 1, limit: 5, 'accept-language': 'ru,en' });
-        const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, { headers: { 'Accept-Language': 'ru,en' } });
+        const params = new URLSearchParams({
+          q: query,
+          format: 'json',
+          addressdetails: 1,
+          limit: 5,
+          'accept-language': 'ru,en'
+        });
+        const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, {
+          headers: { 'Accept-Language': 'ru,en' }
+        });
         return await res.json();
-      } catch (e) { return []; }
+      } catch (e) {
+        return [];
+      }
     }
 
     function showList(listId, items, onSelect) {
@@ -104,7 +114,9 @@
     }
 
     function hideAllLists() {
-      document.querySelectorAll('.autocomplete-list').forEach(function(l) { l.style.display = 'none'; });
+      document.querySelectorAll('.autocomplete-list').forEach(function(l) {
+        l.style.display = 'none';
+      });
     }
 
     document.getElementById('field-country').addEventListener('input', function() {
