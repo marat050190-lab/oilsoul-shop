@@ -44,15 +44,15 @@ const i18n = {
     payment_page_title: 'Оплата заказа',
     after_payment: 'После перевода напишите нам в',
     after_payment2: '— мы подтвердим получение и приступим к упаковке.',
-    custom_page_title: 'Картина под заказ',
-    custom_heading: '✍️ Напишем для вас',
-    custom_text: 'Любой сюжет, размер, стиль. Пришлите боту фото, ссылку или опишите словами — обсудим детали и стоимость.',
+    custom_page_title: 'Картина с вашего подарка',
+    custom_heading: '🎁 Ваш подарок — на холсте',
+    custom_text: 'Есть редкий или любимый подарок Telegram? Plush Pepe, Homemade Cake, Cyberpunk Skull — напишем его маслом на холсте. Уникальный физический аналог вашего цифрового подарка.',
     custom_timeline: '⏱ Срок: от 21 дня + доставка',
     custom_btn: 'Написать в @OilSoulBot',
     custom_how_title: 'Как это работает:',
     custom_step1: '1. Нажмите кнопку — откроется бот',
-    custom_step2: '2. Пришлите фото, ссылку или описание',
-    custom_step3: '3. Обсудим размер, стиль и цену',
+    custom_step2: '2. Пришлите скриншот или название подарка',
+    custom_step3: '3. Обсудим размер и стоимость',
     custom_step4: '4. После оплаты приступаем к работе',
   },
   en: {
@@ -93,15 +93,15 @@ const i18n = {
     payment_page_title: 'Payment',
     after_payment: 'After sending, message us at',
     after_payment2: '— we will confirm receipt and start packing.',
-    custom_page_title: 'Custom painting',
-    custom_heading: '✍️ We\'ll paint it for you',
-    custom_text: 'Any subject, size, style. Send the bot a photo, link, or description — we\'ll discuss details and price.',
+    custom_page_title: 'Paint your gift',
+    custom_heading: '🎁 Your gift — on canvas',
+    custom_text: 'Have a rare or favourite Telegram gift? Plush Pepe, Homemade Cake, Cyberpunk Skull — we\'ll paint it in oil on canvas. A unique physical version of your digital collectible.',
     custom_timeline: '⏱ Timeline: 21+ days + shipping',
     custom_btn: 'Message @OilSoulBot',
     custom_how_title: 'How it works:',
     custom_step1: '1. Tap the button — bot opens',
-    custom_step2: '2. Send a photo, link, or description',
-    custom_step3: '3. We discuss size, style and price',
+    custom_step2: '2. Send a screenshot or name of your gift',
+    custom_step3: '3. We discuss size and price',
     custom_step4: '4. After payment we start painting',
   }
 };
@@ -276,7 +276,7 @@ function showCustomPage() {
       '<h1>' + t('custom_page_title') + '</h1>' +
     '</header>' +
     '<div class="detail-content">' +
-      '<div class="custom-hero">🎨</div>' +
+      '<div class="custom-hero">🎁</div>' +
       '<div class="custom-heading">' + t('custom_heading') + '</div>' +
       '<div class="custom-text">' + t('custom_text') + '</div>' +
       '<div class="custom-timeline">' + t('custom_timeline') + '</div>' +
