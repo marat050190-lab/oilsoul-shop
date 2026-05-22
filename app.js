@@ -130,10 +130,10 @@ function setLang(l) {
 }
 
 function openCustomBot() {
-  if (tg && tg.openTelegramLink) {
+  if (tg) {
     tg.openTelegramLink('https://t.me/OilSoulBot?start=custom');
   } else {
-    window.location.href = 'tg://resolve?domain=OilSoulBot&start=custom';
+    window.location.href = 'https://t.me/OilSoulBot?start=custom';
   }
 }
 
