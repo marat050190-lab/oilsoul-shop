@@ -284,7 +284,8 @@ function showCustomPage() {
       '<h1>' + t('custom_page_title') + '</h1>' +
     '</header>' +
     '<div class="detail-content">' +
-      '<div class="custom-hero">🎁</div>' +
+      '<img src="Durov_s_cap.png" alt="Пример работы" class="detail-img">' +
+      '<div class="custom-example-label">Пример работы — Кепка Дурова</div>' +
       '<div class="custom-heading">' + t('custom_heading') + '</div>' +
       '<div class="custom-text">' + t('custom_text') + '</div>' +
       '<div class="custom-timeline">' + t('custom_timeline') + '</div>' +
