@@ -128,8 +128,14 @@ function setLang(l) {
   document.getElementById('submit-btn').textContent = t('submit_btn');
   renderCatalog();
 }
-
-async function fetchTonPrice() {
+function openCustomBot() {
+  if (tg && tg.openTelegramLink) {
+    tg.openTelegramLink('https://t.me/OilSoulBot?start=custom');
+  } else {
+    window.open('https://t.me/OilSoulBot?start=custom', '_blank');
+  }
+}
+async function fetchTonPrice()
   try {
     const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
     const data = await res.json();
@@ -280,7 +286,7 @@ function showCustomPage() {
       '<div class="custom-heading">' + t('custom_heading') + '</div>' +
       '<div class="custom-text">' + t('custom_text') + '</div>' +
       '<div class="custom-timeline">' + t('custom_timeline') + '</div>' +
-      '<a href="https://t.me/OilSoulBot?start=custom" class="submit-btn custom-submit-btn" target="_blank">' + t('custom_btn') + '</a>' +
+     '<button class="submit-btn custom-submit-btn" onclick="openCustomBot()">' + t('custom_btn') + '</button>' +
       '<div class="custom-steps">' +
         '<div class="custom-steps-title">' + t('custom_how_title') + '</div>' +
         '<div class="custom-step">' + t('custom_step1') + '</div>' +
