@@ -107,18 +107,18 @@ def webhook():
         step = state.get('step')
 
         # /start или /start custom
-        if text == '/start' or text == '/start custom':
-            if 'custom' in text:
-                user_states[chat_id] = {'user_name': user_name, 'delivery': {}}
-                start_custom_flow(chat_id)
-            else:
-                user_states.pop(chat_id, None)
-                send_message(chat_id,
-                    '🎨 <b>Добро пожаловать в Oil&Soul!</b>\n\n'
-                    'Уникальные картины маслом в стиле Telegram-подарков.\n\n'
-                    'Нажмите кнопку <b>🎨 Магазин</b> внизу чтобы открыть каталог.'
-                )
-            return 'ok'
+    if text.startswith('/start'):
+    if 'custom' in text:
+        user_states[chat_id] = {'user_name': user_name, 'delivery': {}}
+        start_custom_flow(chat_id)
+    else:
+        user_states.pop(chat_id, None)
+        send_message(chat_id,
+            '🎨 <b>Добро пожаловать в Oil&Soul!</b>\n\n'
+            'Уникальные картины маслом в стиле Telegram-подарков.\n\n'
+            'Нажмите кнопку <b>🎨 Магазин</b> внизу чтобы открыть каталог.'
+        )
+    return 'ok'
 
         # Флоу кастомного заказа
         if step == 'wait_link':
