@@ -45,15 +45,18 @@ const i18n = {
     after_payment: 'После перевода напишите нам в',
     after_payment2: '— мы подтвердим получение и приступим к упаковке.',
     custom_page_title: 'Картина с вашего подарка',
-    custom_heading: '🎁 Ваш подарок — на холсте',
-    custom_text: 'Есть редкий или любимый подарок Telegram? Plush Pepe, Homemade Cake, Cyberpunk Skull — напишем его маслом на холсте. Уникальный физический аналог вашего цифрового подарка.',
-    custom_timeline: '⏱ Срок написания картины: 21 день + доставка',
-    custom_btn: 'Написать в @OilSoulBot',
-    custom_how_title: 'Как это работает:',
-    custom_step1: '1. Нажмите кнопку — откроется бот',
-    custom_step2: '2. Пришлите ссылку на ваш подарок Telegram',
-    custom_step3: '3. Бот подтвердит условия: 30×30 см, 149 TON, 21 день',
-    custom_step4: '4. После оплаты приступаем к работе',
+    custom_gift_label: '🔗 Ссылка на ваш подарок',
+    custom_gift_placeholder: 'https://t.me/nft/...',
+    custom_gift_hint: 'Как получить: профиль → Мои подарки → нажмите на подарок → Поделиться → скопируйте ссылку',
+    custom_delivery_label: '📦 Данные для доставки',
+    custom_conditions_label: '💎 Условия заказа',
+    custom_size: 'Размер',
+    custom_price: 'Стоимость',
+    custom_deadline: 'Срок',
+    custom_nft: 'Уникальный NFT-номер на картине',
+    custom_submit: '✅ Отправить заказ',
+    custom_fill_fields: 'Пожалуйста заполните все поля, включая ссылку на подарок',
+    custom_success: 'Заказ отправлен! Бот пришлёт реквизиты для оплаты.',
   },
   en: {
     header_title: '🎨 Oil&Soul',
@@ -94,15 +97,18 @@ const i18n = {
     after_payment: 'After sending, message us at',
     after_payment2: '— we will confirm receipt and start packing.',
     custom_page_title: 'Paint your gift',
-    custom_heading: '🎁 Your gift — on canvas',
-    custom_text: 'Have a rare or favourite Telegram gift? Plush Pepe, Homemade Cake, Cyberpunk Skull — we\'ll paint it in oil on canvas. A unique physical version of your digital collectible.',
-    custom_timeline: '⏱ Painting time: 21 days + shipping',
-    custom_btn: 'Message @OilSoulBot',
-    custom_how_title: 'How it works:',
-    custom_step1: '1. Tap the button — bot opens',
-    custom_step2: '2. Send a link to your Telegram gift',
-    custom_step3: '3. Bot confirms: 30×30 cm, 149 TON, 21 days',
-    custom_step4: '4. After payment we start painting',
+    custom_gift_label: '🔗 Link to your gift',
+    custom_gift_placeholder: 'https://t.me/nft/...',
+    custom_gift_hint: 'How to get it: profile → My Gifts → tap the gift → Share → copy the link',
+    custom_delivery_label: '📦 Delivery details',
+    custom_conditions_label: '💎 Order terms',
+    custom_size: 'Size',
+    custom_price: 'Price',
+    custom_deadline: 'Timeline',
+    custom_nft: 'Unique NFT number on the painting',
+    custom_submit: '✅ Send order',
+    custom_fill_fields: 'Please fill in all fields including the gift link',
+    custom_success: 'Order sent! The bot will send payment details.',
   }
 };
 
@@ -127,14 +133,6 @@ function setLang(l) {
   document.getElementById('field-comment').placeholder = t('field_comment');
   document.getElementById('submit-btn').textContent = t('submit_btn');
   renderCatalog();
-}
-
-function openCustomBot() {
-  if (tg) {
-    tg.close();
-  } else {
-    window.location.href = 'https://t.me/OilSoulBot';
-  }
 }
 
 async function fetchTonPrice() {
@@ -286,19 +284,86 @@ function showCustomPage() {
     '<div class="detail-content">' +
       '<img src="Durov\'s%20cap.png" alt="Пример работы" class="detail-img">' +
       '<div class="custom-example-label">Пример работы — Кепка Дурова</div>' +
-      '<div class="custom-heading">' + t('custom_heading') + '</div>' +
-      '<div class="custom-text">' + t('custom_text') + '</div>' +
-      '<div class="custom-timeline">' + t('custom_timeline') + '</div>' +
-      '<button class="submit-btn custom-submit-btn" onclick="openCustomBot()">' + t('custom_btn') + '</button>' +
-      '<div class="custom-steps">' +
-        '<div class="custom-steps-title">' + t('custom_how_title') + '</div>' +
-        '<div class="custom-step">' + t('custom_step1') + '</div>' +
-        '<div class="custom-step">' + t('custom_step2') + '</div>' +
-        '<div class="custom-step">' + t('custom_step3') + '</div>' +
-        '<div class="custom-step">' + t('custom_step4') + '</div>' +
+      '<div class="custom-form">' +
+        '<div class="custom-section">' +
+          '<div class="custom-section-title">' + t('custom_gift_label') + '</div>' +
+          '<input type="url" id="custom-gift-link" class="custom-input" placeholder="' + t('custom_gift_placeholder') + '">' +
+          '<div class="custom-hint">' + t('custom_gift_hint') + '</div>' +
+        '</div>' +
+        '<div class="custom-section">' +
+          '<div class="custom-section-title">' + t('custom_delivery_label') + '</div>' +
+          '<input type="text" id="custom-name" class="custom-input" placeholder="' + t('field_name') + '">' +
+          '<input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '">' +
+          '<input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '">' +
+          '<input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '">' +
+          '<input type="text" id="custom-postal" class="custom-input" placeholder="' + t('field_postal') + '">' +
+          '<input type="tel" id="custom-phone" class="custom-input" placeholder="' + t('field_phone') + '">' +
+          '<input type="email" id="custom-email" class="custom-input" placeholder="' + t('field_email') + '">' +
+          '<textarea id="custom-comment" class="custom-input custom-textarea" placeholder="' + t('field_comment') + '"></textarea>' +
+        '</div>' +
+        '<div class="custom-section custom-conditions">' +
+          '<div class="custom-section-title">' + t('custom_conditions_label') + '</div>' +
+          '<div class="custom-condition-row"><span>' + t('custom_size') + '</span><span>30×30 см</span></div>' +
+          '<div class="custom-condition-row"><span>' + t('custom_price') + '</span><span class="custom-condition-value">149 TON' + (tonPrice ? ' (~$' + (149 * tonPrice.usd).toFixed(0) + ')' : '') + '</span></div>' +
+          '<div class="custom-condition-row"><span>' + t('custom_deadline') + '</span><span>21 день + доставка</span></div>' +
+          '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
+        '</div>' +
+        '<button class="submit-btn" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
       '</div>' +
     '</div>';
   showPage('page-detail');
+}
+
+async function submitCustomOrder() {
+  const giftLink = document.getElementById('custom-gift-link').value.trim();
+  const name = document.getElementById('custom-name').value.trim();
+  const country = document.getElementById('custom-country').value.trim();
+  const city = document.getElementById('custom-city').value.trim();
+  const address = document.getElementById('custom-address').value.trim();
+  const postal = document.getElementById('custom-postal').value.trim();
+  const phone = document.getElementById('custom-phone').value.trim();
+  const email = document.getElementById('custom-email').value.trim();
+  const comment = document.getElementById('custom-comment').value.trim();
+
+  if (!giftLink || !name || !country || !city || !address || !postal || !phone || !email) {
+    alert(t('custom_fill_fields'));
+    return;
+  }
+
+  const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+
+  const orderData = {
+    action: 'custom_order',
+    chat_id: user ? user.id : null,
+    user_name: user ? ((user.first_name || '') + ' ' + (user.last_name || '')).trim() : name,
+    gift_link: giftLink,
+    delivery: { name: name, country: country, city: city, address: address, postal: postal, phone: phone, email: email, comment: comment }
+  };
+
+  try {
+    const res = await fetch('https://oilsoul-bot.onrender.com/custom_order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    });
+    const result = await res.json();
+    if (result.ok) {
+      const page = document.getElementById('page-detail');
+      page.innerHTML =
+        '<header>' +
+          '<button onclick="showPage(\'page-catalog\')">' + t('back_catalog') + '</button>' +
+          '<h1>' + t('custom_page_title') + '</h1>' +
+        '</header>' +
+        '<div class="detail-content">' +
+          '<div class="payment-success-icon">🎨</div>' +
+          '<div class="payment-success-title">' + t('custom_success') + '</div>' +
+          '<div class="payment-success-sub">Проверьте чат с @OilSoulBot — там будут реквизиты для оплаты.</div>' +
+        '</div>';
+      showPage('page-detail');
+    }
+  } catch (e) {
+    alert(t('connection_error'));
+  }
 }
 
 document.getElementById('checkout-btn').addEventListener('click', function() {
