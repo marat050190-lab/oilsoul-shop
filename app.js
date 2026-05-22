@@ -131,9 +131,9 @@ function setLang(l) {
 
 function openCustomBot() {
   if (tg) {
-    tg.openTelegramLink('https://t.me/OilSoulBot?start=custom');
+    tg.close();
   } else {
-    window.location.href = 'https://t.me/OilSoulBot?start=custom';
+    window.location.href = 'https://t.me/OilSoulBot';
   }
 }
 
