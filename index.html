@@ -97,6 +97,7 @@
 
     function showList(listId, items, onSelect) {
       const list = document.getElementById(listId);
+      if (!list) return;
       list.innerHTML = '';
       if (!items.length) { list.style.display = 'none'; return; }
       items.forEach(function(item) {
@@ -113,12 +114,36 @@
       list.style.display = 'block';
     }
 
+    function showDynamicList(inputEl, items, onSelect) {
+      var existing = inputEl.parentNode.querySelector('.autocomplete-list');
+      if (!existing) {
+        existing = document.createElement('div');
+        existing.className = 'autocomplete-list';
+        inputEl.parentNode.appendChild(existing);
+      }
+      existing.innerHTML = '';
+      if (!items.length) { existing.style.display = 'none'; return; }
+      items.forEach(function(item) {
+        var div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        div.textContent = item.display_name;
+        div.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          onSelect(item);
+          existing.style.display = 'none';
+        });
+        existing.appendChild(div);
+      });
+      existing.style.display = 'block';
+    }
+
     function hideAllLists() {
       document.querySelectorAll('.autocomplete-list').forEach(function(l) {
         l.style.display = 'none';
       });
     }
 
+    // Автокомплит для обычной формы заказа
     document.getElementById('field-country').addEventListener('input', function() {
       clearTimeout(acTimer);
       var val = this.value;
@@ -161,6 +186,74 @@
           if (addr.postcode) document.getElementById('field-postal').value = addr.postcode;
         });
       }, 500);
+    });
+
+    // Автокомплит для кастомной формы — вешается после рендера страницы
+    function initCustomAutocomplete() {
+      var countryEl = document.getElementById('custom-country');
+      var cityEl = document.getElementById('custom-city');
+      var addressEl = document.getElementById('custom-address');
+      var postalEl = document.getElementById('custom-postal');
+      if (!countryEl) return;
+
+      countryEl.addEventListener('input', function() {
+        clearTimeout(acTimer);
+        var val = this.value;
+        var el = this;
+        acTimer = setTimeout(async function() {
+          var results = await nominatimSearch(val);
+          showDynamicList(el, results, function(item) {
+            countryEl.value = item.address.country || item.display_name;
+          });
+        }, 400);
+      });
+
+      cityEl.addEventListener('input', function() {
+        clearTimeout(acTimer);
+        var val = this.value;
+        var el = this;
+        acTimer = setTimeout(async function() {
+          var results = await nominatimSearch(val);
+          showDynamicList(el, results, function(item) {
+            var addr = item.address;
+            cityEl.value = addr.city || addr.town || addr.village || val;
+            if (addr.country) countryEl.value = addr.country;
+            if (addr.postcode && postalEl) postalEl.value = addr.postcode;
+          });
+        }, 400);
+      });
+
+      addressEl.addEventListener('input', function() {
+        clearTimeout(acTimer);
+        var val = this.value;
+        var el = this;
+        var city = cityEl ? cityEl.value : '';
+        var query = city ? val + ', ' + city : val;
+        acTimer = setTimeout(async function() {
+          var results = await nominatimSearch(query);
+          showDynamicList(el, results, function(item) {
+            var addr = item.address;
+            var road = addr.road || '';
+            var house = addr.house_number || '';
+            addressEl.value = house ? road + ', ' + house : road || item.display_name;
+            if (addr.city || addr.town) cityEl.value = addr.city || addr.town;
+            if (addr.country) countryEl.value = addr.country;
+            if (addr.postcode && postalEl) postalEl.value = addr.postcode;
+          });
+        }, 500);
+      });
+    }
+
+    // Вызываем initCustomAutocomplete после рендера кастомной страницы
+    var origShowCustomPage = window.showCustomPage;
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof showCustomPage === 'function') {
+        var orig = showCustomPage;
+        window.showCustomPage = function() {
+          orig();
+          setTimeout(initCustomAutocomplete, 100);
+        };
+      }
     });
 
     document.addEventListener('click', hideAllLists);
