@@ -1,74 +1,74 @@
 const products = [
   {
     id: 1,
-    title: "Ракета",
-    description: "Картина маслом по мотивам официального подарка Telegram",
+    title: "Rocket",
+    description: "Oil painting inspired by the official Telegram gift",
     ton: 149, emoji: "🚀", image: null
   },
   {
     id: 2,
-    title: "Кубок",
-    description: "Золотой кубок — символ победы в стиле TG gifts",
+    title: "Golden Trophy",
+    description: "Golden trophy — symbol of victory in TG gifts style",
     ton: 149, emoji: "🏆", image: 'IMAGE 2026-05-19 14:47:33.jpg'
   },
   {
     id: 3,
-    title: "Сигара Дурова",
-    description: "Уникальная работа в стиле редкого подарка Telegram",
+    title: "Durov's Cigar",
+    description: "Unique work in the style of a rare Telegram gift",
     ton: 149, emoji: "🌟", image: null
   },
   {
     id: 4,
-    title: "Кепка Дурова",
-    description: "Легендарная кепка — ручная работа маслом",
+    title: "Durov's Cap",
+    description: "Legendary cap — hand-painted in oil",
     ton: 370, emoji: "🧢", image: null
   },
   {
     id: 5,
-    title: "Торт",
-    description: "Домашний торт — один из первых подарков Telegram",
+    title: "Homemade Cake",
+    description: "Homemade cake — one of the first Telegram gifts",
     ton: 149, emoji: "🎂", image: null
   },
   {
     id: 6,
-    title: "Плюшевый мишка",
-    description: "Мягкий медведь в стиле Telegram gifts",
+    title: "Plush Bear",
+    description: "Soft bear in Telegram gifts style",
     ton: 149, emoji: "🐻", image: null
   },
   {
     id: 7,
-    title: "Красное сердце",
-    description: "Символ любви — картина маслом",
+    title: "Red Heart",
+    description: "Symbol of love — oil painting",
     ton: 149, emoji: "❤️", image: null
   },
   {
     id: 8,
-    title: "Звезда",
-    description: "Золотая звезда — символ Telegram Stars",
+    title: "Star",
+    description: "Golden star — symbol of Telegram Stars",
     ton: 149, emoji: "⭐", image: null
   },
   {
     id: 9,
-    title: "Шампанское",
-    description: "Праздничное шампанское в стиле TG gifts",
+    title: "Champagne",
+    description: "Festive champagne in TG gifts style",
     ton: 149, emoji: "🍾", image: null
   },
   {
     id: 10,
-    title: "Кролик",
-    description: "Jelly Bunny — один из самых популярных подарков",
+    title: "Jelly Bunny",
+    description: "Jelly Bunny — one of the most popular gifts",
     ton: 149, emoji: "🐰", image: null
   },
   {
     id: 11,
-    title: "Лиса",
-    description: "Хитрая лиса в стиле Telegram collectibles",
+    title: "Cute Fox",
+    description: "Cunning fox in Telegram collectibles style",
     ton: 149, emoji: "🦊", image: null
   },
   {
     id: 12,
-    title: "Санта",
-    description: "Santa Hat — лимитированный новогодний подарок",
+    title: "Santa Hat",
+    description: "Santa Hat — limited holiday gift",
     ton: 149, emoji: "🎅", image: null
   }
 ];
