@@ -52,7 +52,7 @@ const i18n = {
     custom_how_title: 'Как это работает:',
     custom_step1: '1. Нажмите кнопку — откроется бот',
     custom_step2: '2. Пришлите ссылку на ваш подарок Telegram',
-    custom_step3: '3. Обсудим размер и стоимость',
+    custom_step3: '3. Бот подтвердит условия: 30×30 см, 149 TON, 21 день',
     custom_step4: '4. После оплаты приступаем к работе',
   },
   en: {
@@ -96,12 +96,12 @@ const i18n = {
     custom_page_title: 'Paint your gift',
     custom_heading: '🎁 Your gift — on canvas',
     custom_text: 'Have a rare or favourite Telegram gift? Plush Pepe, Homemade Cake, Cyberpunk Skull — we\'ll paint it in oil on canvas. A unique physical version of your digital collectible.',
-    custom_timeline: '⏱ Timeline: 21+ days + shipping',
+    custom_timeline: '⏱ Painting time: 21 days + shipping',
     custom_btn: 'Message @OilSoulBot',
     custom_how_title: 'How it works:',
     custom_step1: '1. Tap the button — bot opens',
-    custom_step2: '2. Send a screenshot or name of your gift',
-    custom_step3: '3. We discuss size and price',
+    custom_step2: '2. Send a link to your Telegram gift',
+    custom_step3: '3. Bot confirms: 30×30 cm, 149 TON, 21 days',
     custom_step4: '4. After payment we start painting',
   }
 };
@@ -128,6 +128,7 @@ function setLang(l) {
   document.getElementById('submit-btn').textContent = t('submit_btn');
   renderCatalog();
 }
+
 function openCustomBot() {
   if (tg && tg.openTelegramLink) {
     tg.openTelegramLink('https://t.me/OilSoulBot?start=custom');
@@ -135,7 +136,8 @@ function openCustomBot() {
     window.open('https://t.me/OilSoulBot?start=custom', '_blank');
   }
 }
-async function fetchTonPrice()
+
+async function fetchTonPrice() {
   try {
     const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
     const data = await res.json();
@@ -286,7 +288,7 @@ function showCustomPage() {
       '<div class="custom-heading">' + t('custom_heading') + '</div>' +
       '<div class="custom-text">' + t('custom_text') + '</div>' +
       '<div class="custom-timeline">' + t('custom_timeline') + '</div>' +
-     '<button class="submit-btn custom-submit-btn" onclick="openCustomBot()">' + t('custom_btn') + '</button>' +
+      '<button class="submit-btn custom-submit-btn" onclick="openCustomBot()">' + t('custom_btn') + '</button>' +
       '<div class="custom-steps">' +
         '<div class="custom-steps-title">' + t('custom_how_title') + '</div>' +
         '<div class="custom-step">' + t('custom_step1') + '</div>' +
