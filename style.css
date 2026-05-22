@@ -16,7 +16,7 @@ body {
 }
 
 #page-catalog {
-  padding-bottom: 80px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
 header {
@@ -125,22 +125,29 @@ header p {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
-  background: #0f1e38;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 12px 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  background: rgba(15, 30, 56, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,0.08);
 }
 
 .custom-bar-btn {
   flex-shrink: 0;
-  padding: 10px 16px;
+  padding: 12px 16px;
   background: rgba(100,180,255,0.12);
   border: 1px solid rgba(100,180,255,0.3);
-  border-radius: 12px;
+  border-radius: 14px;
   color: #64b4ff;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+}
+
+.custom-bar-btn:active {
+  opacity: 0.7;
 }
 
 .cart-bar {
@@ -160,11 +167,15 @@ header p {
   background: #f0c040;
   color: #1a1a2e;
   border: none;
-  padding: 10px 16px;
-  border-radius: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+}
+
+#checkout-btn:active {
+  opacity: 0.8;
 }
 
 /* ОФОРМЛЕНИЕ ЗАКАЗА */
@@ -313,6 +324,10 @@ header p {
   text-decoration: none;
 }
 
+.submit-btn:active {
+  opacity: 0.8;
+}
+
 .in-cart-btn {
   background: #27ae60 !important;
   color: white !important;
@@ -424,6 +439,10 @@ header p {
   border-radius: 14px;
   text-decoration: none;
   color: white;
+}
+
+.pay-btn:active {
+  opacity: 0.8;
 }
 
 .pay-btn-wallet {
