@@ -19,57 +19,33 @@ const products = [
   },
   {
     id: 4,
-    title: "Durov's Cap",
-    description: "Legendary cap — hand-painted in oil",
-    ton: 370, emoji: "🧢", image: null
-  },
-  {
-    id: 5,
     title: "Homemade Cake",
     description: "Homemade cake — one of the first Telegram gifts",
     ton: 149, emoji: "🎂", image: 'Cake.png'
   },
   {
-    id: 6,
-    title: "Plush Bear",
-    description: "Soft bear in Telegram gifts style",
-    ton: 149, emoji: "🐻", image: null
-  },
-  {
-    id: 7,
+    id: 5,
     title: "Red Heart",
     description: "Symbol of love — oil painting",
     ton: 149, emoji: "❤️", image: 'Heart.png'
   },
   {
-    id: 8,
+    id: 6,
     title: "Star",
     description: "Golden star — symbol of Telegram Stars",
     ton: 149, emoji: "⭐", image: 'Star.png'
   },
   {
-    id: 9,
+    id: 7,
     title: "Champagne",
     description: "Festive champagne in TG gifts style",
     ton: 149, emoji: "🍾", image: null
   },
   {
-    id: 10,
-    title: "Jelly Bunny",
-    description: "Jelly Bunny — one of the most popular gifts",
-    ton: 149, emoji: "🐰", image: null
-  },
-  {
-    id: 11,
-    title: "Cute Fox",
-    description: "Cunning fox in Telegram collectibles style",
-    ton: 149, emoji: "🦊", image: null
-  },
-  {
-    id: 12,
-    title: "Santa Hat",
-    description: "Santa Hat — limited holiday gift",
-    ton: 149, emoji: "🎅", image: null
+    id: 8,
+    title: "Plush Bear",
+    description: "Soft bear in Telegram gifts style",
+    ton: 149, emoji: "🐻", image: null
   }
 ];
 
