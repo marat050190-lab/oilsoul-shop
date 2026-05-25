@@ -3,7 +3,7 @@ const products = [
     id: 1,
     title: "Rocket",
     description: "Oil painting inspired by the official Telegram gift",
-    ton: 149, emoji: "🚀", image: null
+    ton: 149, emoji: "🚀", image: 'Rocket_.png'
   },
   {
     id: 2,
@@ -27,7 +27,7 @@ const products = [
     id: 5,
     title: "Homemade Cake",
     description: "Homemade cake — one of the first Telegram gifts",
-    ton: 149, emoji: "🎂", image: null
+    ton: 149, emoji: "🎂", image: 'Cake.png'
   },
   {
     id: 6,
@@ -39,13 +39,13 @@ const products = [
     id: 7,
     title: "Red Heart",
     description: "Symbol of love — oil painting",
-    ton: 149, emoji: "❤️", image: null
+    ton: 149, emoji: "❤️", image: 'Heart.png'
   },
   {
     id: 8,
     title: "Star",
     description: "Golden star — symbol of Telegram Stars",
-    ton: 149, emoji: "⭐", image: null
+    ton: 149, emoji: "⭐", image: 'Star.png'
   },
   {
     id: 9,
