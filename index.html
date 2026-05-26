@@ -10,17 +10,50 @@
 <body>
 
   <div id="page-catalog">
-    <header>
-      <div class="lang-switcher">
-        <button id="lang-ru" class="lang-btn lang-active" onclick="setLang('ru')">RU</button>
-        <button id="lang-en" class="lang-btn" onclick="setLang('en')">EN</button>
+    <header class="main-header">
+      <div class="main-header-left">
+        <div class="main-header-logo">🎨</div>
+        <div class="main-header-text">
+          <div class="main-header-title">Oil&Soul</div>
+          <div class="main-header-sub">Картины маслом по мотивам Telegram-подарков</div>
+        </div>
       </div>
-      <h1>🎨 Oil&Soul</h1>
-      <p>Картины маслом в стиле Telegram</p>
+      <div class="main-header-right">
+        <div class="lang-switcher-inline">
+          <button id="lang-ru" class="lang-btn lang-active" onclick="setLang('ru')">RU</button>
+          <button id="lang-en" class="lang-btn" onclick="setLang('en')">EN</button>
+        </div>
+        <button class="gift-btn" onclick="showCustomPage()">🎁</button>
+      </div>
     </header>
+
+    <div class="hero-banner">
+      <div class="hero-text">
+        <h2 class="hero-title">Цифровой подарок —<br>в настоящей<br>масляной живописи</h2>
+        <p class="hero-desc">Мы переносим Telegram-подарки на холст 30×30 см: масляные краски, фактурные мазки, ручная работа и уникальный номер вашего подарка.</p>
+      </div>
+      <div class="hero-icon">🎁</div>
+    </div>
+
+    <div class="features-row">
+      <div class="feature-card">
+        <div class="feature-icon">🖌️</div>
+        <div class="feature-label">Масло и холст</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <div class="feature-label">Доставка по всему миру</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💎</div>
+        <div class="feature-label">Оплата в TON</div>
+      </div>
+    </div>
+
     <main>
       <div id="catalog" class="catalog"></div>
     </main>
+
     <div class="bottom-bar">
       <button class="custom-bar-btn" onclick="showCustomPage()">✍️ Под заказ</button>
       <div id="cart-bar" class="cart-bar hidden">
@@ -143,7 +176,6 @@
       });
     }
 
-    // Автокомплит для обычной формы заказа
     document.getElementById('field-country').addEventListener('input', function() {
       clearTimeout(acTimer);
       var val = this.value;
@@ -188,7 +220,6 @@
       }, 500);
     });
 
-    // Автокомплит для кастомной формы — вешается после рендера страницы
     function initCustomAutocomplete() {
       var countryEl = document.getElementById('custom-country');
       var cityEl = document.getElementById('custom-city');
@@ -244,8 +275,6 @@
       });
     }
 
-    // Вызываем initCustomAutocomplete после рендера кастомной страницы
-    var origShowCustomPage = window.showCustomPage;
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof showCustomPage === 'function') {
         var orig = showCustomPage;
