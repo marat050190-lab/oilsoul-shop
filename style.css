@@ -119,11 +119,13 @@ body {
 }
 
 .hero-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   color: #fff;
   line-height: 1.25;
   margin-bottom: 12px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.3px;
 }
 
 .hero-desc {
