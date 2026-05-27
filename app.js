@@ -4,6 +4,7 @@ if (tg) tg.expand();
 let cart = [];
 let tonPrice = null;
 let lang = 'ru';
+let currentFilter = 'all';
 
 const i18n = {
   ru: {
@@ -65,6 +66,14 @@ const i18n = {
     custom_submit: '✅ Отправить заказ',
     custom_fill_fields: 'Пожалуйста заполните все поля, включая ссылку на подарок',
     custom_success: 'Заказ отправлен! Бот пришлёт реквизиты для оплаты.',
+    filter_all: 'Все',
+    filter_ready: 'Ready to ship',
+    filter_custom: 'Custom order',
+    filter_sold: 'Sold',
+    sold_label: 'Продано',
+    custom_card_title: '🎁 Картина с вашего подарка',
+    custom_card_desc: 'Закажите картину маслом по мотивам вашего коллекционного подарка Telegram',
+    custom_card_btn: 'Заказать →',
   },
   en: {
     header_title: '🎨 Oil&Soul',
@@ -125,6 +134,14 @@ const i18n = {
     custom_submit: '✅ Send order',
     custom_fill_fields: 'Please fill in all fields including the gift link',
     custom_success: 'Order sent! The bot will send payment details.',
+    filter_all: 'All',
+    filter_ready: 'Ready to ship',
+    filter_custom: 'Custom order',
+    filter_sold: 'Sold',
+    sold_label: 'Sold',
+    custom_card_title: '🎁 Paint your gift',
+    custom_card_desc: 'Order an oil painting based on your Telegram collectible gift',
+    custom_card_btn: 'Order →',
   }
 };
 
@@ -136,8 +153,6 @@ function setLang(l) {
   lang = l;
   document.getElementById('lang-ru').classList.toggle('lang-active', l === 'ru');
   document.getElementById('lang-en').classList.toggle('lang-active', l === 'en');
-  document.querySelector('#page-catalog header h1').textContent = t('header_title');
-  document.querySelector('#page-catalog header p').textContent = t('header_sub');
   document.getElementById('checkout-btn').textContent = t('cart_btn');
   document.getElementById('field-name').placeholder = t('field_name');
   document.getElementById('field-country').placeholder = t('field_country');
@@ -185,29 +200,90 @@ function showPage(pageId) {
   window.scrollTo(0, 0);
 }
 
+function setFilter(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.classList.remove('filter-active');
+  });
+  document.getElementById('filter-' + filter).classList.add('filter-active');
+  renderCatalog();
+}
+
 function renderCatalog() {
   const catalog = document.getElementById('catalog');
   catalog.innerHTML = '';
-  products.forEach(function(product) {
+
+  // Фильтр-таблетки
+  const filterBar = document.createElement('div');
+  filterBar.className = 'filter-bar';
+  filterBar.innerHTML =
+    '<button id="filter-all" class="filter-btn' + (currentFilter === 'all' ? ' filter-active' : '') + '" onclick="setFilter(\'all\')">' + t('filter_all') + '</button>' +
+    '<button id="filter-ready" class="filter-btn' + (currentFilter === 'ready' ? ' filter-active' : '') + '" onclick="setFilter(\'ready\')">' + t('filter_ready') + '</button>' +
+    '<button id="filter-custom" class="filter-btn' + (currentFilter === 'custom' ? ' filter-active' : '') + '" onclick="setFilter(\'custom\')">' + t('filter_custom') + '</button>' +
+    '<button id="filter-sold" class="filter-btn' + (currentFilter === 'sold' ? ' filter-active' : '') + '" onclick="setFilter(\'sold\')">' + t('filter_sold') + '</button>';
+  catalog.appendChild(filterBar);
+
+  // Большая карточка кастомного заказа (показываем при all и custom)
+  if (currentFilter === 'all' || currentFilter === 'custom') {
+    const customCard = document.createElement('div');
+    customCard.className = 'custom-order-card';
+    customCard.innerHTML =
+      '<div class="custom-order-card-img">' +
+        '<img src="Durov\'s%20cap.png" alt="Custom order">' +
+      '</div>' +
+      '<div class="custom-order-card-body">' +
+        '<div class="custom-order-card-title">' + t('custom_card_title') + '</div>' +
+        '<div class="custom-order-card-desc">' + t('custom_card_desc') + '</div>' +
+        '<div class="custom-order-card-price">149 TON' + (tonPrice ? ' (~$' + (149 * tonPrice.usd).toFixed(0) + ')' : '') + '</div>' +
+        '<button class="custom-order-card-btn" onclick="showCustomPage()">' + t('custom_card_btn') + '</button>' +
+      '</div>';
+    catalog.appendChild(customCard);
+  }
+
+  // Грид товаров
+  const grid = document.createElement('div');
+  grid.className = 'catalog-grid';
+
+  const filtered = products.filter(function(p) {
+    if (currentFilter === 'all') return p.status !== 'custom';
+    return p.status === currentFilter;
+  });
+
+  if (filtered.length === 0 && currentFilter !== 'custom') {
+    const empty = document.createElement('div');
+    empty.className = 'catalog-empty';
+    empty.textContent = currentFilter === 'sold' ? 'Проданные работы появятся здесь' : 'Нет работ в этой категории';
+    grid.appendChild(empty);
+  }
+
+  filtered.forEach(function(product) {
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'card' + (product.status === 'sold' ? ' card-sold' : '');
     const inCart = cart.find(function(i) { return i.id === product.id; });
+    const isSold = product.status === 'sold';
+
     card.innerHTML =
-      (product.image
-        ? '<img src="' + product.image + '" alt="' + product.title + '">'
-        : '<div class="placeholder-img">' + product.emoji + '</div>') +
+      '<div class="card-img-wrap">' +
+        (product.image
+          ? '<img src="' + product.image + '" alt="' + product.title + '">'
+          : '<div class="placeholder-img">' + product.emoji + '</div>') +
+        (isSold ? '<div class="sold-badge">' + t('sold_label') + '</div>' : '') +
+      '</div>' +
       '<div class="card-body">' +
         '<div class="card-title">' + product.emoji + ' ' + product.title + '</div>' +
-        '<div class="card-price">' + formatPrice(product.ton) + '</div>' +
+        '<div class="card-price">' + (isSold ? '<span class="sold-price">' + formatPrice(product.ton) + '</span>' : formatPrice(product.ton)) + '</div>' +
         '<div class="card-actions">' +
           '<button class="card-btn-detail" onclick="showDetail(' + product.id + ')">' + t('btn_details') + '</button>' +
-          '<button class="card-btn ' + (inCart ? 'in-cart' : '') + '" onclick="toggleCart(' + product.id + ')">' +
-            (inCart ? t('btn_in_cart') : t('btn_buy')) +
-          '</button>' +
+          (isSold
+            ? '<button class="card-btn card-btn-sold" disabled>' + t('sold_label') + '</button>'
+            : '<button class="card-btn ' + (inCart ? 'in-cart' : '') + '" onclick="toggleCart(' + product.id + ')">' + (inCart ? t('btn_in_cart') : t('btn_buy')) + '</button>'
+          ) +
         '</div>' +
       '</div>';
-    catalog.appendChild(card);
+    grid.appendChild(card);
   });
+
+  catalog.appendChild(grid);
 }
 
 function showDetail(id) {
@@ -229,9 +305,10 @@ function showDetail(id) {
       (desc
         ? '<div class="detail-desc">' + desc.replace(/\n/g, '<br>') + '</div>'
         : '<div class="detail-desc">' + product.description + '</div>') +
-      '<button id="detail-cart-btn" class="submit-btn ' + (inCart ? 'in-cart-btn' : '') + '" onclick="detailToggleCart(' + id + ')">' +
-        (inCart ? t('btn_in_cart_full') : t('btn_add_cart')) +
-      '</button>' +
+      (product.status === 'sold'
+        ? '<button class="submit-btn in-cart-btn" disabled>' + t('sold_label') + '</button>'
+        : '<button id="detail-cart-btn" class="submit-btn ' + (inCart ? 'in-cart-btn' : '') + '" onclick="detailToggleCart(' + id + ')">' + (inCart ? t('btn_in_cart_full') : t('btn_add_cart')) + '</button>'
+      ) +
     '</div>';
   showPage('page-detail');
 }
@@ -247,6 +324,7 @@ function detailToggleCart(id) {
 
 function toggleCart(id) {
   const product = products.find(function(p) { return p.id === id; });
+  if (product.status === 'sold') return;
   const index = cart.findIndex(function(i) { return i.id === id; });
   if (index === -1) {
     cart.push(product);
@@ -339,6 +417,9 @@ function showCustomPage() {
           '<div class="custom-condition-row"><span>' + t('custom_price') + '</span><span class="custom-condition-value">149 TON' + (tonPrice ? ' (~$' + (149 * tonPrice.usd).toFixed(0) + ')' : '') + '</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_deadline') + '</span><span>21 день + доставка</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
+        '</div>' +
+        '<div class="custom-disclaimer">' +
+          'Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram и не связан с авторами оригинальных цифровых подарков. Каждая работа является физической художественной интерпретацией.' +
         '</div>' +
         '<button class="submit-btn" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
       '</div>' +
