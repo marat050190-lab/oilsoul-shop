@@ -876,3 +876,158 @@ body {
   object-fit: cover;
   flex-shrink: 0;
 }
+/* ФИЛЬТР */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px 0 12px;
+  grid-column: 1 / -1;
+}
+
+.filter-bar::-webkit-scrollbar { display: none; }
+
+.filter-btn {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-active {
+  background: rgba(240,192,64,0.15);
+  border-color: #f0c040;
+  color: #f0c040;
+}
+
+/* КАТАЛОГ ГРИД */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+.catalog-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(255,255,255,0.3);
+  font-size: 14px;
+}
+
+/* КАРТОЧКА SOLD */
+.card-sold {
+  opacity: 0.7;
+}
+
+.card-img-wrap {
+  position: relative;
+}
+
+.card-img-wrap img,
+.card-img-wrap .placeholder-img {
+  width: 100%;
+}
+
+.sold-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.7);
+  color: rgba(255,255,255,0.8);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sold-price {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.card-btn-sold {
+  background: rgba(255,255,255,0.08) !important;
+  color: rgba(255,255,255,0.3) !important;
+  cursor: not-allowed !important;
+}
+
+/* БОЛЬШАЯ КАРТОЧКА КАСТОМНОГО ЗАКАЗА */
+.custom-order-card {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #0d1f3c, #1a3a6e);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(100,180,255,0.2);
+  display: flex;
+  gap: 0;
+}
+
+.custom-order-card-img {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.custom-order-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.custom-order-card-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+
+.custom-order-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.custom-order-card-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.4;
+}
+
+.custom-order-card-price {
+  font-size: 13px;
+  color: #f0c040;
+  font-weight: 600;
+}
+
+.custom-order-card-btn {
+  margin-top: 4px;
+  padding: 8px 16px;
+  background: rgba(100,180,255,0.15);
+  border: 1px solid rgba(100,180,255,0.3);
+  border-radius: 10px;
+  color: #64b4ff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+/* ДИСКЛЕЙМЕР */
+.custom-disclaimer {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.5;
+  text-align: center;
+  padding: 12px 4px 4px;
+}
