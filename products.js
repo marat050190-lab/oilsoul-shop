@@ -3,31 +3,31 @@ const products = [
     id: 1,
     title: "Rocket",
     description: "Oil painting inspired by the official Telegram gift",
-    ton: 149, emoji: "🚀", image: 'Rocket%20.png'
+    ton: 149, emoji: "🚀", image: 'Rocket%20.png', status: 'ready'
   },
   {
     id: 2,
     title: "Golden Trophy",
     description: "Golden trophy — symbol of victory in TG gifts style",
-    ton: 149, emoji: "🏆", image: 'IMAGE 2026-05-19 14:47:33.jpg'
+    ton: 149, emoji: "🏆", image: 'IMAGE 2026-05-19 14:47:33.jpg', status: 'ready'
   },
   {
     id: 3,
     title: "Homemade Cake",
     description: "Homemade cake — one of the first Telegram gifts",
-    ton: 149, emoji: "🎂", image: 'Cake.png'
+    ton: 149, emoji: "🎂", image: 'Cake.png', status: 'ready'
   },
   {
     id: 4,
     title: "Red Heart",
     description: "Symbol of love — oil painting",
-    ton: 149, emoji: "❤️", image: 'Heart.png'
+    ton: 149, emoji: "❤️", image: 'Heart.png', status: 'ready'
   },
   {
     id: 5,
     title: "Star",
     description: "Golden star — symbol of Telegram Stars",
-    ton: 149, emoji: "⭐", image: 'Star.png'
+    ton: 149, emoji: "⭐", image: 'Star.png', status: 'ready'
   }
 ];
 
