@@ -74,6 +74,7 @@ const i18n = {
     custom_card_title: '🎁 Картина с вашего подарка',
     custom_card_desc: 'Закажите картину маслом по мотивам вашего коллекционного подарка Telegram',
     custom_card_btn: 'Заказать →',
+    faq_title: 'Частые вопросы',
   },
   en: {
     header_title: '🎨 Oil&Soul',
@@ -142,6 +143,7 @@ const i18n = {
     custom_card_title: '🎁 Paint your gift',
     custom_card_desc: 'Order an oil painting based on your Telegram collectible gift',
     custom_card_btn: 'Order →',
+    faq_title: 'FAQ',
   }
 };
 
@@ -192,12 +194,92 @@ const descriptions = {
   }
 };
 
+const faqItems = {
+  ru: [
+    { q: 'Что такое Oil&Soul?', a: 'Oil&Soul — сервис, где цифровые Telegram-подарки превращаются в физические картины маслом на холсте. Мы создаём готовые работы и картины под заказ по ссылке на ваш Telegram collectible gift. Каждая работа сопровождается сертификатом уникальности.' },
+    { q: 'Это настоящая картина или распечатка?', a: 'Это настоящая картина, написанная вручную масляными красками на холсте. Не печать, не постер и не цифровая распечатка. Каждая работа имеет живую фактуру мазков и сопровождается сертификатом уникальности.' },
+    { q: 'Какой размер картины?', a: 'Базовый формат — 30×30 см. Картина пишется на холсте на подрамнике. Боковые стороны прокрашиваются, поэтому работу можно размещать без рамы.' },
+    { q: 'Можно ли заказать картину по моему Telegram-подарку?', a: 'Да. Вы отправляете ссылку на ваш Telegram-подарок, а мы создаём физическую картину маслом по его мотивам. На холсте можно указать NFT-номер вашего подарка.' },
+    { q: 'Будет ли картина точной копией подарка?', a: 'Картина создаётся вручную, поэтому она не является пиксельной копией 1 в 1. Мы сохраняем основные элементы подарка: форму, цвета, фон, настроение и NFT-номер, но итоговая работа остаётся живой масляной интерпретацией с фактурой мазков.' },
+    { q: 'Что нужно отправить для кастомного заказа?', a: 'Нужно отправить ссылку на ваш Telegram-подарок. Формат: https://t.me/nft/... Также можно добавить комментарий, если есть пожелания по NFT-номеру, фону или деталям.' },
+    { q: 'Сколько времени занимает написание картины?', a: 'Стандартный срок написания картины — 21 день. После завершения работы картина проходит финальную проверку, затем упаковывается и отправляется вам.' },
+    { q: 'Как происходит заказ картины с моего подарка?', a: '1. Вы отправляете ссылку на Telegram-подарок\n2. Мы проверяем подарок и согласуем детали\n3. После оплаты художник начинает работу\n4. Картина проходит финальную проверку\n5. Мы оформляем сертификат уникальности\n6. Картина упаковывается и отправляется вам' },
+    { q: 'Какие материалы используются?', a: 'Холст на подрамнике, масляные краски, художественные кисти и мастихины, защитный лак после высыхания, упаковка для безопасной доставки.' },
+    { q: 'Доставляете ли вы по всему миру?', a: 'Да, мы отправляем картины по всему миру. Стоимость и срок доставки зависят от страны получателя и рассчитываются индивидуально после оформления заказа.' },
+    { q: 'Как упаковывается картина?', a: 'Картина упаковывается в защитную упаковку. Мы используем плотную упаковку, защитные слои и коробку, подходящую под формат холста.' },
+    { q: 'Как происходит оплата?', a: 'Оплата принимается в TON. После оформления заказа вы получите данные для оплаты. После подтверждения оплаты заказ передаётся в работу.' },
+    { q: 'Можно ли вернуть картину?', a: 'Готовые работы обсуждаются индивидуально. Кастомные картины создаются специально под ваш Telegram-подарок, поэтому возврат таких работ обычно невозможен после начала написания. Если возникнет проблема — рассмотрим ситуацию отдельно.' },
+    { q: 'Что входит в заказ?', a: 'Картина маслом на холсте, прокрашенные боковые стороны, NFT-номер подарка на холсте (если предусмотрен), сертификат уникальности, защитная упаковка.' },
+    { q: 'Что такое сертификат уникальности?', a: 'Сертификат подтверждает данные физической картины: название работы, NFT-номер подарка, техника (масло на холсте), размер, год создания и данные проекта Oil&Soul.' },
+    { q: 'Будет ли QR-код на оригинальный Telegram-подарок?', a: 'Да, для кастомных работ можно добавить QR-код на обратную сторону картины. QR-код будет вести на ссылку оригинального Telegram-подарка. Наносится в виде аккуратной печатной наклейки.' },
+  ],
+  en: [
+    { q: 'What is Oil&Soul?', a: 'Oil&Soul is a service that turns digital Telegram gifts into physical oil paintings on canvas. We create ready-made works and custom paintings based on your Telegram collectible gift link. Each work comes with a certificate of uniqueness.' },
+    { q: 'Is it a real painting or a print?', a: 'It is a real painting, hand-painted with oil paints on canvas. Not a print, not a poster, not a digital reproduction. Each work has the live texture of brushstrokes and comes with a certificate of uniqueness.' },
+    { q: 'What size is the painting?', a: 'The base format is 30×30 cm. The painting is made on a stretched canvas. The sides are painted, so the work can be displayed without a frame.' },
+    { q: 'Can I order a painting based on my Telegram gift?', a: 'Yes. You send a link to your Telegram gift and we create a physical oil painting inspired by it. The NFT number of your gift can be included on the canvas.' },
+    { q: 'Will the painting be an exact copy of the gift?', a: 'The painting is handmade, so it is not a pixel-perfect 1:1 copy. We preserve the key elements: shape, colors, background, mood and NFT number — but the final work remains a live oil interpretation with brushstroke texture.' },
+    { q: 'What do I need to send for a custom order?', a: 'Send a link to your Telegram gift. Format: https://t.me/nft/... You can also add a comment if you have wishes regarding the NFT number, background or details.' },
+    { q: 'How long does painting take?', a: 'The standard painting time is 21 days. After completion, the painting goes through a final check, then gets packaged and shipped to you.' },
+    { q: 'How does a custom order work?', a: '1. You send a link to your Telegram gift\n2. We check the gift and agree on details\n3. After payment the artist starts work\n4. The painting passes a final check\n5. We prepare the certificate of uniqueness\n6. The painting is packaged and shipped to you' },
+    { q: 'What materials are used?', a: 'Stretched canvas, oil paints, artist brushes and palette knives, protective varnish after drying, packaging for safe delivery.' },
+    { q: 'Do you ship worldwide?', a: 'Yes, we ship paintings worldwide. The cost and time of delivery depend on the recipient\'s country and are calculated individually after placing an order.' },
+    { q: 'How is the painting packaged?', a: 'The painting is packed in protective packaging. We use dense packing, protective layers and a box suitable for the canvas format.' },
+    { q: 'How does payment work?', a: 'Payment is accepted in TON. After placing an order you will receive payment details. After payment confirmation the order goes into production.' },
+    { q: 'Can I return a painting?', a: 'Ready-made works are discussed individually. Custom paintings are created specifically for your Telegram gift, so returns are usually not possible after painting has started. If a problem arises we will consider the situation separately.' },
+    { q: 'What is included in the order?', a: 'Oil painting on canvas, painted sides, NFT number on canvas (if applicable), certificate of uniqueness, protective packaging.' },
+    { q: 'What is the certificate of uniqueness?', a: 'The certificate confirms the physical painting data: title, NFT number, technique (oil on canvas), size, year of creation and Oil&Soul project details.' },
+    { q: 'Will there be a QR code for the original Telegram gift?', a: 'Yes, for custom works a QR code can be added to the back of the painting. It will link to the original Telegram gift. Applied as a neat printed sticker.' },
+  ]
+};
+
 function showPage(pageId) {
   document.getElementById('page-catalog').classList.add('hidden');
   document.getElementById('page-checkout').classList.add('hidden');
   document.getElementById('page-detail').classList.add('hidden');
   document.getElementById(pageId).classList.remove('hidden');
   window.scrollTo(0, 0);
+}
+
+function showFaqPage() {
+  const items = faqItems[lang] || faqItems['ru'];
+  const page = document.getElementById('page-detail');
+  page.innerHTML =
+    '<header>' +
+      '<button onclick="showPage(\'page-catalog\')">' + t('back') + '</button>' +
+      '<h1>' + t('faq_title') + '</h1>' +
+    '</header>' +
+    '<div class="detail-content">' +
+      '<div class="faq-list">' +
+        items.map(function(item, i) {
+          return '<div class="faq-item" id="faq-' + i + '">' +
+            '<div class="faq-question" onclick="toggleFaq(' + i + ')">' +
+              '<span>' + item.q + '</span>' +
+              '<span class="faq-arrow" id="faq-arrow-' + i + '">▾</span>' +
+            '</div>' +
+            '<div class="faq-answer" id="faq-answer-' + i + '">' +
+              item.a.replace(/\n/g, '<br>') +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+      '<div class="custom-disclaimer" style="margin-top:16px">' +
+        'Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram.' +
+      '</div>' +
+    '</div>';
+  showPage('page-detail');
+}
+
+function toggleFaq(i) {
+  var answer = document.getElementById('faq-answer-' + i);
+  var arrow = document.getElementById('faq-arrow-' + i);
+  var isOpen = answer.classList.contains('faq-open');
+  document.querySelectorAll('.faq-answer').forEach(function(el) { el.classList.remove('faq-open'); });
+  document.querySelectorAll('.faq-arrow').forEach(function(el) { el.textContent = '▾'; });
+  if (!isOpen) {
+    answer.classList.add('faq-open');
+    arrow.textContent = '▴';
+  }
 }
 
 function setFilter(filter) {
@@ -213,7 +295,6 @@ function renderCatalog() {
   const catalog = document.getElementById('catalog');
   catalog.innerHTML = '';
 
-  // Фильтр-таблетки
   const filterBar = document.createElement('div');
   filterBar.className = 'filter-bar';
   filterBar.innerHTML =
@@ -223,7 +304,6 @@ function renderCatalog() {
     '<button id="filter-sold" class="filter-btn' + (currentFilter === 'sold' ? ' filter-active' : '') + '" onclick="setFilter(\'sold\')">' + t('filter_sold') + '</button>';
   catalog.appendChild(filterBar);
 
-  // Большая карточка кастомного заказа (показываем при all и custom)
   if (currentFilter === 'all' || currentFilter === 'custom') {
     const customCard = document.createElement('div');
     customCard.className = 'custom-order-card';
@@ -240,7 +320,6 @@ function renderCatalog() {
     catalog.appendChild(customCard);
   }
 
-  // Грид товаров
   const grid = document.createElement('div');
   grid.className = 'catalog-grid';
 
@@ -384,53 +463,17 @@ function showCustomPage() {
       '<div class="custom-steps">' +
         '<div class="custom-steps-title">' + t('custom_how_title') + '</div>' +
         '<div class="production-stages">' +
-          '<div class="production-stage">' +
-            '<img src="step1.png" class="stage-icon" alt="">' +
-            '<div class="stage-text">' +
-              '<div class="stage-name">Вы отправляете ссылку на подарок</div>' +
-              '<div class="stage-desc">Мы получаем все детали вашего коллекционного подарка</div>' +
-            '</div>' +
-          '</div>' +
+          '<div class="production-stage"><img src="step1.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Вы отправляете ссылку на подарок</div><div class="stage-desc">Мы получаем все детали вашего коллекционного подарка</div></div></div>' +
           '<div class="stage-connector"></div>' +
-          '<div class="production-stage">' +
-            '<img src="step2.png" class="stage-icon" alt="">' +
-            '<div class="stage-text">' +
-              '<div class="stage-name">Мы готовим референс</div>' +
-              '<div class="stage-desc">Художник изучает подарок и создаёт эскиз композиции</div>' +
-            '</div>' +
-          '</div>' +
+          '<div class="production-stage"><img src="step2.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Мы готовим референс</div><div class="stage-desc">Художник изучает подарок и создаёт эскиз композиции</div></div></div>' +
           '<div class="stage-connector"></div>' +
-          '<div class="production-stage">' +
-            '<img src="step3.png" class="stage-icon" alt="">' +
-            '<div class="stage-text">' +
-              '<div class="stage-name">Перенос на холст</div>' +
-              '<div class="stage-desc">Художник переносит композицию на холст 30×30 см</div>' +
-            '</div>' +
-          '</div>' +
+          '<div class="production-stage"><img src="step3.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Перенос на холст</div><div class="stage-desc">Художник переносит композицию на холст 30×30 см</div></div></div>' +
           '<div class="stage-connector"></div>' +
-          '<div class="production-stage">' +
-            '<img src="step4.png" class="stage-icon" alt="">' +
-            '<div class="stage-text">' +
-              '<div class="stage-name">Написание маслом</div>' +
-              '<div class="stage-desc">Пишем картину масляными красками, слой за слоем</div>' +
-            '</div>' +
-          '</div>' +
+          '<div class="production-stage"><img src="step4.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Написание маслом</div><div class="stage-desc">Пишем картину масляными красками, слой за слоем</div></div></div>' +
           '<div class="stage-connector"></div>' +
-          '<div class="production-stage">' +
-            '<img src="step5.png" class="stage-icon" alt="">' +
-            '<div class="stage-text">' +
-              '<div class="stage-name">Фото на согласование</div>' +
-              '<div class="stage-desc">Отправляем фото готовой работы для вашего одобрения</div>' +
-            '</div>' +
-          '</div>' +
+          '<div class="production-stage"><img src="step5.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Фото на согласование</div><div class="stage-desc">Отправляем фото готовой работы для вашего одобрения</div></div></div>' +
           '<div class="stage-connector"></div>' +
-          '<div class="production-stage">' +
-            '<img src="step6.png" class="stage-icon" alt="">' +
-            '<div class="stage-text">' +
-              '<div class="stage-name">Упаковка и отправка</div>' +
-              '<div class="stage-desc">Упаковываем бережно и отправляем по всему миру</div>' +
-            '</div>' +
-          '</div>' +
+          '<div class="production-stage"><img src="step6.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Упаковка и отправка</div><div class="stage-desc">Упаковываем бережно и отправляем по всему миру</div></div></div>' +
         '</div>' +
       '</div>' +
       '<div class="custom-form">' +
@@ -442,15 +485,9 @@ function showCustomPage() {
         '<div class="custom-section">' +
           '<div class="custom-section-title">' + t('custom_delivery_label') + '</div>' +
           '<input type="text" id="custom-name" class="custom-input" placeholder="' + t('field_name') + '">' +
-          '<div class="autocomplete-wrap">' +
-            '<input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '">' +
-          '</div>' +
-          '<div class="autocomplete-wrap">' +
-            '<input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '">' +
-          '</div>' +
-          '<div class="autocomplete-wrap">' +
-            '<input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '">' +
-          '</div>' +
+          '<div class="autocomplete-wrap"><input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '"></div>' +
+          '<div class="autocomplete-wrap"><input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '"></div>' +
+          '<div class="autocomplete-wrap"><input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '"></div>' +
           '<input type="text" id="custom-postal" class="custom-input" placeholder="' + t('field_postal') + '">' +
           '<input type="tel" id="custom-phone" class="custom-input" placeholder="' + t('field_phone') + '">' +
           '<input type="email" id="custom-email" class="custom-input" placeholder="' + t('field_email') + '">' +
@@ -463,15 +500,15 @@ function showCustomPage() {
           '<div class="custom-condition-row"><span>' + t('custom_deadline') + '</span><span>21 день + доставка</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
         '</div>' +
-        '<div class="custom-disclaimer">' +
-          'Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram и не связан с авторами оригинальных цифровых подарков. Каждая работа является физической художественной интерпретацией.' +
-        '</div>' +
+        '<div class="custom-disclaimer">Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram и не связан с авторами оригинальных цифровых подарков. Каждая работа является физической художественной интерпретацией.</div>' +
         '<button class="submit-btn" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
+        '<button class="faq-link-btn" onclick="showFaqPage()">❓ Частые вопросы</button>' +
       '</div>' +
     '</div>';
   showPage('page-detail');
   setTimeout(initCustomAutocomplete, 100);
 }
+
 async function submitCustomOrder() {
   const giftLink = document.getElementById('custom-gift-link').value.trim();
   const name = document.getElementById('custom-name').value.trim();
@@ -609,17 +646,11 @@ function showPayment(totalTon) {
       '<div class="payment-buttons">' +
         '<a href="' + walletLink + '" class="pay-btn pay-btn-wallet">' +
           '<span class="pay-btn-icon">✈️</span>' +
-          '<span class="pay-btn-text">' +
-            '<strong>' + t('pay_wallet') + '</strong>' +
-            '<small>' + t('pay_wallet_sub') + '</small>' +
-          '</span>' +
+          '<span class="pay-btn-text"><strong>' + t('pay_wallet') + '</strong><small>' + t('pay_wallet_sub') + '</small></span>' +
         '</a>' +
         '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">' +
           '<span class="pay-btn-icon">💎</span>' +
-          '<span class="pay-btn-text">' +
-            '<strong>' + t('pay_tonkeeper') + '</strong>' +
-            '<small>' + t('pay_tonkeeper_sub') + '</small>' +
-          '</span>' +
+          '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
         '</a>' +
       '</div>' +
       '<div class="payment-manual">' +
