@@ -383,10 +383,55 @@ function showCustomPage() {
       '<div class="custom-timeline">' + t('custom_timeline') + '</div>' +
       '<div class="custom-steps">' +
         '<div class="custom-steps-title">' + t('custom_how_title') + '</div>' +
-        '<div class="custom-step">' + t('custom_step1') + '</div>' +
-        '<div class="custom-step">' + t('custom_step2') + '</div>' +
-        '<div class="custom-step">' + t('custom_step3') + '</div>' +
-        '<div class="custom-step">' + t('custom_step4') + '</div>' +
+        '<div class="production-stages">' +
+          '<div class="production-stage">' +
+            '<img src="step1.png" class="stage-icon" alt="">' +
+            '<div class="stage-text">' +
+              '<div class="stage-name">Вы отправляете ссылку на подарок</div>' +
+              '<div class="stage-desc">Мы получаем все детали вашего коллекционного подарка</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="stage-connector"></div>' +
+          '<div class="production-stage">' +
+            '<img src="step2.png" class="stage-icon" alt="">' +
+            '<div class="stage-text">' +
+              '<div class="stage-name">Мы готовим референс</div>' +
+              '<div class="stage-desc">Художник изучает подарок и создаёт эскиз композиции</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="stage-connector"></div>' +
+          '<div class="production-stage">' +
+            '<img src="step3.png" class="stage-icon" alt="">' +
+            '<div class="stage-text">' +
+              '<div class="stage-name">Перенос на холст</div>' +
+              '<div class="stage-desc">Художник переносит композицию на холст 30×30 см</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="stage-connector"></div>' +
+          '<div class="production-stage">' +
+            '<img src="step4.png" class="stage-icon" alt="">' +
+            '<div class="stage-text">' +
+              '<div class="stage-name">Написание маслом</div>' +
+              '<div class="stage-desc">Пишем картину масляными красками, слой за слоем</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="stage-connector"></div>' +
+          '<div class="production-stage">' +
+            '<img src="step5.png" class="stage-icon" alt="">' +
+            '<div class="stage-text">' +
+              '<div class="stage-name">Фото на согласование</div>' +
+              '<div class="stage-desc">Отправляем фото готовой работы для вашего одобрения</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="stage-connector"></div>' +
+          '<div class="production-stage">' +
+            '<img src="step6.png" class="stage-icon" alt="">' +
+            '<div class="stage-text">' +
+              '<div class="stage-name">Упаковка и отправка</div>' +
+              '<div class="stage-desc">Упаковываем бережно и отправляем по всему миру</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="custom-form">' +
         '<div class="custom-section">' +
@@ -427,7 +472,6 @@ function showCustomPage() {
   showPage('page-detail');
   setTimeout(initCustomAutocomplete, 100);
 }
-
 async function submitCustomOrder() {
   const giftLink = document.getElementById('custom-gift-link').value.trim();
   const name = document.getElementById('custom-name').value.trim();
