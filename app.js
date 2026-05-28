@@ -74,7 +74,7 @@ const i18n = {
     custom_card_title: '🎁 Картина с вашего подарка',
     custom_card_desc: 'Закажите картину маслом по мотивам вашего коллекционного подарка Telegram',
     custom_card_btn: 'Заказать →',
-    faq_title: 'Частые вопросы',
+    faq_title: 'FAQ',
   },
   en: {
     header_title: '🎨 Oil&Soul',
