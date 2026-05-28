@@ -264,7 +264,7 @@ function showFaqPage() {
         }).join('') +
       '</div>' +
       '<div class="custom-disclaimer" style="margin-top:16px">' +
-        'Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram.' +
+        'Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram. Каждая работа — физическая художественная интерпретация цифрового подарка.' +
       '</div>' +
     '</div>';
   showPage('page-detail');
@@ -500,7 +500,7 @@ function showCustomPage() {
           '<div class="custom-condition-row"><span>' + t('custom_deadline') + '</span><span>21 день + доставка</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
         '</div>' +
-        '<div class="custom-disclaimer">Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram и не связан с авторами оригинальных цифровых подарков. Каждая работа является физической художественной интерпретацией.</div>' +
+       'Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram. Каждая работа — физическая художественная интерпретация цифрового подарка.' +
         '<button class="submit-btn" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
         '<button class="faq-link-btn" onclick="showFaqPage()">❓ Частые вопросы</button>' +
       '</div>' +
