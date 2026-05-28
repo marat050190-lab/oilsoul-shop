@@ -1031,3 +1031,47 @@ body {
   text-align: center;
   padding: 12px 4px 4px;
 }
+/* ЭТАПЫ ПРОИЗВОДСТВА */
+.production-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.production-stage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stage-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.stage-text {
+  flex: 1;
+}
+
+.stage-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.stage-desc {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.4;
+}
+
+.stage-connector {
+  width: 2px;
+  height: 16px;
+  background: rgba(255,255,255,0.1);
+  margin-left: 23px;
+}
