@@ -1130,3 +1130,42 @@ body {
   cursor: pointer;
   margin-top: 4px;
 }
+/* ГАЛЕРЕЯ */
+.gallery {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.gallery-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.gallery-slide {
+  width: 100%;
+  flex-shrink: 0;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0 4px;
+}
+
+.gallery-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gallery-dot-active {
+  background: #f0c040;
+}
