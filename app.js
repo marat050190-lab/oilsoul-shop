@@ -419,6 +419,10 @@ function showDetail(id) {
 var galleryIndex = {};
 
 function galleryGoTo(id, index) {
+  var images = products.find(function(p) { return p.id === id; }).images;
+  var total = images ? images.length : 1;
+  if (index < 0) index = 0;
+  if (index >= total) index = total - 1;
   galleryIndex[id] = index;
   var track = document.getElementById('gallery-track-' + id);
   if (track) track.style.transform = 'translateX(-' + (index * 100) + '%)';
