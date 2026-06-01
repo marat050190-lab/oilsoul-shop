@@ -455,7 +455,7 @@ function initGallerySwipe(id, total) {
       }
     }
   }, { passive: true });
-
+}
 function detailToggleCart(id) {
   toggleCart(id);
   const btn = document.getElementById('detail-cart-btn');
