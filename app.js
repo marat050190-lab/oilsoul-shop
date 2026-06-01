@@ -436,16 +436,20 @@ function initGallerySwipe(id, total) {
   var track = document.getElementById('gallery-track-' + id);
   if (!track) return;
   galleryIndex[id] = 0;
+  track.style.transform = 'translateX(0%)';
   var startX = 0;
+  var startY = 0;
   track.addEventListener('touchstart', function(e) {
     startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
   }, { passive: true });
   track.addEventListener('touchend', function(e) {
-    var diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) {
+    var diffX = startX - e.changedTouches[0].clientX;
+    var diffY = startY - e.changedTouches[0].clientY;
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
       var current = galleryIndex[id] || 0;
-      if (diff > 0 && current < total - 1) galleryGoTo(id, current + 1);
-      if (diff < 0 && current > 0) galleryGoTo(id, current - 1);
+      if (diffX > 0 && current < total - 1) galleryGoTo(id, current + 1);
+      if (diffX < 0 && current > 0) galleryGoTo(id, current - 1);
     }
   }, { passive: true });
 }
