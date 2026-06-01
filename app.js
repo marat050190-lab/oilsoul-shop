@@ -446,13 +446,15 @@ function initGallerySwipe(id, total) {
   track.addEventListener('touchend', function(e) {
     var diffX = startX - e.changedTouches[0].clientX;
     var diffY = startY - e.changedTouches[0].clientY;
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
-      var current = galleryIndex[id] || 0;
-      if (diffX > 0 && current < total - 1) galleryGoTo(id, current + 1);
-      if (diffX < 0 && current > 0) galleryGoTo(id, current - 1);
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+      var current = galleryIndex[id] !== undefined ? galleryIndex[id] : 0;
+      if (diffX > 0 && current < total - 1) {
+        galleryGoTo(id, current + 1);
+      } else if (diffX < 0 && current > 0) {
+        galleryGoTo(id, current - 1);
+      }
     }
   }, { passive: true });
-}
 
 function detailToggleCart(id) {
   toggleCart(id);
