@@ -369,6 +369,28 @@ function showDetail(id) {
   const product = products.find(function(p) { return p.id === id; });
   const inCart = cart.find(function(i) { return i.id === id; });
   const desc = (descriptions[lang] && descriptions[lang][id]) || (descriptions['ru'] && descriptions['ru'][id]);
+  const images = product.images || (product.image ? [product.image] : null);
+
+  var galleryHtml = '';
+  if (images && images.length > 1) {
+    galleryHtml =
+      '<div class="gallery" id="gallery-' + id + '">' +
+        '<div class="gallery-track" id="gallery-track-' + id + '">' +
+          images.map(function(img) {
+            return '<img src="' + img + '" alt="' + product.title + '" class="gallery-slide">';
+          }).join('') +
+        '</div>' +
+        '<div class="gallery-dots" id="gallery-dots-' + id + '">' +
+          images.map(function(img, i) {
+            return '<div class="gallery-dot' + (i === 0 ? ' gallery-dot-active' : '') + '" onclick="galleryGoTo(' + id + ',' + i + ')"></div>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+  } else if (product.image) {
+    galleryHtml = '<img src="' + product.image + '" alt="' + product.title + '" class="detail-img">';
+  } else {
+    galleryHtml = '<div class="detail-placeholder">' + product.emoji + '</div>';
+  }
 
   const page = document.getElementById('page-detail');
   page.innerHTML =
@@ -377,9 +399,7 @@ function showDetail(id) {
       '<h1>' + product.title + '</h1>' +
     '</header>' +
     '<div class="detail-content">' +
-      (product.image
-        ? '<img src="' + product.image + '" alt="' + product.title + '" class="detail-img">'
-        : '<div class="detail-placeholder">' + product.emoji + '</div>') +
+      galleryHtml +
       '<div class="detail-price">' + formatPrice(product.ton) + '</div>' +
       (desc
         ? '<div class="detail-desc">' + desc.replace(/\n/g, '<br>') + '</div>'
@@ -390,6 +410,40 @@ function showDetail(id) {
       ) +
     '</div>';
   showPage('page-detail');
+
+  if (images && images.length > 1) {
+    initGallerySwipe(id, images.length);
+  }
+}
+
+var galleryIndex = {};
+
+function galleryGoTo(id, index) {
+  galleryIndex[id] = index;
+  var track = document.getElementById('gallery-track-' + id);
+  if (track) track.style.transform = 'translateX(-' + (index * 100) + '%)';
+  var dots = document.querySelectorAll('#gallery-dots-' + id + ' .gallery-dot');
+  dots.forEach(function(d, i) {
+    d.classList.toggle('gallery-dot-active', i === index);
+  });
+}
+
+function initGallerySwipe(id, total) {
+  var track = document.getElementById('gallery-track-' + id);
+  if (!track) return;
+  galleryIndex[id] = 0;
+  var startX = 0;
+  track.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  track.addEventListener('touchend', function(e) {
+    var diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      var current = galleryIndex[id] || 0;
+      if (diff > 0 && current < total - 1) galleryGoTo(id, current + 1);
+      if (diff < 0 && current > 0) galleryGoTo(id, current - 1);
+    }
+  }, { passive: true });
 }
 
 function detailToggleCart(id) {
