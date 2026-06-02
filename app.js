@@ -370,7 +370,7 @@ function showDetail(id) {
   const desc = (descriptions[lang] && descriptions[lang][id]) || (descriptions['ru'] && descriptions['ru'][id]);
   const images = product.images || (product.image ? [product.image] : null);
 
-  var galleryHtml = '';
+ var galleryHtml = '';
   if (images && images.length > 1) {
     galleryHtml =
       '<div class="gallery" id="gallery-' + id + '">' +
