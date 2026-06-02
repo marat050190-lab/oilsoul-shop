@@ -439,10 +439,25 @@ function initGallerySwipe(id, total) {
   track.style.transform = 'translateX(0%)';
   var startX = 0;
   var startY = 0;
+  var isDragging = false;
+
   track.addEventListener('touchstart', function(e) {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
+    isDragging = false;
   }, { passive: true });
+
+  track.addEventListener('touchmove', function(e) {
+    var diffX = startX - e.touches[0].clientX;
+    var diffY = startY - e.touches[0].clientY;
+    if (!isDragging && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 5) {
+      isDragging = true;
+    }
+    if (isDragging) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
   track.addEventListener('touchend', function(e) {
     var diffX = startX - e.changedTouches[0].clientX;
     var diffY = startY - e.changedTouches[0].clientY;
@@ -454,6 +469,7 @@ function initGallerySwipe(id, total) {
         galleryGoTo(id, current - 1);
       }
     }
+    isDragging = false;
   }, { passive: true });
 }
 function detailToggleCart(id) {
