@@ -370,7 +370,7 @@ function showDetail(id) {
   const desc = (descriptions[lang] && descriptions[lang][id]) || (descriptions['ru'] && descriptions['ru'][id]);
   const images = product.images || (product.image ? [product.image] : null);
 
- var galleryHtml = '';
+var galleryHtml = '';
   if (images && images.length > 1) {
     galleryHtml =
       '<div class="gallery" id="gallery-' + id + '">' +
@@ -379,12 +379,10 @@ function showDetail(id) {
             return '<img src="' + img + '" alt="' + product.title + '" class="gallery-slide">';
           }).join('') +
         '</div>' +
+        '<button class="gallery-arrow gallery-arrow-left" onclick="galleryGoTo(' + id + ', (galleryIndex[' + id + ']||0) - 1)">&#8249;</button>' +
+        '<button class="gallery-arrow gallery-arrow-right" onclick="galleryGoTo(' + id + ', (galleryIndex[' + id + ']||0) + 1)">&#8250;</button>' +
         '<div class="gallery-dots" id="gallery-dots-' + id + '">' +
           images.map(function(img, i) {
-            return '<div class="gallery-dot' + (i === 0 ? ' gallery-dot-active' : '') + '" onclick="galleryGoTo(' + id + ',' + i + ')"></div>';
-          }).join('') +
-        '</div>' +
-      '</div>';
   } else if (product.image) {
     galleryHtml = '<img src="' + product.image + '" alt="' + product.title + '" class="detail-img">';
   } else {
