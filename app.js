@@ -373,16 +373,20 @@ function showDetail(id) {
 var galleryHtml = '';
   if (images && images.length > 1) {
     galleryHtml =
-      '<div class="gallery" id="gallery-' + id + '">' +
-        '<div class="gallery-track" id="gallery-track-' + id + '">' +
+      '<div class="gallery" id="gallery-' + id + '" style="position:relative;width:100%;overflow:hidden;border-radius:16px;">' +
+        '<div class="gallery-track" id="gallery-track-' + id + '" style="display:flex;transition:transform 0.3s ease;">' +
           images.map(function(img) {
-            return '<img src="' + img + '" alt="' + product.title + '" class="gallery-slide">';
+            return '<img src="' + img + '" alt="' + product.title + '" style="width:100%;flex-shrink:0;aspect-ratio:1;object-fit:cover;">';
           }).join('') +
         '</div>' +
-        '<button class="gallery-arrow gallery-arrow-left" onclick="galleryGoTo(' + id + ', (galleryIndex[' + id + ']||0) - 1)">&#8249;</button>' +
-        '<button class="gallery-arrow gallery-arrow-right" onclick="galleryGoTo(' + id + ', (galleryIndex[' + id + ']||0) + 1)">&#8250;</button>' +
-        '<div class="gallery-dots" id="gallery-dots-' + id + '">' +
+        '<button onclick="galleryGoTo(' + id + ', (galleryIndex[' + id + ']||0) - 1)" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:white;font-size:22px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;padding:0;">&#8249;</button>' +
+        '<button onclick="galleryGoTo(' + id + ', (galleryIndex[' + id + ']||0) + 1)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:white;font-size:22px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;padding:0;">&#8250;</button>' +
+        '<div id="gallery-dots-' + id + '" style="display:flex;justify-content:center;gap:6px;padding:10px 0 4px;">' +
           images.map(function(img, i) {
+            return '<div class="gallery-dot' + (i === 0 ? ' gallery-dot-active' : '') + '" onclick="galleryGoTo(' + id + ',' + i + ')" style="width:6px;height:6px;border-radius:50%;background:' + (i === 0 ? '#f0c040' : 'rgba(255,255,255,0.2)') + ';cursor:pointer;"></div>';
+          }).join('') +
+        '</div>' +
+      '</div>';
   } else if (product.image) {
     galleryHtml = '<img src="' + product.image + '" alt="' + product.title + '" class="detail-img">';
   } else {
@@ -407,12 +411,8 @@ var galleryHtml = '';
       ) +
     '</div>';
   showPage('page-detail');
-
-  if (images && images.length > 1) {
-    initGallerySwipe(id, images.length);
-  }
+  galleryIndex[id] = 0;
 }
-
 var galleryIndex = {};
 
 function galleryGoTo(id, index) {
@@ -431,46 +431,7 @@ function galleryGoTo(id, index) {
 
 function initGallerySwipe(id, total) {
   var track = document.getElementById('gallery-track-' + id);
-  if (!track) return;
-  galleryIndex[id] = 0;
-  track.style.transform = 'translateX(0%)';
-  var startX = 0;
-  var startY = 0;
-  var isDragging = false;
-
-  track.addEventListener('touchstart', function(e) {
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    isDragging = false;
-  }, { passive: true });
-
-  track.addEventListener('touchmove', function(e) {
-    var diffX = startX - e.touches[0].clientX;
-    var diffY = startY - e.touches[0].clientY;
-    if (!isDragging && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 5) {
-      isDragging = true;
-    }
-    if (isDragging) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-
-  track.addEventListener('touchend', function(e) {
-    var diffX = startX - e.changedTouches[0].clientX;
-    var diffY = startY - e.changedTouches[0].clientY;
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
-      var current = galleryIndex[id] !== undefined ? galleryIndex[id] : 0;
-      if (diffX > 0 && current < total - 1) {
-        galleryGoTo(id, current + 1);
-      } else if (diffX < 0 && current > 0) {
-        galleryGoTo(id, current - 1);
-      }
-    }
-    isDragging = false;
-  }, { passive: true });
-}
-function detailToggleCart(id) {
-  toggleCart(id);
+ 
   const btn = document.getElementById('detail-cart-btn');
   if (!btn) return;
   const inCart = cart.find(function(i) { return i.id === id; });
