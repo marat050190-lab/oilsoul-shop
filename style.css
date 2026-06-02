@@ -1136,11 +1136,13 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 16px;
+  touch-action: pan-y;
 }
 
 .gallery-track {
   display: flex;
   transition: transform 0.3s ease;
+  touch-action: pan-y;
 }
 
 .gallery-slide {
@@ -1148,6 +1150,10 @@ body {
   flex-shrink: 0;
   aspect-ratio: 1;
   object-fit: cover;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
 }
 
 .gallery-dots {
