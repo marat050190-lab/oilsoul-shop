@@ -222,6 +222,28 @@ function setLang(l) {
   lang = l;
   document.getElementById('lang-ru').classList.toggle('lang-active', l === 'ru');
   document.getElementById('lang-en').classList.toggle('lang-active', l === 'en');
+  document.getElementById('lang-ar').classList.toggle('lang-active', l === 'ar');
+
+  var isRtl = l === 'ar';
+  document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+  document.documentElement.setAttribute('lang', l);
+  document.body.style.fontFamily = isRtl ? "'Noto Sans Arabic', sans-serif" : "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+
+  var headerSub = document.getElementById('header-sub');
+  if (headerSub) headerSub.textContent = t('header_sub');
+  var heroTitle = document.getElementById('hero-title');
+  if (heroTitle) heroTitle.innerHTML = l === 'ru' ? 'Цифровой подарок —<br>в настоящей<br>масляной живописи' : l === 'ar' ? 'هديتك الرقمية —<br>في لوحة زيتية حقيقية' : 'Your digital gift —<br>in a real<br>oil painting';
+  var heroDesc = document.getElementById('hero-desc');
+  if (heroDesc) heroDesc.textContent = t('header_sub');
+  var feat1 = document.getElementById('feat-1');
+  if (feat1) feat1.textContent = l === 'ru' ? 'Масло и холст' : l === 'ar' ? 'زيت وقماش' : 'Oil & canvas';
+  var feat2 = document.getElementById('feat-2');
+  if (feat2) feat2.textContent = l === 'ru' ? 'Доставка по всему миру' : l === 'ar' ? 'شحن دولي' : 'Worldwide shipping';
+  var feat3 = document.getElementById('feat-3');
+  if (feat3) feat3.textContent = l === 'ru' ? 'Оплата в TON' : l === 'ar' ? 'الدفع بـ TON' : 'Pay in TON';
+  var customBtn = document.getElementById('custom-bar-btn');
+  if (customBtn) customBtn.textContent = l === 'ar' ? '✍️ طلب خاص' : l === 'en' ? '✍️ Custom order' : '✍️ Под заказ';
+
   document.getElementById('checkout-btn').textContent = t('cart_btn');
   document.getElementById('field-name').placeholder = t('field_name');
   document.getElementById('field-country').placeholder = t('field_country');
@@ -233,6 +255,7 @@ function setLang(l) {
   document.getElementById('field-comment').placeholder = t('field_comment');
   document.getElementById('submit-btn').textContent = t('submit_btn');
   renderCatalog();
+}
 }
 
 async function fetchTonPrice() {
