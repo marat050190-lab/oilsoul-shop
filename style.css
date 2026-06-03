@@ -1276,3 +1276,51 @@ body {
   line-height: 1.5;
   text-align: center;
 }
+/* RTL */
+[dir="rtl"] .main-header-right {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .bottom-bar {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .card-actions {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .payment-req-content {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .payment-address-row {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .payment-amount-row {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .order-item {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .order-total {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .custom-condition-row {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .feature-card {
+  text-align: center;
+}
+[dir="rtl"] .hero-title {
+  font-family: 'Noto Sans Arabic', sans-serif;
+}
+[dir="rtl"] .faq-question {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .pay-btn {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+[dir="rtl"] .stage-icon {
+  order: 1;
+}
+[dir="rtl"] .stage-text {
+  order: 0;
+  text-align: right;
+}
