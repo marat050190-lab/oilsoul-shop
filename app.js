@@ -432,14 +432,33 @@ function galleryGoTo(id, index) {
     d.style.transition = 'all 0.2s';
   });
 }
-function initGallerySwipe(id, total) {
-  var track = document.getElementById('gallery-track-' + id);
- 
+function detailToggleCart(id) {
+  toggleCart(id);
   const btn = document.getElementById('detail-cart-btn');
   if (!btn) return;
   const inCart = cart.find(function(i) { return i.id === id; });
-  btn.className = 'submit-btn ' + (inCart ? 'in-cart-btn' : '');
-  btn.textContent = inCart ? t('btn_in_cart_full') : t('btn_add_cart');
+  if (inCart) {
+    btn.className = 'submit-btn in-cart-btn';
+    btn.textContent = t('btn_in_cart_full');
+    var existing = document.getElementById('detail-checkout-btn');
+    if (!existing) {
+      var checkoutBtn = document.createElement('button');
+      checkoutBtn.id = 'detail-checkout-btn';
+      checkoutBtn.className = 'submit-btn';
+      checkoutBtn.style.marginTop = '10px';
+      checkoutBtn.textContent = t('cart_btn');
+      checkoutBtn.onclick = function() {
+        renderCheckout();
+        showPage('page-checkout');
+      };
+      btn.parentNode.insertBefore(checkoutBtn, btn.nextSibling);
+    }
+  } else {
+    btn.className = 'submit-btn';
+    btn.textContent = t('btn_add_cart');
+    var existing = document.getElementById('detail-checkout-btn');
+    if (existing) existing.remove();
+  }
 }
 
 function toggleCart(id) {
