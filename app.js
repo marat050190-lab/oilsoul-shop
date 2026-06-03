@@ -667,7 +667,7 @@ const orderId = 'OS-' + Date.now();
     delivery: { name: name, country: country, city: city, address: address, postal: postal, phone: phone, email: email, comment: comment }
   };
 
-  try {
+ try {
     const res = await fetch('https://oilsoul-bot.onrender.com/order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -680,11 +680,7 @@ const orderId = 'OS-' + Date.now();
   } catch (e) {
     alert(t('connection_error'));
   }
-  } catch (e) {
-    alert(t('connection_error'));
-  }
 });
-
 function copyToClipboard(text, btn) {
   navigator.clipboard.writeText(text).then(function() {
     const original = btn.textContent;
