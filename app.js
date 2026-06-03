@@ -416,7 +416,8 @@ var galleryHtml = '';
 var galleryIndex = {};
 
 function galleryGoTo(id, index) {
-  var images = products.find(function(p) { return p.id === id; }).images;
+  var product = products.find(function(p) { return p.id === id; });
+  var images = product.images || (product.image ? [product.image] : null);
   var total = images ? images.length : 1;
   if (index < 0) index = 0;
   if (index >= total) index = total - 1;
@@ -425,10 +426,12 @@ function galleryGoTo(id, index) {
   if (track) track.style.transform = 'translateX(-' + (index * 100) + '%)';
   var dots = document.querySelectorAll('#gallery-dots-' + id + ' .gallery-dot');
   dots.forEach(function(d, i) {
-    d.classList.toggle('gallery-dot-active', i === index);
+    d.style.background = (i === index) ? '#f0c040' : 'rgba(255,255,255,0.2)';
+    d.style.width = (i === index) ? '18px' : '6px';
+    d.style.borderRadius = '3px';
+    d.style.transition = 'all 0.2s';
   });
 }
-
 function initGallerySwipe(id, total) {
   var track = document.getElementById('gallery-track-' + id);
  
