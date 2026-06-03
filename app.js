@@ -655,12 +655,15 @@ document.getElementById('submit-btn').addEventListener('click', async function()
   const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
   const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
 
+const orderId = 'OS-' + Date.now();
+
   const orderData = {
     action: 'order',
     chat_id: user ? user.id : null,
     user_name: user ? ((user.first_name || '') + ' ' + (user.last_name || '')).trim() : name,
     items: cart.map(function(i) { return { id: i.id, title: i.title, ton: i.ton }; }),
     total_ton: totalTon,
+    order_id: orderId,
     delivery: { name: name, country: country, city: city, address: address, postal: postal, phone: phone, email: email, comment: comment }
   };
 
@@ -672,8 +675,11 @@ document.getElementById('submit-btn').addEventListener('click', async function()
     });
     const result = await res.json();
     if (result.ok) {
-      showPayment(totalTon);
+      showPayment(totalTon, orderId);
     }
+  } catch (e) {
+    alert(t('connection_error'));
+  }
   } catch (e) {
     alert(t('connection_error'));
   }
@@ -691,12 +697,12 @@ function copyToClipboard(text, btn) {
   });
 }
 
-function showPayment(totalTon) {
+function showPayment(totalTon, orderId) {
   cart = [];
   updateCartBar();
 
-  const walletLink = 'ton://transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=OilSoul';
-  const tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=OilSoul';
+  const walletLink = 'ton://transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + orderId;
+  const tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + orderId;
   const amountDisplay = totalTon + ' TON' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
 
   const page = document.getElementById('page-detail');
@@ -730,12 +736,23 @@ function showPayment(totalTon) {
           '<strong>' + totalTon + ' TON</strong>' +
           '<button class="copy-btn" onclick="copyToClipboard(\'' + totalTon + '\', this)">' + t('copy') + '</button>' +
         '</div>' +
+        '<div class="payment-comment-row">' +
+          '<div class="payment-comment-label">📝 Комментарий к переводу:</div>' +
+          '<div class="payment-comment-value" id="order-id-display">' + orderId + '</div>' +
+          '<button class="copy-btn" onclick="copyToClipboard(\'' + orderId + '\', this)">' + t('copy') + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="payment-note-box">' +
+        '<span class="payment-note-icon">⚠️</span>' +
+        'Обязательно укажите номер заказа в комментарии к переводу — оплата подтвердится автоматически.' +
       '</div>' +
       '<div class="payment-after">' +
         t('after_payment') + ' <a href="https://t.me/OilSoulBot" target="_blank">@OilSoulBot</a> ' + t('after_payment2') +
       '</div>' +
     '</div>';
 
+  showPage('page-detail');
+}
   showPage('page-detail');
 }
 
