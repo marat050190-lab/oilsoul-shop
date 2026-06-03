@@ -5,7 +5,7 @@ let cart = [];
 let tonPrice = null;
 let lang = 'ru';
 let currentFilter = 'all';
-
+let savedScrollY = 0;
 const i18n = {
   ru: {
     header_title: '🎨 Oil&Soul',
@@ -237,7 +237,13 @@ function showPage(pageId) {
   document.getElementById('page-checkout').classList.add('hidden');
   document.getElementById('page-detail').classList.add('hidden');
   document.getElementById(pageId).classList.remove('hidden');
-  window.scrollTo(0, 0);
+  if (pageId === 'page-catalog') {
+    setTimeout(function() {
+      window.scrollTo(0, savedScrollY);
+    }, 50);
+  } else {
+    window.scrollTo(0, 0);
+  }
 }
 
 function showFaqPage() {
@@ -365,6 +371,7 @@ function renderCatalog() {
 }
 
 function showDetail(id) {
+  savedScrollY = window.scrollY;
   const product = products.find(function(p) { return p.id === id; });
   const inCart = cart.find(function(i) { return i.id === id; });
   const desc = (descriptions[lang] && descriptions[lang][id]) || (descriptions['ru'] && descriptions['ru'][id]);
