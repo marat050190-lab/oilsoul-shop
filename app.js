@@ -6,6 +6,7 @@ let tonPrice = null;
 let lang = 'ru';
 let currentFilter = 'all';
 let savedScrollY = 0;
+
 const i18n = {
   ru: {
     header_title: '🎨 Oil&Soul',
@@ -66,10 +67,11 @@ const i18n = {
     custom_submit: '✅ Отправить заказ',
     custom_fill_fields: 'Пожалуйста заполните все поля, включая ссылку на подарок',
     custom_success: 'Заказ отправлен! Бот пришлёт реквизиты для оплаты.',
- filter_all: 'Все',
-filter_ready: 'В наличии',
-filter_custom: 'Под заказ',
-filter_sold: 'Продано',
+    filter_all: 'Все',
+    filter_ready: 'В наличии',
+    filter_custom: 'Под заказ',
+    filter_sold: 'Продано',
+    sold_label: 'Продано',
     custom_card_title: '🎁 Картина с вашего подарка',
     custom_card_desc: 'Закажите картину маслом по мотивам вашего коллекционного подарка Telegram',
     custom_card_btn: 'Заказать →',
@@ -238,9 +240,7 @@ function showPage(pageId) {
   document.getElementById('page-detail').classList.add('hidden');
   document.getElementById(pageId).classList.remove('hidden');
   if (pageId === 'page-catalog') {
-    setTimeout(function() {
-      window.scrollTo(0, savedScrollY);
-    }, 50);
+    setTimeout(function() { window.scrollTo(0, savedScrollY); }, 50);
   } else {
     window.scrollTo(0, 0);
   }
@@ -289,9 +289,7 @@ function toggleFaq(i) {
 
 function setFilter(filter) {
   currentFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(function(btn) {
-    btn.classList.remove('filter-active');
-  });
+  document.querySelectorAll('.filter-btn').forEach(function(btn) { btn.classList.remove('filter-active'); });
   document.getElementById('filter-' + filter).classList.add('filter-active');
   renderCatalog();
 }
@@ -335,7 +333,7 @@ function renderCatalog() {
   if (filtered.length === 0 && currentFilter !== 'custom') {
     const empty = document.createElement('div');
     empty.className = 'catalog-empty';
-    empty.textContent = currentFilter === 'sold' ? 'Проданные работы появятся здесь' : 'Нет работ в этой категории';
+    empty.textContent = 'Нет работ в этой категории';
     grid.appendChild(empty);
   }
 
@@ -344,7 +342,6 @@ function renderCatalog() {
     card.className = 'card' + (product.status === 'sold' ? ' card-sold' : '');
     const inCart = cart.find(function(i) { return i.id === product.id; });
     const isSold = product.status === 'sold';
-
     card.innerHTML =
       '<div class="card-img-wrap">' +
         (product.image
@@ -376,7 +373,7 @@ function showDetail(id) {
   const desc = (descriptions[lang] && descriptions[lang][id]) || (descriptions['ru'] && descriptions['ru'][id]);
   const images = product.images || (product.image ? [product.image] : null);
 
-var galleryHtml = '';
+  var galleryHtml = '';
   if (images && images.length > 1) {
     galleryHtml =
       '<div class="gallery" id="gallery-' + id + '" style="position:relative;width:100%;overflow:hidden;border-radius:16px;">' +
@@ -389,7 +386,7 @@ var galleryHtml = '';
         '<button onclick="galleryGoTo(' + id + ', (galleryIndex[' + id + ']||0) + 1)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:white;font-size:22px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;padding:0;">&#8250;</button>' +
         '<div id="gallery-dots-' + id + '" style="display:flex;justify-content:center;gap:6px;padding:10px 0 4px;">' +
           images.map(function(img, i) {
-            return '<div class="gallery-dot' + (i === 0 ? ' gallery-dot-active' : '') + '" onclick="galleryGoTo(' + id + ',' + i + ')" style="width:6px;height:6px;border-radius:50%;background:' + (i === 0 ? '#f0c040' : 'rgba(255,255,255,0.2)') + ';cursor:pointer;"></div>';
+            return '<div class="gallery-dot' + (i === 0 ? ' gallery-dot-active' : '') + '" onclick="galleryGoTo(' + id + ',' + i + ')" style="width:' + (i === 0 ? '18px' : '6px') + ';height:6px;border-radius:3px;background:' + (i === 0 ? '#f0c040' : 'rgba(255,255,255,0.2)') + ';cursor:pointer;transition:all 0.2s;"></div>';
           }).join('') +
         '</div>' +
       '</div>';
@@ -419,6 +416,7 @@ var galleryHtml = '';
   showPage('page-detail');
   galleryIndex[id] = 0;
 }
+
 var galleryIndex = {};
 
 function galleryGoTo(id, index) {
@@ -438,6 +436,7 @@ function galleryGoTo(id, index) {
     d.style.transition = 'all 0.2s';
   });
 }
+
 function detailToggleCart(id) {
   toggleCart(id);
   const btn = document.getElementById('detail-cart-btn');
@@ -566,9 +565,9 @@ function showCustomPage() {
           '<div class="custom-condition-row"><span>' + t('custom_deadline') + '</span><span>21 день + доставка</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
         '</div>' +
-       'Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram. Каждая работа — физическая художественная интерпретация цифрового подарка.' +
+        '<div class="custom-disclaimer">Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram. Каждая работа — физическая художественная интерпретация цифрового подарка.</div>' +
         '<button class="submit-btn" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
-        '<button class="faq-link-btn" onclick="showFaqPage()">❓ Частые вопросы</button>' +
+        '<button class="faq-link-btn" onclick="showFaqPage()">❓ FAQ</button>' +
       '</div>' +
     '</div>';
   showPage('page-detail');
@@ -618,7 +617,7 @@ async function submitCustomOrder() {
         '<div class="detail-content">' +
           '<div class="payment-success-icon">🎨</div>' +
           '<div class="payment-success-title">' + t('custom_success') + '</div>' +
-          '<div class="payment-success-sub">Проверьте чат с @OilSoulBot — там будут реквизиты для оплаты.</div>' +
+          '<div class="payment-success-sub">Проверьте чат с @OilSoulBot — там реквизиты для оплаты.</div>' +
         '</div>';
       showPage('page-detail');
     }
@@ -654,8 +653,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
 
   const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
   const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
-
-const orderId = 'OS-' + Date.now();
+  const orderId = 'OS-' + Date.now();
 
   const orderData = {
     action: 'order',
@@ -667,7 +665,7 @@ const orderId = 'OS-' + Date.now();
     delivery: { name: name, country: country, city: city, address: address, postal: postal, phone: phone, email: email, comment: comment }
   };
 
- try {
+  try {
     const res = await fetch('https://oilsoul-bot.onrender.com/order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -681,6 +679,7 @@ const orderId = 'OS-' + Date.now();
     alert(t('connection_error'));
   }
 });
+
 function copyToClipboard(text, btn) {
   navigator.clipboard.writeText(text).then(function() {
     const original = btn.textContent;
@@ -734,21 +733,19 @@ function showPayment(totalTon, orderId) {
         '</div>' +
         '<div class="payment-comment-row">' +
           '<div class="payment-comment-label">📝 Комментарий к переводу:</div>' +
-          '<div class="payment-comment-value" id="order-id-display">' + orderId + '</div>' +
+          '<div class="payment-comment-value">' + orderId + '</div>' +
           '<button class="copy-btn" onclick="copyToClipboard(\'' + orderId + '\', this)">' + t('copy') + '</button>' +
         '</div>' +
       '</div>' +
       '<div class="payment-note-box">' +
         '<span class="payment-note-icon">⚠️</span>' +
-        'Обязательно укажите номер заказа в комментарии к переводу — оплата подтвердится автоматически.' +
+        '<span>Укажите номер заказа в комментарии к переводу — оплата подтвердится автоматически.</span>' +
       '</div>' +
       '<div class="payment-after">' +
         t('after_payment') + ' <a href="https://t.me/OilSoulBot" target="_blank">@OilSoulBot</a> ' + t('after_payment2') +
       '</div>' +
     '</div>';
 
-  showPage('page-detail');
-}
   showPage('page-detail');
 }
 
