@@ -212,7 +212,8 @@ const i18n = {
     custom_card_desc: 'اطلب لوحة زيتية بأسلوب هديتك على Telegram',
     custom_card_btn: 'اطلب →',
     faq_title: 'FAQ',
-  }
+  }}
+};
 function t(key) {
   return i18n[lang][key] || key;
 }
