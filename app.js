@@ -740,10 +740,6 @@ function showPayment(totalTon, orderId) {
       '</div>' +
       '<div class="payment-note-info">Укажите номер заказа в комментарии к переводу — оплата подтвердится автоматически</div>' +
       '<div class="payment-buttons">' +
-        '<a href="' + walletLink + '" class="pay-btn pay-btn-wallet">' +
-          '<span class="pay-btn-icon">✈️</span>' +
-          '<span class="pay-btn-text"><strong>' + t('pay_wallet') + '</strong><small>' + t('pay_wallet_sub') + '</small></span>' +
-        '</a>' +
         '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">' +
           '<span class="pay-btn-icon">💎</span>' +
           '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
