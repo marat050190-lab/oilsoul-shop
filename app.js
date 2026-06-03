@@ -697,7 +697,6 @@ function showPayment(totalTon, orderId) {
   updateCartBar();
 
   const shortId = 'OS-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-  const walletLink = 'ton://transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + shortId;
   const tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + shortId;
   const amountDisplay = totalTon + ' TON' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
   const shortWallet = TON_WALLET.substring(0, 10) + '...' + TON_WALLET.substring(TON_WALLET.length - 6);
