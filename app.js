@@ -145,9 +145,8 @@ const i18n = {
     custom_card_desc: 'Order an oil painting based on your Telegram collectible gift',
     custom_card_btn: 'Order →',
     faq_title: 'FAQ',
-  }
-};
-ar: {
+},
+  ar: {
     header_title: '🎨 Oil&Soul',
     header_sub: 'لوحات زيتية بأسلوب هدايا Telegram',
     btn_details: 'التفاصيل',
