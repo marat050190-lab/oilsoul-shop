@@ -306,7 +306,6 @@ function renderCatalog() {
     '<button id="filter-all" class="filter-btn' + (currentFilter === 'all' ? ' filter-active' : '') + '" onclick="setFilter(\'all\')">' + t('filter_all') + '</button>' +
     '<button id="filter-ready" class="filter-btn' + (currentFilter === 'ready' ? ' filter-active' : '') + '" onclick="setFilter(\'ready\')">' + t('filter_ready') + '</button>' +
     '<button id="filter-custom" class="filter-btn' + (currentFilter === 'custom' ? ' filter-active' : '') + '" onclick="setFilter(\'custom\')">' + t('filter_custom') + '</button>' +
-    '<button id="filter-sold" class="filter-btn' + (currentFilter === 'sold' ? ' filter-active' : '') + '" onclick="setFilter(\'sold\')">' + t('filter_sold') + '</button>';
   catalog.appendChild(filterBar);
 
   if (currentFilter === 'all' || currentFilter === 'custom') {
