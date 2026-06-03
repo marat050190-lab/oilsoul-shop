@@ -256,7 +256,6 @@ function setLang(l) {
   document.getElementById('submit-btn').textContent = t('submit_btn');
   renderCatalog();
 }
-}
 
 async function fetchTonPrice() {
   try {
