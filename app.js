@@ -696,9 +696,11 @@ function showPayment(totalTon, orderId) {
   cart = [];
   updateCartBar();
 
-  const walletLink = 'ton://transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + orderId;
-  const tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + orderId;
+  const shortId = 'OS-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+  const walletLink = 'ton://transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + shortId;
+  const tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + shortId;
   const amountDisplay = totalTon + ' TON' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
+  const shortWallet = TON_WALLET.substring(0, 10) + '...' + TON_WALLET.substring(TON_WALLET.length - 6);
 
   const page = document.getElementById('page-detail');
   page.innerHTML =
@@ -710,6 +712,33 @@ function showPayment(totalTon, orderId) {
       '<div class="payment-success-icon">💎</div>' +
       '<div class="payment-success-title">' + t('payment_done') + '</div>' +
       '<div class="payment-success-sub">' + t('payment_sub') + ' ' + amountDisplay + '</div>' +
+      '<div class="payment-requisites">' +
+        '<div class="payment-req-label">Реквизиты для оплаты</div>' +
+        '<div class="payment-req-row">' +
+          '<div class="payment-req-name">Адрес кошелька</div>' +
+          '<div class="payment-req-content">' +
+            '<div class="payment-req-value">' + shortWallet + '</div>' +
+            '<button class="copy-btn" onclick="copyToClipboard(\'' + TON_WALLET + '\', this)">' + t('copy') + '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="payment-req-divider"></div>' +
+        '<div class="payment-req-row">' +
+          '<div class="payment-req-name">Сумма</div>' +
+          '<div class="payment-req-content">' +
+            '<div class="payment-req-value payment-req-amount">' + totalTon + ' TON</div>' +
+            '<button class="copy-btn" onclick="copyToClipboard(\'' + totalTon + '\', this)">' + t('copy') + '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="payment-req-divider"></div>' +
+        '<div class="payment-req-row">' +
+          '<div class="payment-req-name">Комментарий</div>' +
+          '<div class="payment-req-content">' +
+            '<div class="payment-req-value payment-req-order">' + shortId + '</div>' +
+            '<button class="copy-btn" onclick="copyToClipboard(\'' + shortId + '\', this)">' + t('copy') + '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="payment-note-info">Укажите номер заказа в комментарии к переводу — оплата подтвердится автоматически</div>' +
       '<div class="payment-buttons">' +
         '<a href="' + walletLink + '" class="pay-btn pay-btn-wallet">' +
           '<span class="pay-btn-icon">✈️</span>' +
@@ -720,33 +749,10 @@ function showPayment(totalTon, orderId) {
           '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
         '</a>' +
       '</div>' +
-      '<div class="payment-manual">' +
-        '<div class="payment-manual-label">' + t('other_wallet') + '</div>' +
-        '<div class="payment-address-row">' +
-          '<div class="payment-address">' + TON_WALLET + '</div>' +
-          '<button class="copy-btn" onclick="copyToClipboard(\'' + TON_WALLET + '\', this)">' + t('copy') + '</button>' +
-        '</div>' +
-        '<div class="payment-amount-row">' +
-          '<span>' + t('amount') + '</span>' +
-          '<strong>' + totalTon + ' TON</strong>' +
-          '<button class="copy-btn" onclick="copyToClipboard(\'' + totalTon + '\', this)">' + t('copy') + '</button>' +
-        '</div>' +
-        '<div class="payment-comment-row">' +
-          '<div class="payment-comment-label">📝 Комментарий к переводу:</div>' +
-          '<div class="payment-comment-value">' + orderId + '</div>' +
-          '<button class="copy-btn" onclick="copyToClipboard(\'' + orderId + '\', this)">' + t('copy') + '</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="payment-note-box">' +
-        '<span class="payment-note-icon">⚠️</span>' +
-        '<span>Укажите номер заказа в комментарии к переводу — оплата подтвердится автоматически.</span>' +
-      '</div>' +
-      '<div class="payment-after">' +
-        t('after_payment') + ' <a href="https://t.me/OilSoulBot" target="_blank">@OilSoulBot</a> ' + t('after_payment2') +
-      '</div>' +
     '</div>';
 
   showPage('page-detail');
+  window._currentOrderId = shortId;
 }
 
 fetchTonPrice();
