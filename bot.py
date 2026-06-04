@@ -135,7 +135,7 @@ def order():
     items = data.get('items', [])
     total_ton = data.get('total_ton', sum(i.get('ton', 0) for i in items))
     delivery = data.get('delivery', {})
-   order_id = data.get('order_id') or ('OS-' + str(int(time.time())))
+    order_id = data.get('order_id') or ('OS-' + str(int(time.time())))
 
     if order_id and chat_id:
         pending_orders[order_id] = {
@@ -246,5 +246,3 @@ if __name__ == '__main__':
     start_ton_monitor()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-
-start_ton_monitor()
