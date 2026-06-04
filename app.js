@@ -743,7 +743,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
 
   const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
   const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
-  const orderId = 'OS-' + Date.now();
+  const orderId = 'OS-' + Math.random().toString(36).substring(2, 6).toUpperCase();
 
   const orderData = {
     action: 'order',
