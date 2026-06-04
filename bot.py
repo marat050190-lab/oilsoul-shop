@@ -5,47 +5,102 @@ import time
 from flask import Flask, request
 from flask_cors import CORS
 import requests
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 TOKEN = os.environ.get('BOT_TOKEN')
 ADMIN_ID = 364102600
 WEBHOOK_URL = os.environ.get('WEBHOOK_URL')
+DATABASE_URL = os.environ.get('DATABASE_URL')
 TON_WALLET = 'UQCbHnRC6iUeksoheBxy2Xo_Lh0qGkr98J10nUCzHsG8KLq_'
 TON_API_KEY = 'e7ea536bf5ab4a139c669310f6d77c8513e7151feab6ef0686a3a7d2a1636d51'
 
 app = Flask(__name__)
 CORS(app)
 
-ORDERS_FILE = '/tmp/pending_orders.json'
-CONFIRMED_FILE = '/tmp/confirmed_orders.json'
-orders_lock = threading.Lock()
+def get_db():
+    return psycopg2.connect(DATABASE_URL, sslmode='require')
 
-def save_orders():
-    with orders_lock:
-        with open(ORDERS_FILE, 'w') as f:
-            json.dump(pending_orders, f)
-        with open(CONFIRMED_FILE, 'w') as f:
-            json.dump(list(confirmed_orders), f)
-
-def load_orders():
-    orders = {}
-    confirmed = set()
+def init_db():
     try:
-        if os.path.exists(ORDERS_FILE):
-            with open(ORDERS_FILE, 'r') as f:
-                orders = json.load(f)
-            print(f'Loaded {len(orders)} pending orders from disk')
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS pending_orders (
+                order_id TEXT PRIMARY KEY,
+                chat_id BIGINT,
+                total_ton FLOAT,
+                user_name TEXT,
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        ''')
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS confirmed_orders (
+                order_id TEXT PRIMARY KEY,
+                confirmed_at TIMESTAMP DEFAULT NOW()
+            )
+        ''')
+        conn.commit()
+        cur.close()
+        conn.close()
+        print('DB initialized OK')
     except Exception as e:
-        print(f'Error loading orders: {e}')
-    try:
-        if os.path.exists(CONFIRMED_FILE):
-            with open(CONFIRMED_FILE, 'r') as f:
-                confirmed = set(json.load(f))
-            print(f'Loaded {len(confirmed)} confirmed orders from disk')
-    except Exception as e:
-        print(f'Error loading confirmed: {e}')
-    return orders, confirmed
+        print(f'DB init error: {e}')
 
-pending_orders, confirmed_orders = load_orders()
+def save_order(order_id, chat_id, total_ton, user_name):
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            'INSERT INTO pending_orders (order_id, chat_id, total_ton, user_name) VALUES (%s, %s, %s, %s) ON CONFLICT (order_id) DO NOTHING',
+            (order_id, chat_id, total_ton, user_name)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(f'Order saved to DB: {order_id}')
+    except Exception as e:
+        print(f'save_order error: {e}')
+
+def get_pending_order(order_id):
+    try:
+        conn = get_db()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute('SELECT * FROM pending_orders WHERE order_id = %s', (order_id,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        return dict(row) if row else None
+    except Exception as e:
+        print(f'get_pending_order error: {e}')
+        return None
+
+def is_confirmed(order_id):
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute('SELECT 1 FROM confirmed_orders WHERE order_id = %s', (order_id,))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return result is not None
+    except Exception as e:
+        print(f'is_confirmed error: {e}')
+        return False
+
+def confirm_order(order_id):
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            'INSERT INTO confirmed_orders (order_id) VALUES (%s) ON CONFLICT DO NOTHING',
+            (order_id,)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f'confirm_order error: {e}')
 
 def send_message(chat_id, text):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
@@ -65,13 +120,12 @@ def check_ton_transactions():
     last_lt = None
     while True:
         try:
-            url = f'https://toncenter.com/api/v2/getTransactions'
             params = {
                 'address': TON_WALLET,
                 'limit': 20,
                 'api_key': TON_API_KEY
             }
-            r = requests.get(url, params=params, timeout=10)
+            r = requests.get('https://toncenter.com/api/v2/getTransactions', params=params, timeout=10)
             data = r.json()
 
             if data.get('ok') and data.get('result'):
@@ -79,7 +133,6 @@ def check_ton_transactions():
                     tx_lt = tx.get('transaction_id', {}).get('lt', '')
                     if tx_lt == last_lt:
                         break
-
                     if last_lt is None:
                         last_lt = tx_lt
                         break
@@ -93,31 +146,31 @@ def check_ton_transactions():
                     except:
                         comment = ''
 
-                    print(f'TX: comment={comment}, amount={amount}, pending={list(pending_orders.keys())}')
+                    print(f'TX: comment={comment}, amount={amount}')
 
-                    if comment.startswith('OS-') and comment in pending_orders and comment not in confirmed_orders:
-                        order = pending_orders[comment]
-                        expected_nano = int(order['total_ton'] * 1e9)
-
-                        if amount >= expected_nano * 0.99:
-                            confirmed_orders.add(comment)
-                            save_orders()
-                            chat_id = order.get('chat_id')
-                            if chat_id:
-                                send_message(chat_id,
-                                    '✅ <b>Оплата получена!</b>\n\n'
-                                    f'💎 {order["total_ton"]} TON — подтверждено\n\n'
-                                    '🎨 Художник приступает к работе.\n'
-                                    'Срок изготовления: 21 день.\n\n'
-                                    'Мы свяжемся с вами когда картина будет готова к отправке.'
+                    if comment.startswith('OS-') and not is_confirmed(comment):
+                        order = get_pending_order(comment)
+                        if order:
+                            expected_nano = int(order['total_ton'] * 1e9)
+                            if amount >= expected_nano * 0.99:
+                                confirm_order(comment)
+                                chat_id = order.get('chat_id')
+                                if chat_id:
+                                    send_message(chat_id,
+                                        '✅ <b>Оплата получена!</b>\n\n'
+                                        f'💎 {order["total_ton"]} TON — подтверждено\n\n'
+                                        '🎨 Художник приступает к работе.\n'
+                                        'Срок изготовления: 21 день.\n\n'
+                                        'Мы свяжемся с вами когда картина будет готова к отправке.'
+                                    )
+                                send_message(ADMIN_ID,
+                                    f'💰 <b>ОПЛАТА ПОЛУЧЕНА!</b>\n\n'
+                                    f'👤 {order.get("user_name", "—")}\n'
+                                    f'🆔 ID: {chat_id}\n'
+                                    f'💎 {order["total_ton"]} TON\n'
+                                    f'🔑 Заказ: {comment}'
                                 )
-                            send_message(ADMIN_ID,
-                                f'💰 <b>ОПЛАТА ПОЛУЧЕНА!</b>\n\n'
-                                f'👤 {order.get("user_name", "—")}\n'
-                                f'🆔 ID: {chat_id}\n'
-                                f'💎 {order["total_ton"]} TON\n'
-                                f'🔑 Заказ: {comment}'
-                            )
+                                print(f'Order confirmed: {comment}')
 
                     if last_lt is None or int(tx_lt) > int(last_lt):
                         last_lt = tx_lt
@@ -143,11 +196,9 @@ def webhook():
     data = request.json
     if not data or 'message' not in data:
         return 'ok'
-
     msg = data['message']
     chat_id = msg['chat']['id']
     text = msg.get('text', '').strip()
-
     if text.startswith('/start'):
         send_message(chat_id,
             '🎨 <b>Добро пожаловать в Oil&Soul!</b>\n\n'
@@ -155,9 +206,7 @@ def webhook():
             'Откройте магазин кнопкой ниже.'
         )
     else:
-        send_message(chat_id,
-            '🎨 Откройте магазин Oil&Soul чтобы сделать заказ.'
-        )
+        send_message(chat_id, '🎨 Откройте магазин Oil&Soul чтобы сделать заказ.')
     return 'ok'
 
 @app.route('/order', methods=['POST', 'OPTIONS'])
@@ -175,14 +224,7 @@ def order():
     delivery = data.get('delivery', {})
     order_id = data.get('order_id') or ('OS-' + str(int(time.time())))
 
-    if order_id and chat_id:
-        pending_orders[order_id] = {
-            'chat_id': chat_id,
-            'total_ton': total_ton,
-            'user_name': user_name
-        }
-        save_orders()
-        print(f'Order saved: {order_id}, pending={list(pending_orders.keys())}')
+    save_order(order_id, chat_id, total_ton, user_name)
 
     if chat_id:
         order_text = '✅ <b>Ваш заказ принят!</b>\n\n'
@@ -220,7 +262,6 @@ def order():
     )
     if delivery.get('comment'):
         admin_text += f'Комментарий: {delivery.get("comment")}\n'
-
     send_message(ADMIN_ID, admin_text)
     return {'ok': True}
 
@@ -238,13 +279,9 @@ def custom_order():
     delivery = data.get('delivery', {})
     order_id = data.get('order_id', 'OS-' + str(int(time.time())))
 
+    save_order(order_id, chat_id, 149, user_name)
+
     if chat_id:
-        pending_orders[order_id] = {
-            'chat_id': chat_id,
-            'total_ton': 149,
-            'user_name': user_name
-        }
-        save_orders()
         send_message(chat_id,
             '✅ <b>Заказ картины принят!</b>\n\n'
             f'🔗 Подарок: {gift_link}\n'
@@ -277,11 +314,11 @@ def custom_order():
     )
     if delivery.get('comment'):
         admin_text += f'Комментарий: {delivery.get("comment")}\n'
-
     send_message(ADMIN_ID, admin_text)
     return {'ok': True}
 
-# Запуск при импорте gunicorn
+# Инициализация БД и запуск мониторинга при старте
+init_db()
 _start_monitor_once()
 
 if __name__ == '__main__':
