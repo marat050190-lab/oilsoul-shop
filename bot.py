@@ -19,6 +19,14 @@ CORS(app)
 pending_orders = {}
 confirmed_orders = set()
 
+# Запускаем мониторинг TON при старте (работает и с gunicorn и напрямую)
+def _start_monitor_once():
+    import threading
+    if not any(t.name == 'ton_monitor' for t in threading.enumerate()):
+        t = threading.Thread(target=check_ton_transactions, daemon=True, name='ton_monitor')
+        t.start()
+        print('TON monitor started')
+
 def send_message(chat_id, text):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
     requests.post(url, json={'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'})
@@ -242,7 +250,9 @@ def custom_order():
     send_message(ADMIN_ID, admin_text)
     return {'ok': True}
 
+# Запуск при импорте gunicorn
+_start_monitor_once()
+
 if __name__ == '__main__':
-    start_ton_monitor()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
