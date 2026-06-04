@@ -125,6 +125,7 @@ def set_webhook_once():
 
 def check_ton_transactions():
     last_lt = None
+    first_run = True
     while True:
         try:
             params = {
@@ -140,7 +141,7 @@ def check_ton_transactions():
                     tx_lt = tx.get('transaction_id', {}).get('lt', '')
                     if tx_lt == last_lt:
                         break
-                    if last_lt is None:
+                    if last_lt is None and not first_run:
                         last_lt = tx_lt
                         break
 
@@ -185,6 +186,7 @@ def check_ton_transactions():
         except Exception as e:
             print(f'TON monitor error: {e}')
 
+        first_run = False
         time.sleep(30)
 
 def _start_monitor_once():
