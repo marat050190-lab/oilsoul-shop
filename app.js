@@ -786,8 +786,7 @@ function showPayment(totalTon, orderId) {
   cart = [];
   updateCartBar();
 
-  const shortId = 'OS-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-  const tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + shortId;
+  const tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + Math.round(totalTon * 1e9) + '&text=' + orderId;
   const amountDisplay = totalTon + ' TON' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
   const shortWallet = TON_WALLET.substring(0, 10) + '...' + TON_WALLET.substring(TON_WALLET.length - 6);
 
@@ -822,8 +821,8 @@ function showPayment(totalTon, orderId) {
         '<div class="payment-req-row">' +
           '<div class="payment-req-name">Комментарий</div>' +
           '<div class="payment-req-content">' +
-            '<div class="payment-req-value payment-req-order">' + shortId + '</div>' +
-            '<button class="copy-btn" onclick="copyToClipboard(\'' + shortId + '\', this)">' + t('copy') + '</button>' +
+            '<div class="payment-req-value payment-req-order">' + orderId + '</div>' +
+            '<button class="copy-btn" onclick="copyToClipboard(\'' + orderId + '\', this)">' + t('copy') + '</button>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -837,7 +836,7 @@ function showPayment(totalTon, orderId) {
     '</div>';
 
   showPage('page-detail');
-  window._currentOrderId = shortId;
+  window._currentOrderId = orderId;
 }
 
 fetchTonPrice();
