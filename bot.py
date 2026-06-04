@@ -22,30 +22,37 @@ def get_db():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def init_db():
-    try:
-        conn = get_db()
-        cur = conn.cursor()
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS pending_orders (
-                order_id TEXT PRIMARY KEY,
-                chat_id BIGINT,
-                total_ton FLOAT,
-                user_name TEXT,
-                created_at TIMESTAMP DEFAULT NOW()
-            )
-        ''')
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS confirmed_orders (
-                order_id TEXT PRIMARY KEY,
-                confirmed_at TIMESTAMP DEFAULT NOW()
-            )
-        ''')
-        conn.commit()
-        cur.close()
-        conn.close()
-        print('DB initialized OK')
-    except Exception as e:
-        print(f'DB init error: {e}')
+    for attempt in range(5):
+        try:
+            print(f'DB init attempt {attempt+1}...')
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS pending_orders (
+                    order_id TEXT PRIMARY KEY,
+                    chat_id BIGINT,
+                    total_ton FLOAT,
+                    user_name TEXT,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )
+            ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS confirmed_orders (
+                    order_id TEXT PRIMARY KEY,
+                    confirmed_at TIMESTAMP DEFAULT NOW()
+                )
+            ''')
+            conn.commit()
+            cur.close()
+            conn.close()
+            print('DB initialized OK')
+            return
+        except Exception as e:
+            import traceback
+            print(f'DB init error (attempt {attempt+1}): {e}')
+            traceback.print_exc()
+            time.sleep(3)
+    print('DB init FAILED after 5 attempts')
 
 def save_order(order_id, chat_id, total_ton, user_name):
     try:
