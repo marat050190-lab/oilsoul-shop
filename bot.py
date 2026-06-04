@@ -149,9 +149,11 @@ def check_ton_transactions():
                     comment_hex = msg.get('message', '')
                     amount = int(msg.get('value', 0))
 
-                    # Log raw hex for debugging
-                    if comment_hex and comment_hex != '':
-                        print(f'RAW hex: {comment_hex[:60]}')
+                    # Log full msg structure for debugging
+                    if amount > 0:
+                        print(f'MSG keys: {list(msg.keys())}')
+                        print(f'MSG message: {repr(comment_hex[:80])}')
+                        print(f'MSG msg_data: {repr(str(msg.get("msg_data", ""))[:80])}')
 
                     try:
                         raw = bytes.fromhex(comment_hex)
