@@ -150,9 +150,16 @@ def check_ton_transactions():
                     amount = int(msg.get('value', 0))
 
                     try:
-                        comment = bytes.fromhex(comment_hex).decode('utf-8').strip()
+                        raw = bytes.fromhex(comment_hex)
+                        # TON comments have a 4-byte prefix (0x00000000)
+                        if len(raw) > 4 and raw[:4] == b'\x00\x00\x00\x00':
+                            comment = raw[4:].decode('utf-8').strip()
+                        else:
+                            comment = raw.decode('utf-8').strip()
                     except:
                         comment = ''
+                    if comment:
+                        print(f'TX decoded comment: {repr(comment)}')
 
                     print(f'TX: comment={comment}, amount={amount}')
 
