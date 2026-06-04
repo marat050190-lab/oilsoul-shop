@@ -149,6 +149,10 @@ def check_ton_transactions():
                     comment_hex = msg.get('message', '')
                     amount = int(msg.get('value', 0))
 
+                    # Log raw hex for debugging
+                    if comment_hex and comment_hex != '':
+                        print(f'RAW hex: {comment_hex[:60]}')
+
                     try:
                         raw = bytes.fromhex(comment_hex)
                         # TON comments have a 4-byte prefix (0x00000000)
@@ -156,7 +160,8 @@ def check_ton_transactions():
                             comment = raw[4:].decode('utf-8').strip()
                         else:
                             comment = raw.decode('utf-8').strip()
-                    except:
+                    except Exception as ex:
+                        print(f'Decode error: {ex}, hex={comment_hex[:40]}')
                         comment = ''
                     if comment:
                         print(f'TX decoded comment: {repr(comment)}')
