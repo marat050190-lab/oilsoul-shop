@@ -15,23 +15,48 @@ TON_API_KEY = 'e7ea536bf5ab4a139c669310f6d77c8513e7151feab6ef0686a3a7d2a1636d51'
 app = Flask(__name__)
 CORS(app)
 
-# Хранилище ожидающих заказов: { 'OS-XXXXXX': { chat_id, total_ton, user_name } }
-pending_orders = {}
-confirmed_orders = set()
+ORDERS_FILE = '/tmp/pending_orders.json'
+CONFIRMED_FILE = '/tmp/confirmed_orders.json'
+orders_lock = threading.Lock()
 
-# Запускаем мониторинг TON при старте (работает и с gunicorn и напрямую)
-def _start_monitor_once():
-    import threading
-    if not any(t.name == 'ton_monitor' for t in threading.enumerate()):
-        t = threading.Thread(target=check_ton_transactions, daemon=True, name='ton_monitor')
-        t.start()
-        print('TON monitor started')
+def save_orders():
+    with orders_lock:
+        with open(ORDERS_FILE, 'w') as f:
+            json.dump(pending_orders, f)
+        with open(CONFIRMED_FILE, 'w') as f:
+            json.dump(list(confirmed_orders), f)
+
+def load_orders():
+    orders = {}
+    confirmed = set()
+    try:
+        if os.path.exists(ORDERS_FILE):
+            with open(ORDERS_FILE, 'r') as f:
+                orders = json.load(f)
+            print(f'Loaded {len(orders)} pending orders from disk')
+    except Exception as e:
+        print(f'Error loading orders: {e}')
+    try:
+        if os.path.exists(CONFIRMED_FILE):
+            with open(CONFIRMED_FILE, 'r') as f:
+                confirmed = set(json.load(f))
+            print(f'Loaded {len(confirmed)} confirmed orders from disk')
+    except Exception as e:
+        print(f'Error loading confirmed: {e}')
+    return orders, confirmed
+
+pending_orders, confirmed_orders = load_orders()
 
 def send_message(chat_id, text):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
     requests.post(url, json={'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'})
 
-def set_webhook():
+_webhook_set = False
+def set_webhook_once():
+    global _webhook_set
+    if _webhook_set:
+        return
+    _webhook_set = True
     url = f'https://api.telegram.org/bot{TOKEN}/setWebhook'
     r = requests.post(url, json={'url': WEBHOOK_URL})
     print('Webhook set:', r.json())
@@ -68,12 +93,15 @@ def check_ton_transactions():
                     except:
                         comment = ''
 
+                    print(f'TX: comment={comment}, amount={amount}, pending={list(pending_orders.keys())}')
+
                     if comment.startswith('OS-') and comment in pending_orders and comment not in confirmed_orders:
                         order = pending_orders[comment]
                         expected_nano = int(order['total_ton'] * 1e9)
 
                         if amount >= expected_nano * 0.99:
                             confirmed_orders.add(comment)
+                            save_orders()
                             chat_id = order.get('chat_id')
                             if chat_id:
                                 send_message(chat_id,
@@ -99,13 +127,15 @@ def check_ton_transactions():
 
         time.sleep(30)
 
-def start_ton_monitor():
-    t = threading.Thread(target=check_ton_transactions, daemon=True)
-    t.start()
+def _start_monitor_once():
+    if not any(t.name == 'ton_monitor' for t in threading.enumerate()):
+        t = threading.Thread(target=check_ton_transactions, daemon=True, name='ton_monitor')
+        t.start()
+        print('TON monitor started')
 
 @app.route('/')
 def index():
-    set_webhook()
+    set_webhook_once()
     return 'Oil&Soul Bot is running'
 
 @app.route('/webhook', methods=['POST'])
@@ -151,11 +181,11 @@ def order():
             'total_ton': total_ton,
             'user_name': user_name
         }
+        save_orders()
+        print(f'Order saved: {order_id}, pending={list(pending_orders.keys())}')
 
     if chat_id:
-        order_text = (
-            '✅ <b>Ваш заказ принят!</b>\n\n'
-        )
+        order_text = '✅ <b>Ваш заказ принят!</b>\n\n'
         for item in items:
             order_text += f'🎨 {item["title"]} — {item.get("ton", 0)} TON\n'
         order_text += (
@@ -214,6 +244,7 @@ def custom_order():
             'total_ton': 149,
             'user_name': user_name
         }
+        save_orders()
         send_message(chat_id,
             '✅ <b>Заказ картины принят!</b>\n\n'
             f'🔗 Подарок: {gift_link}\n'
