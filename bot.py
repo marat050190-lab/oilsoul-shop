@@ -135,7 +135,7 @@ def order():
     items = data.get('items', [])
     total_ton = data.get('total_ton', sum(i.get('ton', 0) for i in items))
     delivery = data.get('delivery', {})
-    order_id = data.get('order_id', '')
+   order_id = data.get('order_id') or ('OS-' + str(int(time.time())))
 
     if order_id and chat_id:
         pending_orders[order_id] = {
