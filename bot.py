@@ -198,7 +198,7 @@ def custom_order():
     user_name = data.get('user_name', 'Неизвестен')
     gift_link = data.get('gift_link', '—')
     delivery = data.get('delivery', {})
-    order_id = 'OS-' + str(int(time.time()))
+    order_id = data.get('order_id', 'OS-' + str(int(time.time())))
 
     if chat_id:
         pending_orders[order_id] = {
