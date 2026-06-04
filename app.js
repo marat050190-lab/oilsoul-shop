@@ -678,13 +678,15 @@ async function submitCustomOrder() {
     return;
   }
 
-  const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+ const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  const orderId = 'OS-' + Math.random().toString(36).substring(2, 6).toUpperCase();
 
   const orderData = {
     action: 'custom_order',
     chat_id: user ? user.id : null,
     user_name: user ? ((user.first_name || '') + ' ' + (user.last_name || '')).trim() : name,
     gift_link: giftLink,
+    order_id: orderId,
     delivery: { name: name, country: country, city: city, address: address, postal: postal, phone: phone, email: email, comment: comment }
   };
 
