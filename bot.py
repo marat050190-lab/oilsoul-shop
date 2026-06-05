@@ -162,9 +162,9 @@ def check_ton_transactions():
                                 chat_id = order.get('chat_id')
                                 if chat_id:
                                     send_message(chat_id,
-                                        '✅ <b>Оплата получена!</b>\n\n'
+                                        f'✅ <b>Оплата по заказу {comment} получена!</b>\n\n'
                                         f'💎 {order["total_ton"]} TON — подтверждено\n\n'
-                                        '🎨 Художник приступает к работе.\n'
+                                        '🖼 Мы приступаем к работе.\n'
                                         'Срок изготовления: 21 день.\n\n'
                                         'Мы свяжемся с вами когда картина будет готова к отправке.'
                                     )
@@ -233,16 +233,16 @@ def order():
     save_order(order_id, chat_id, total_ton, user_name)
 
     if chat_id:
-        order_text = '✅ <b>Ваш заказ принят!</b>\n\n'
+        order_text = f'✅ <b>Заказ {order_id} принят!</b>\n\n'
         for item in items:
             order_text += f'🎨 {item["title"]} — {item.get("ton", 0)} TON\n'
         order_text += (
             f'\n💎 Итого: <b>{total_ton} TON</b>\n\n'
-            f'💳 Переведите <b>{total_ton} TON</b> на адрес:\n'
-            f'<code>{TON_WALLET}</code>\n\n'
-            f'📝 В комментарии к переводу укажите:\n'
-            f'<code>{order_id}</code>\n\n'
-            f'После перевода оплата подтвердится автоматически.'
+            f'💳 Оплата:\n'
+            f'Адрес: <code>{TON_WALLET}</code>\n'
+            f'Сумма: <b>{total_ton} TON</b>\n'
+            f'Комментарий: <code>{order_id}</code>\n\n'
+            f'Переведите точную сумму с комментарием — оплата подтвердится автоматически.'
         )
         send_message(chat_id, order_text)
 
@@ -289,17 +289,17 @@ def custom_order():
 
     if chat_id:
         send_message(chat_id,
-            '✅ <b>Заказ картины принят!</b>\n\n'
+            f'✅ <b>Заказ {order_id} принят!</b>\n\n'
             f'🔗 Подарок: {gift_link}\n'
             f'🖼 Размер: 30×30 см, масло на холсте\n'
-            f'🔢 Уникальный NFT-номер на картине\n'
+            f'🔢 Уникальный номер на картине\n'
             f'💎 Стоимость: <b>149 TON</b>\n'
-            f'⏱ Срок: 21 день + доставка\n\n'
-            f'💳 Переведите <b>149 TON</b> на адрес:\n'
-            f'<code>{TON_WALLET}</code>\n\n'
-            f'📝 В комментарии к переводу укажите:\n'
-            f'<code>{order_id}</code>\n\n'
-            f'После перевода оплата подтвердится автоматически. 🎨'
+            f'⏱ Срок изготовления: 21 день + доставка\n\n'
+            f'💳 Оплата:\n'
+            f'Адрес: <code>{TON_WALLET}</code>\n'
+            f'Сумма: <b>149 TON</b>\n'
+            f'Комментарий: <code>{order_id}</code>\n\n'
+            f'Переведите точную сумму с комментарием — оплата подтвердится автоматически. 🎨'
         )
 
     admin_text = (
