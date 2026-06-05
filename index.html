@@ -22,10 +22,17 @@
         </div>
       </div>
       <div class="main-header-right">
-        <div class="lang-switcher-inline">
-          <button id="lang-ru" class="lang-btn lang-active" onclick="setLang('ru')">RU</button>
-          <button id="lang-en" class="lang-btn" onclick="setLang('en')">EN</button>
-          <button id="lang-ar" class="lang-btn" onclick="setLang('ar')">AR</button>
+        <div class="lang-dropdown-wrap">
+          <button class="lang-dropdown-btn" id="lang-dropdown-btn" onclick="toggleLangDropdown()">
+            <span id="lang-current-flag">🇷🇺</span>
+            <span id="lang-current-code">RU</span>
+            <span class="lang-dropdown-arrow">▾</span>
+          </button>
+          <div class="lang-dropdown-menu" id="lang-dropdown-menu">
+            <button onclick="selectLang('ru')"><span>🇷🇺</span> RU</button>
+            <button onclick="selectLang('en')"><span>🇬🇧</span> EN</button>
+            <button onclick="selectLang('ar')"><span>🇸🇦</span> AR</button>
+          </div>
         </div>
       </div>
     </header>
@@ -106,6 +113,25 @@
     </div>
   </div>
 
+  <script>
+  function toggleLangDropdown() {
+    var menu = document.getElementById('lang-dropdown-menu');
+    menu.classList.toggle('lang-dropdown-open');
+  }
+  function selectLang(l) {
+    var flags = { ru: '🇷🇺', en: '🇬🇧', ar: '🇸🇦' };
+    document.getElementById('lang-current-flag').textContent = flags[l];
+    document.getElementById('lang-current-code').textContent = l.toUpperCase();
+    document.getElementById('lang-dropdown-menu').classList.remove('lang-dropdown-open');
+    setLang(l);
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.lang-dropdown-wrap')) {
+      var menu = document.getElementById('lang-dropdown-menu');
+      if (menu) menu.classList.remove('lang-dropdown-open');
+    }
+  });
+  </script>
   <script src="products.js"></script>
   <script src="app.js"></script>
   <script>
