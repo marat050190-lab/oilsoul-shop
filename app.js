@@ -53,8 +53,8 @@ const i18n = {
     custom_how_title: 'КАК ЭТО РАБОТАЕТ:',
     custom_step1: '1. Заполните форму ниже',
     custom_step2: '2. Пришлите ссылку на ваш подарок Telegram',
-    custom_step3: '3. Мы подтвердим заказ и пришлём реквизиты',
-    custom_step4: '4. После оплаты приступаем к работе',
+    custom_step3: '3. Мы подтвердим заказ и пришлём реквизиты для оплаты',
+    custom_step4: '4. После оплаты мы приступаем к работе',
     custom_gift_label: '🔗 Ссылка на ваш подарок',
     custom_gift_placeholder: 'https://t.me/nft/...',
     custom_gift_hint: 'Как получить: профиль → Мои подарки → нажмите на подарок → Поделиться → скопируйте ссылку',
@@ -63,7 +63,7 @@ const i18n = {
     custom_size: 'Размер',
     custom_price: 'Стоимость',
     custom_deadline: 'Срок',
-    custom_nft: 'Уникальный NFT-номер на картине',
+    custom_nft: 'Уникальный номер на картине',
     custom_submit: '✅ Отправить заказ',
     custom_fill_fields: 'Пожалуйста заполните все поля, включая ссылку на подарок',
     custom_success: 'Заказ отправлен! Бот пришлёт реквизиты для оплаты.',
@@ -132,7 +132,7 @@ const i18n = {
     custom_size: 'Size',
     custom_price: 'Price',
     custom_deadline: 'Timeline',
-    custom_nft: 'Unique NFT number on the painting',
+    custom_nft: 'Unique number on the painting',
     custom_submit: '✅ Send order',
     custom_fill_fields: 'Please fill in all fields including the gift link',
     custom_success: 'Order sent! The bot will send payment details.',
@@ -199,7 +199,7 @@ const i18n = {
     custom_size: 'الحجم',
     custom_price: 'السعر',
     custom_deadline: 'المدة',
-    custom_nft: 'رقم NFT الفريد على اللوحة',
+    custom_nft: 'رقم فريد على اللوحة',
     custom_submit: '✅ إرسال الطلب',
     custom_fill_fields: 'يرجى ملء جميع الحقول بما فيها رابط الهدية',
     custom_success: 'تم إرسال الطلب! سيرسل البوت تفاصيل الدفع.',
@@ -288,36 +288,36 @@ const faqItems = {
     { q: 'Что такое Oil&Soul?', a: 'Oil&Soul — сервис, где цифровые Telegram-подарки превращаются в физические картины маслом на холсте. Мы создаём готовые работы и картины под заказ по ссылке на ваш Telegram collectible gift. Каждая работа сопровождается сертификатом уникальности.' },
     { q: 'Это настоящая картина или распечатка?', a: 'Это настоящая картина, написанная вручную масляными красками на холсте. Не печать, не постер и не цифровая распечатка. Каждая работа имеет живую фактуру мазков и сопровождается сертификатом уникальности.' },
     { q: 'Какой размер картины?', a: 'Базовый формат — 30×30 см. Картина пишется на холсте на подрамнике. Боковые стороны прокрашиваются, поэтому работу можно размещать без рамы.' },
-    { q: 'Можно ли заказать картину по моему Telegram-подарку?', a: 'Да. Вы отправляете ссылку на ваш Telegram-подарок, а мы создаём физическую картину маслом по его мотивам. На холсте можно указать NFT-номер вашего подарка.' },
-    { q: 'Будет ли картина точной копией подарка?', a: 'Картина создаётся вручную, поэтому она не является пиксельной копией 1 в 1. Мы сохраняем основные элементы подарка: форму, цвета, фон, настроение и NFT-номер, но итоговая работа остаётся живой масляной интерпретацией с фактурой мазков.' },
-    { q: 'Что нужно отправить для кастомного заказа?', a: 'Нужно отправить ссылку на ваш Telegram-подарок. Формат: https://t.me/nft/... Также можно добавить комментарий, если есть пожелания по NFT-номеру, фону или деталям.' },
+    { q: 'Можно ли заказать картину по моему Telegram-подарку?', a: 'Да. Вы отправляете ссылку на ваш Telegram-подарок, а мы создаём физическую картину маслом по его мотивам. На холсте можно указать номер вашего подарка.'  },
+    { q: 'Будет ли картина точной копией подарка?', a: 'Картина создаётся вручную, поэтому она не является пиксельной копией 1 в 1. Мы сохраняем основные элементы подарка: форму, цвета, фон, настроение и уникальный номер, но итоговая работа остаётся живой масляной интерпретацией с фактурой мазков.' },
+    { q: 'Что нужно отправить для кастомного заказа?', a: 'Нужно отправить ссылку на ваш Telegram-подарок. Формат: https://t.me/nft/... Также можно добавить комментарий, если есть пожелания по фону или деталям.' },
     { q: 'Сколько времени занимает написание картины?', a: 'Стандартный срок написания картины — 21 день. После завершения работы картина проходит финальную проверку, затем упаковывается и отправляется вам.' },
-    { q: 'Как происходит заказ картины с моего подарка?', a: '1. Вы отправляете ссылку на Telegram-подарок\n2. Мы проверяем подарок и согласуем детали\n3. После оплаты художник начинает работу\n4. Картина проходит финальную проверку\n5. Мы оформляем сертификат уникальности\n6. Картина упаковывается и отправляется вам' },
+    { q: 'Как происходит заказ картины с моего подарка?', a: '1. Вы отправляете ссылку на Telegram-подарок\n2. Мы проверяем подарок и согласуем детали\n3. После оплаты мы приступаем к работе\n4. Картина проходит финальную проверку\n5. Мы оформляем сертификат уникальности\n6. Картина упаковывается и отправляется вам' },
     { q: 'Какие материалы используются?', a: 'Холст на подрамнике, масляные краски, художественные кисти и мастихины, защитный лак после высыхания, упаковка для безопасной доставки.' },
     { q: 'Доставляете ли вы по всему миру?', a: 'Да, мы отправляем картины по всему миру. Стоимость и срок доставки зависят от страны получателя и рассчитываются индивидуально после оформления заказа.' },
     { q: 'Как упаковывается картина?', a: 'Картина упаковывается в защитную упаковку. Мы используем плотную упаковку, защитные слои и коробку, подходящую под формат холста.' },
     { q: 'Как происходит оплата?', a: 'Оплата принимается в TON. После оформления заказа вы получите данные для оплаты. После подтверждения оплаты заказ передаётся в работу.' },
     { q: 'Можно ли вернуть картину?', a: 'Готовые работы обсуждаются индивидуально. Кастомные картины создаются специально под ваш Telegram-подарок, поэтому возврат таких работ обычно невозможен после начала написания. Если возникнет проблема — рассмотрим ситуацию отдельно.' },
-    { q: 'Что входит в заказ?', a: 'Картина маслом на холсте, прокрашенные боковые стороны, NFT-номер подарка на холсте (если предусмотрен), сертификат уникальности, защитная упаковка.' },
-    { q: 'Что такое сертификат уникальности?', a: 'Сертификат подтверждает данные физической картины: название работы, NFT-номер подарка, техника (масло на холсте), размер, год создания и данные проекта Oil&Soul.' },
+    { q: 'Что входит в заказ?', a: 'Картина маслом на холсте, прокрашенные боковые стороны, Номер подарка на холсте (если предусмотрен), сертификат уникальности, защитная упаковка.' },
+    { q: 'Что такое сертификат уникальности?', a: 'Сертификат подтверждает данные физической картины: название работы, номер подарка, техника (масло на холсте), размер, год создания и данные проекта Oil&Soul.' },
     { q: 'Будет ли QR-код на оригинальный Telegram-подарок?', a: 'Да, для кастомных работ можно добавить QR-код на обратную сторону картины. QR-код будет вести на ссылку оригинального Telegram-подарка. Наносится в виде аккуратной печатной наклейки.' },
   ],
   en: [
     { q: 'What is Oil&Soul?', a: 'Oil&Soul is a service that turns digital Telegram gifts into physical oil paintings on canvas. We create ready-made works and custom paintings based on your Telegram collectible gift link. Each work comes with a certificate of uniqueness.' },
     { q: 'Is it a real painting or a print?', a: 'It is a real painting, hand-painted with oil paints on canvas. Not a print, not a poster, not a digital reproduction. Each work has the live texture of brushstrokes and comes with a certificate of uniqueness.' },
     { q: 'What size is the painting?', a: 'The base format is 30×30 cm. The painting is made on a stretched canvas. The sides are painted, so the work can be displayed without a frame.' },
-    { q: 'Can I order a painting based on my Telegram gift?', a: 'Yes. You send a link to your Telegram gift and we create a physical oil painting inspired by it. The NFT number of your gift can be included on the canvas.' },
-    { q: 'Will the painting be an exact copy of the gift?', a: 'The painting is handmade, so it is not a pixel-perfect 1:1 copy. We preserve the key elements: shape, colors, background, mood and NFT number — but the final work remains a live oil interpretation with brushstroke texture.' },
-    { q: 'What do I need to send for a custom order?', a: 'Send a link to your Telegram gift. Format: https://t.me/nft/... You can also add a comment if you have wishes regarding the NFT number, background or details.' },
+    { q: 'Can I order a painting based on my Telegram gift?', a: 'Yes. You send a link to your Telegram gift and we create a physical oil painting inspired by it. The unique number of your gift can be included on the canvas.' },
+    { q: 'Will the painting be an exact copy of the gift?', a: 'The painting is handmade, so it is not a pixel-perfect 1:1 copy. We preserve the key elements: shape, colors, background, mood and unique number — but the final work remains a live oil interpretation with brushstroke texture.' },
+    { q: 'What do I need to send for a custom order?', a: 'Send a link to your Telegram gift. Format: https://t.me/nft/... You can also add a comment if you have wishes regarding the background or details.' },
     { q: 'How long does painting take?', a: 'The standard painting time is 21 days. After completion, the painting goes through a final check, then gets packaged and shipped to you.' },
-    { q: 'How does a custom order work?', a: '1. You send a link to your Telegram gift\n2. We check the gift and agree on details\n3. After payment the artist starts work\n4. The painting passes a final check\n5. We prepare the certificate of uniqueness\n6. The painting is packaged and shipped to you' },
+    { q: 'How does a custom order work?', a: '1. You send a link to your Telegram gift\n2. We check the gift and agree on details\n3. After payment we start working\n4. The painting passes a final check\n5. We prepare the certificate of uniqueness\n6. The painting is packaged and shipped to you' },
     { q: 'What materials are used?', a: 'Stretched canvas, oil paints, artist brushes and palette knives, protective varnish after drying, packaging for safe delivery.' },
     { q: 'Do you ship worldwide?', a: 'Yes, we ship paintings worldwide. The cost and time of delivery depend on the recipient\'s country and are calculated individually after placing an order.' },
     { q: 'How is the painting packaged?', a: 'The painting is packed in protective packaging. We use dense packing, protective layers and a box suitable for the canvas format.' },
     { q: 'How does payment work?', a: 'Payment is accepted in TON. After placing an order you will receive payment details. After payment confirmation the order goes into production.' },
     { q: 'Can I return a painting?', a: 'Ready-made works are discussed individually. Custom paintings are created specifically for your Telegram gift, so returns are usually not possible after painting has started. If a problem arises we will consider the situation separately.' },
-    { q: 'What is included in the order?', a: 'Oil painting on canvas, painted sides, NFT number on canvas (if applicable), certificate of uniqueness, protective packaging.' },
-    { q: 'What is the certificate of uniqueness?', a: 'The certificate confirms the physical painting data: title, NFT number, technique (oil on canvas), size, year of creation and Oil&Soul project details.' },
+    { q: 'What is included in the order?', a: 'Oil painting on canvas, painted sides, Unique number on canvas (if applicable), certificate of uniqueness, protective packaging.' },
+    { q: 'What is the certificate of uniqueness?', a: 'The certificate confirms the physical painting data: title, unique number, technique (oil on canvas), size, year of creation and Oil&Soul project details.' },
     { q: 'Will there be a QR code for the original Telegram gift?', a: 'Yes, for custom works a QR code can be added to the back of the painting. It will link to the original Telegram gift. Applied as a neat printed sticker.' },
   ]
 };
@@ -618,9 +618,9 @@ function showCustomPage() {
         '<div class="production-stages">' +
           '<div class="production-stage"><img src="step1.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Вы отправляете ссылку на подарок</div><div class="stage-desc">Мы получаем все детали вашего коллекционного подарка</div></div></div>' +
           '<div class="stage-connector"></div>' +
-          '<div class="production-stage"><img src="step2.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Мы готовим референс</div><div class="stage-desc">Художник изучает подарок и создаёт эскиз композиции</div></div></div>' +
+          '<div class="production-stage"><img src="step2.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Мы готовим референс</div><div class="stage-desc">Изучаем подарок и создаём эскиз композиции</div></div></div>' +
           '<div class="stage-connector"></div>' +
-          '<div class="production-stage"><img src="step3.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Перенос на холст</div><div class="stage-desc">Художник переносит композицию на холст 30×30 см</div></div></div>' +
+          '<div class="production-stage"><img src="step3.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Перенос на холст</div><div class="stage-desc">Переносим композицию на холст 30×30 см</div></div></div>' +
           '<div class="stage-connector"></div>' +
           '<div class="production-stage"><img src="step4.png" class="stage-icon" alt=""><div class="stage-text"><div class="stage-name">Написание маслом</div><div class="stage-desc">Пишем картину масляными красками, слой за слоем</div></div></div>' +
           '<div class="stage-connector"></div>' +
