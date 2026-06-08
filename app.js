@@ -330,10 +330,28 @@ function showPage(pageId) {
   document.getElementById('page-checkout').classList.add('hidden');
   document.getElementById('page-detail').classList.add('hidden');
   document.getElementById(pageId).classList.remove('hidden');
+
+  var floatBtn = document.getElementById('float-back-btn');
+  if (floatBtn) { if (floatBtn._removeScroll) floatBtn._removeScroll(); floatBtn.remove(); }
+
   if (pageId === 'page-catalog') {
     setTimeout(function() { window.scrollTo(0, savedScrollY); }, 50);
   } else {
     window.scrollTo(0, 0);
+    if (pageId === 'page-detail') {
+      var btn = document.createElement('button');
+      btn.id = 'float-back-btn';
+      btn.textContent = '← Назад';
+      btn.style.cssText = 'position:fixed;bottom:80px;right:16px;z-index:999;padding:10px 18px;background:rgba(15,30,56,0.92);border:1px solid rgba(255,255,255,0.15);border-radius:20px;color:rgba(255,255,255,0.75);font-size:13px;font-weight:600;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;transition:opacity 0.3s;box-shadow:0 4px 16px rgba(0,0,0,0.4);';
+      btn.onclick = function() {
+        btn.style.opacity = '0';
+        setTimeout(function() { showPage('page-catalog'); }, 200);
+      };
+      document.body.appendChild(btn);
+      function onScroll() { btn.style.opacity = window.scrollY > 80 ? '1' : '0'; }
+      window.addEventListener('scroll', onScroll);
+      btn._removeScroll = function() { window.removeEventListener('scroll', onScroll); };
+    }
   }
 }
 
@@ -486,7 +504,7 @@ function renderCatalog() {
   faqSection.innerHTML =
     '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;padding-top:4px;">FAQ</div>' +
     '<div class="faq-list">' +
-      faqItems_main.slice(0, 5).map(function(item, i) {
+      faqItems_main.slice(0, 3).map(function(item, i) {
         return '<div class="faq-item" id="main-faq-' + i + '">' +
           '<div class="faq-question" onclick="toggleMainFaq(' + i + ')">' +
             '<span>' + item.q + '</span>' +
