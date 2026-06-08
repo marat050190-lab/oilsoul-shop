@@ -469,12 +469,22 @@ function renderCatalog() {
 
   catalog.appendChild(grid);
 
+  // FAQ and footer go OUTSIDE the catalog grid, into the parent main element
+  const mainEl = catalog.parentNode;
+
+  // Remove old FAQ/footer if re-rendering
+  var oldFaq = document.getElementById('main-faq-section');
+  if (oldFaq) oldFaq.remove();
+  var oldFooter = document.getElementById('main-footer');
+  if (oldFooter) oldFooter.remove();
+
   // FAQ section on main page
   const faqSection = document.createElement('div');
-  faqSection.style.cssText = 'padding: 0 16px 8px;';
+  faqSection.id = 'main-faq-section';
+  faqSection.style.cssText = 'padding: 8px 16px 8px;';
   const faqItems_main = faqItems[lang] || faqItems['ru'];
   faqSection.innerHTML =
-    '<div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;padding-top:8px;">FAQ</div>' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;padding-top:4px;">FAQ</div>' +
     '<div class="faq-list">' +
       faqItems_main.slice(0, 5).map(function(item, i) {
         return '<div class="faq-item" id="main-faq-' + i + '">' +
@@ -486,15 +496,16 @@ function renderCatalog() {
         '</div>';
       }).join('') +
     '</div>' +
-    '<button class="faq-link-btn" onclick="showFaqPage()" style="margin-top:8px;">Все вопросы →</button>';
-  catalog.appendChild(faqSection);
+    '<button class="faq-link-btn" onclick="showFaqPage()" style="margin-top:8px;width:100%;">Все вопросы →</button>';
+  mainEl.appendChild(faqSection);
 
   // Footer with support
   const footer = document.createElement('div');
-  footer.style.cssText = 'padding: 16px 16px 8px; text-align: center;';
+  footer.id = 'main-footer';
+  footer.style.cssText = 'padding: 12px 16px 20px; text-align: center;';
   footer.innerHTML =
-    '<a href="https://t.me/oilsoul_support" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:rgba(255,255,255,0.6);font-size:14px;text-decoration:none;">💬 @oilsoul_support</a>';
-  catalog.appendChild(footer);
+    '<a href="https://t.me/oilsoul_support" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:rgba(255,255,255,0.5);font-size:14px;text-decoration:none;transition:opacity 0.2s;">💬 @oilsoul_support</a>';
+  mainEl.appendChild(footer);
 }
 
 function showDetail(id) {
