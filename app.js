@@ -220,9 +220,12 @@ function t(key) {
 
 function setLang(l) {
   lang = l;
-  document.getElementById('lang-ru').classList.toggle('lang-active', l === 'ru');
-  document.getElementById('lang-en').classList.toggle('lang-active', l === 'en');
-  document.getElementById('lang-ar').classList.toggle('lang-active', l === 'ar');
+  // update dropdown display
+  var flags = { ru: '🇷🇺', en: '🇬🇧', ar: '🇸🇦' };
+  var flagEl = document.getElementById('lang-current-flag');
+  var codeEl = document.getElementById('lang-current-code');
+  if (flagEl) flagEl.textContent = flags[l] || '';
+  if (codeEl) codeEl.textContent = l.toUpperCase();
 
   var isRtl = l === 'ar';
   document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
@@ -375,6 +378,19 @@ function toggleFaq(i) {
   }
 }
 
+function toggleMainFaq(i) {
+  var answer = document.getElementById('main-faq-answer-' + i);
+  var arrow = document.getElementById('main-faq-arrow-' + i);
+  if (!answer) return;
+  var isOpen = answer.classList.contains('faq-open');
+  document.querySelectorAll('[id^="main-faq-answer-"]').forEach(function(el) { el.classList.remove('faq-open'); });
+  document.querySelectorAll('[id^="main-faq-arrow-"]').forEach(function(el) { el.textContent = '▾'; });
+  if (!isOpen) {
+    answer.classList.add('faq-open');
+    arrow.textContent = '▴';
+  }
+}
+
 function setFilter(filter) {
   currentFilter = filter;
   document.querySelectorAll('.filter-btn').forEach(function(btn) { btn.classList.remove('filter-active'); });
@@ -452,6 +468,33 @@ function renderCatalog() {
   });
 
   catalog.appendChild(grid);
+
+  // FAQ section on main page
+  const faqSection = document.createElement('div');
+  faqSection.style.cssText = 'padding: 0 16px 8px;';
+  const faqItems_main = faqItems[lang] || faqItems['ru'];
+  faqSection.innerHTML =
+    '<div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;padding-top:8px;">FAQ</div>' +
+    '<div class="faq-list">' +
+      faqItems_main.slice(0, 5).map(function(item, i) {
+        return '<div class="faq-item" id="main-faq-' + i + '">' +
+          '<div class="faq-question" onclick="toggleMainFaq(' + i + ')">' +
+            '<span>' + item.q + '</span>' +
+            '<span class="faq-arrow" id="main-faq-arrow-' + i + '">▾</span>' +
+          '</div>' +
+          '<div class="faq-answer" id="main-faq-answer-' + i + '">' + item.a.replace(/\n/g, '<br>') + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>' +
+    '<button class="faq-link-btn" onclick="showFaqPage()" style="margin-top:8px;">Все вопросы →</button>';
+  catalog.appendChild(faqSection);
+
+  // Footer with support
+  const footer = document.createElement('div');
+  footer.style.cssText = 'padding: 16px 16px 8px; text-align: center;';
+  footer.innerHTML =
+    '<a href="https://t.me/oilsoul_support" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:rgba(255,255,255,0.6);font-size:14px;text-decoration:none;">💬 @oilsoul_support</a>';
+  catalog.appendChild(footer);
 }
 
 function showDetail(id) {
@@ -655,7 +698,7 @@ function showCustomPage() {
         '</div>' +
         '<div class="custom-disclaimer">Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram. Каждая работа — физическая художественная интерпретация цифрового подарка.</div>' +
         '<button class="submit-btn" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
-        '<button class="faq-link-btn" onclick="showFaqPage()">❓ FAQ</button>' +
+        '<button class="faq-link-btn" onclick="showFaqPage()">FAQ</button>' +
       '</div>' +
     '</div>';
   showPage('page-detail');
@@ -723,7 +766,8 @@ document.getElementById('checkout-btn').addEventListener('click', function() {
 });
 
 document.getElementById('back-btn').addEventListener('click', function() {
-  showPage('page-catalog');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(function() { showPage('page-catalog'); }, 300);
 });
 
 document.getElementById('submit-btn').addEventListener('click', async function() {
