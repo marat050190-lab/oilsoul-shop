@@ -651,6 +651,9 @@ function updateCartBar() {
   }
 }
 
+var deliveryMethod = 'cdek';
+var cdekSelectedPvz = null;
+
 function renderCheckout() {
   const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
   const summary = document.getElementById('order-summary');
@@ -667,8 +670,168 @@ function renderCheckout() {
   document.getElementById('ton-address-display').textContent = TON_WALLET;
   document.querySelector('#page-checkout header h1').textContent = t('checkout_title');
   document.getElementById('back-btn').textContent = t('back');
-  document.querySelector('.form-section h3').textContent = t('delivery_title');
   document.getElementById('submit-btn').textContent = t('submit_btn');
+  renderDeliveryForm();
+}
+
+function renderDeliveryForm() {
+  var fs = document.querySelector('.form-section');
+  if (!fs) return;
+  fs.innerHTML =
+    '<div class="dv-label">Страна доставки</div>' +
+    '<select id="dv-country" class="dv-select" onchange="onDvCountryChange()">' +
+      '<option value="">— Выберите страну —</option>' +
+      '<option value="ru">🇷🇺 Россия</option>' +
+      '<option value="other">🌍 Другая страна</option>' +
+    '</select>' +
+    '<div id="dv-russia" style="display:none;">' +
+      '<div class="dv-info-box">' +
+        '<div class="dv-info-title">Доставка по России — бесплатно</div>' +
+        '<div class="dv-info-sub">Выберите удобный способ получения</div>' +
+      '</div>' +
+      '<div class="dv-label">Способ доставки</div>' +
+      '<div id="dv-method-cdek" class="dv-method-card dv-method-active" onclick="selectDvMethod(\'cdek\')">' +
+        '<img src="icon_cdek.png" class="dv-method-logo" alt="CDEK">' +
+        '<span class="dv-method-label">СДЭК — пункт выдачи</span>' +
+        '<span class="dv-radio dv-radio-on" id="dv-radio-cdek"></span>' +
+      '</div>' +
+      '<div id="dv-method-post" class="dv-method-card" onclick="selectDvMethod(\'post\')">' +
+        '<img src="icon_post.png" class="dv-method-logo" alt="Почта России">' +
+        '<span class="dv-method-label">Почта России — отделение</span>' +
+        '<span class="dv-radio" id="dv-radio-post"></span>' +
+      '</div>' +
+      '<div id="dv-cdek-block">' +
+        '<div class="dv-label" style="margin-top:14px;">Город</div>' +
+        '<div style="position:relative;">' +
+          '<input id="dv-cdek-city" class="dv-input" placeholder="Введите город" oninput="dvSearchCity(this.value)">' +
+          '<div id="dv-cdek-city-list" class="dv-autocomplete" style="display:none;"></div>' +
+        '</div>' +
+        '<div id="dv-pvz-section" style="display:none;">' +
+          '<div id="dv-pvz-selected" style="display:none;"></div>' +
+          '<button class="dv-btn-map" onclick="dvOpenCdekMap()">📍 Выбрать пункт выдачи СДЭК</button>' +
+          '<input id="dv-cdek-pvz-manual" class="dv-input" placeholder="Вставьте адрес выбранного ПВЗ *" style="margin-top:8px;display:none;">' +
+        '</div>' +
+      '</div>' +
+      '<div id="dv-post-block" style="display:none;">' +
+        '<div class="dv-label" style="margin-top:14px;">Город</div>' +
+        '<input id="dv-post-city" class="dv-input" placeholder="Город *">' +
+        '<div class="dv-label">Индекс отделения</div>' +
+        '<input id="dv-post-index" class="dv-input" placeholder="Например: 420111" maxlength="6">' +
+        '<div class="dv-label">Адрес отделения</div>' +
+        '<input id="dv-post-address" class="dv-input" placeholder="Улица, дом отделения *">' +
+      '</div>' +
+      '<div class="dv-sep"></div>' +
+      '<div class="dv-label">ФИО получателя</div>' +
+      '<input id="dv-ru-name" class="dv-input" placeholder="Иванов Иван Иванович *">' +
+      '<div class="dv-label">Телефон</div>' +
+      '<input id="dv-ru-phone" class="dv-input" type="tel" placeholder="+7 (999) 123-45-67 *">' +
+      '<div class="dv-label">Email</div>' +
+      '<input id="dv-ru-email" class="dv-input" type="email" placeholder="email@mail.ru *">' +
+      '<div class="dv-label">Комментарий</div>' +
+      '<textarea id="dv-ru-comment" class="dv-input" style="height:60px;resize:none;" placeholder="Необязательно"></textarea>' +
+    '</div>' +
+    '<div id="dv-intl" style="display:none;">' +
+      '<div class="dv-info-box dv-info-blue">' +
+        '<div class="dv-method-card-logo-wrap"><img src="icon_ems.png" class="dv-method-logo" alt="EMS" style="border-radius:8px;"></div>' +
+        '<div>' +
+          '<div class="dv-info-title" style="color:#7ab3f0;">EMS / International Post</div>' +
+          '<div class="dv-info-sub">Отправляем по всему миру. После отправки вы получите трек-номер.</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="dv-label">Full name / ФИО</div>' +
+      '<input id="dv-intl-name" class="dv-input" placeholder="Full name *">' +
+      '<div class="dv-label">Country / Страна</div>' +
+      '<input id="dv-intl-country" class="dv-input" placeholder="Country *">' +
+      '<div class="dv-label">City / Город</div>' +
+      '<input id="dv-intl-city" class="dv-input" placeholder="City *">' +
+      '<div class="dv-label">Address / Адрес</div>' +
+      '<input id="dv-intl-address" class="dv-input" placeholder="Street, building, apt *">' +
+      '<div class="dv-label">Postal code / Индекс</div>' +
+      '<input id="dv-intl-postal" class="dv-input" placeholder="Postal code *">' +
+      '<div class="dv-label">Phone / Телефон</div>' +
+      '<input id="dv-intl-phone" class="dv-input" type="tel" placeholder="+1 234 567 8900 *">' +
+      '<div class="dv-label">Email</div>' +
+      '<input id="dv-intl-email" class="dv-input" type="email" placeholder="email@example.com *">' +
+      '<div class="dv-label">Comment / Комментарий</div>' +
+      '<textarea id="dv-intl-comment" class="dv-input" style="height:60px;resize:none;" placeholder="Optional"></textarea>' +
+      '<div class="dv-intl-note">Стоимость международной доставки рассчитывается индивидуально после оформления заказа.</div>' +
+    '</div>';
+}
+
+function onDvCountryChange() {
+  var v = document.getElementById('dv-country').value;
+  document.getElementById('dv-russia').style.display = v === 'ru' ? 'block' : 'none';
+  document.getElementById('dv-intl').style.display = v === 'other' ? 'block' : 'none';
+}
+
+function selectDvMethod(method) {
+  deliveryMethod = method;
+  var cdekCard = document.getElementById('dv-method-cdek');
+  var postCard = document.getElementById('dv-method-post');
+  var cdekRadio = document.getElementById('dv-radio-cdek');
+  var postRadio = document.getElementById('dv-radio-post');
+  var cdekBlock = document.getElementById('dv-cdek-block');
+  var postBlock = document.getElementById('dv-post-block');
+  if (method === 'cdek') {
+    cdekCard.className = 'dv-method-card dv-method-active';
+    postCard.className = 'dv-method-card';
+    cdekRadio.className = 'dv-radio dv-radio-on';
+    postRadio.className = 'dv-radio';
+    cdekBlock.style.display = 'block';
+    postBlock.style.display = 'none';
+  } else {
+    postCard.className = 'dv-method-card dv-method-active';
+    cdekCard.className = 'dv-method-card';
+    postRadio.className = 'dv-radio dv-radio-on';
+    cdekRadio.className = 'dv-radio';
+    postBlock.style.display = 'block';
+    cdekBlock.style.display = 'none';
+  }
+}
+
+function dvSearchCity(val) {
+  var list = document.getElementById('dv-cdek-city-list');
+  if (val.length < 2) { list.style.display = 'none'; return; }
+  fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(val + ', Россия') + '&format=json&limit=5&addressdetails=1&accept-language=ru')
+    .then(function(r) { return r.json(); })
+    .then(function(results) {
+      list.innerHTML = '';
+      var seen = {};
+      results.forEach(function(item) {
+        var city = item.address && (item.address.city || item.address.town || item.address.village);
+        if (!city || seen[city]) return;
+        seen[city] = true;
+        var div = document.createElement('div');
+        div.className = 'dv-autocomplete-item';
+        div.textContent = city;
+        div.onmousedown = function(e) {
+          e.preventDefault();
+          document.getElementById('dv-cdek-city').value = city;
+          list.style.display = 'none';
+          document.getElementById('dv-pvz-section').style.display = 'block';
+        };
+        list.appendChild(div);
+      });
+      list.style.display = list.children.length ? 'block' : 'none';
+    }).catch(function() { list.style.display = 'none'; });
+}
+
+function dvOpenCdekMap() {
+  var city = (document.getElementById('dv-cdek-city') || {}).value || '';
+  if (!city) { alert('Сначала введите город'); return; }
+  var url = 'https://www.cdek.ru/ru/offices/?city=' + encodeURIComponent(city);
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.openLink(url);
+  } else {
+    window.open(url, '_blank');
+  }
+  var manualInput = document.getElementById('dv-cdek-pvz-manual');
+  if (manualInput) {
+    manualInput.style.display = 'block';
+    var pvzSel = document.getElementById('dv-pvz-selected');
+    pvzSel.style.display = 'block';
+    pvzSel.innerHTML = '<div class="dv-pvz-hint">После выбора пункта на сайте СДЭК — скопируйте и вставьте его адрес:</div>';
+  }
 }
 
 function showCustomPage() {
@@ -799,47 +962,69 @@ document.getElementById('back-btn').addEventListener('click', function() {
 });
 
 document.getElementById('submit-btn').addEventListener('click', async function() {
-  const name = document.getElementById('field-name').value.trim();
-  const country = document.getElementById('field-country').value.trim();
-  const city = document.getElementById('field-city').value.trim();
-  const address = document.getElementById('field-address').value.trim();
-  const postal = document.getElementById('field-postal').value.trim();
-  const phone = document.getElementById('field-phone').value.trim();
-  const email = document.getElementById('field-email').value.trim();
-  const comment = document.getElementById('field-comment').value.trim();
+  var countryVal = (document.getElementById('dv-country') || {}).value || '';
+  var delivery = {};
 
-  if (!name || !country || !city || !address || !postal || !phone || !email) {
-    alert(t('fill_fields'));
-    return;
+  if (countryVal === 'ru') {
+    var name = ((document.getElementById('dv-ru-name') || {}).value || '').trim();
+    var phone = ((document.getElementById('dv-ru-phone') || {}).value || '').trim();
+    var email = ((document.getElementById('dv-ru-email') || {}).value || '').trim();
+    var comment = ((document.getElementById('dv-ru-comment') || {}).value || '').trim();
+    if (!name || !phone || !email) { alert('Пожалуйста, заполните ФИО, телефон и email'); return; }
+    delivery = { deliveryCountry: 'Россия', deliveryMethod: deliveryMethod === 'cdek' ? 'СДЭК' : 'Почта России', recipientName: name, recipientPhone: phone, recipientEmail: email, comment: comment, trackingCarrier: deliveryMethod === 'cdek' ? 'CDEK' : 'Russian Post' };
+    if (deliveryMethod === 'cdek') {
+      var cdekCity = ((document.getElementById('dv-cdek-city') || {}).value || '').trim();
+      var cdekAddr = ((document.getElementById('dv-cdek-pvz-manual') || {}).value || '').trim();
+      if (!cdekCity) { alert('Введите город для СДЭК'); return; }
+      if (!cdekAddr) { alert('Укажите адрес пункта выдачи СДЭК'); return; }
+      delivery.cdekCity = cdekCity;
+      delivery.cdekPickupPointAddress = cdekAddr;
+      delivery.city = cdekCity;
+      delivery.address = cdekAddr;
+    } else {
+      var postCity = ((document.getElementById('dv-post-city') || {}).value || '').trim();
+      var postIndex = ((document.getElementById('dv-post-index') || {}).value || '').trim();
+      var postAddr = ((document.getElementById('dv-post-address') || {}).value || '').trim();
+      if (!postCity || !postIndex || !postAddr) { alert('Заполните город, индекс и адрес отделения'); return; }
+      delivery.city = postCity;
+      delivery.postalOfficeIndex = postIndex;
+      delivery.postalOfficeAddress = postAddr;
+      delivery.address = postAddr;
+      delivery.postalCode = postIndex;
+    }
+  } else if (countryVal === 'other') {
+    var name = ((document.getElementById('dv-intl-name') || {}).value || '').trim();
+    var country = ((document.getElementById('dv-intl-country') || {}).value || '').trim();
+    var city = ((document.getElementById('dv-intl-city') || {}).value || '').trim();
+    var address = ((document.getElementById('dv-intl-address') || {}).value || '').trim();
+    var postal = ((document.getElementById('dv-intl-postal') || {}).value || '').trim();
+    var phone = ((document.getElementById('dv-intl-phone') || {}).value || '').trim();
+    var email = ((document.getElementById('dv-intl-email') || {}).value || '').trim();
+    var comment = ((document.getElementById('dv-intl-comment') || {}).value || '').trim();
+    if (!name || !country || !city || !address || !postal || !phone || !email) { alert(t('fill_fields')); return; }
+    delivery = { deliveryCountry: country, deliveryMethod: 'EMS / International Post', recipientName: name, city: city, address: address, postalCode: postal, recipientPhone: phone, recipientEmail: email, comment: comment, trackingCarrier: 'EMS / International Post' };
+  } else {
+    alert('Пожалуйста, выберите страну доставки'); return;
   }
 
   const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
   const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
   const orderId = 'OS-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-
   const orderData = {
     action: 'order',
     chat_id: user ? user.id : null,
-    user_name: user ? ((user.first_name || '') + ' ' + (user.last_name || '')).trim() : name,
+    user_name: user ? ((user.first_name || '') + ' ' + (user.last_name || '')).trim() : delivery.recipientName,
     items: cart.map(function(i) { return { id: i.id, title: i.title, ton: i.ton }; }),
     total_ton: totalTon,
     order_id: orderId,
-    delivery: { name: name, country: country, city: city, address: address, postal: postal, phone: phone, email: email, comment: comment }
+    delivery: delivery
   };
 
   try {
-    const res = await fetch('https://oilsoul-bot.onrender.com/order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderData)
-    });
+    const res = await fetch('https://oilsoul-bot.onrender.com/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(orderData) });
     const result = await res.json();
-    if (result.ok) {
-      showPayment(totalTon, orderId);
-    }
-  } catch (e) {
-    alert(t('connection_error'));
-  }
+    if (result.ok) { showPayment(totalTon, orderId); }
+  } catch (e) { alert(t('connection_error')); }
 });
 
 function copyToClipboard(text, btn) {
