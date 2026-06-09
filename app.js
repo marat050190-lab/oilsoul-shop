@@ -819,19 +819,87 @@ function dvSearchCity(val) {
 function dvOpenCdekMap() {
   var city = (document.getElementById('dv-cdek-city') || {}).value || '';
   if (!city) { alert('Сначала введите город'); return; }
-  var url = 'https://www.cdek.ru/ru/offices/?city=' + encodeURIComponent(city);
-  if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.openLink(url);
-  } else {
-    window.open(url, '_blank');
-  }
-  var manualInput = document.getElementById('dv-cdek-pvz-manual');
-  if (manualInput) {
-    manualInput.style.display = 'block';
-    var pvzSel = document.getElementById('dv-pvz-selected');
-    pvzSel.style.display = 'block';
-    pvzSel.innerHTML = '<div class="dv-pvz-hint">После выбора пункта на сайте СДЭК — скопируйте и вставьте его адрес:</div>';
-  }
+
+  // Show CDEK widget overlay
+  var overlay = document.createElement('div');
+  overlay.id = 'cdek-widget-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#0d1f38;z-index:9999;display:flex;flex-direction:column;';
+
+  overlay.innerHTML =
+    '<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.1);">' +
+      '<button onclick="dvCloseCdekMap()" style="background:transparent;border:none;color:rgba(255,255,255,0.7);font-size:14px;cursor:pointer;padding:4px 0;">← Назад</button>' +
+      '<span style="font-size:15px;font-weight:600;color:#fff;">Выберите пункт выдачи</span>' +
+    '</div>' +
+    '<div id="cdek-map-container" style="flex:1;overflow:hidden;"></div>';
+
+  document.body.appendChild(overlay);
+
+  // Load CDEK widget script
+  var script = document.createElement('script');
+  script.src = 'https://widget.cdek.ru/widget/widgetviewer.js';
+  script.onload = function() {
+    try {
+      new CDEKWidget({
+        from: { country_code: 'RU', city: city },
+        root: 'cdek-map-container',
+        apiKey: '',
+        canChoose: true,
+        servicePath: '',
+        lang: 'rus',
+        currency: 'RUB',
+        tariffs: { office: [234, 136] },
+        onChoose: function(type, tariff, address) {
+          // address contains selected pickup point data
+          var pvzAddress = address.address || address.name || '';
+          var pvzCode = address.id || '';
+          var pvzName = address.name || '';
+          var pvzWorkTime = address.work_time || '';
+
+          document.getElementById('dv-cdek-pvz-manual').value = pvzAddress;
+          document.getElementById('dv-cdek-pvz-manual').style.display = 'none';
+
+          var pvzSel = document.getElementById('dv-pvz-selected');
+          pvzSel.style.display = 'block';
+          pvzSel.innerHTML =
+            '<div class="dv-pvz-card">' +
+              '<div class="dv-pvz-addr">📍 ' + pvzName + '</div>' +
+              '<div class="dv-pvz-address-line">' + pvzAddress + '</div>' +
+              (pvzWorkTime ? '<div class="dv-pvz-time">' + pvzWorkTime + '</div>' : '') +
+              '<button class="dv-pvz-change" onclick="dvOpenCdekMap()">Изменить пункт выдачи</button>' +
+            '</div>';
+
+          // Store for order submission
+          window._cdekPvzCode = pvzCode;
+          window._cdekPvzAddress = pvzAddress;
+          window._cdekPvzName = pvzName;
+          window._cdekPvzWorkTime = pvzWorkTime;
+
+          dvCloseCdekMap();
+        }
+      });
+    } catch(e) {
+      // Fallback if widget fails
+      dvCloseCdekMap();
+      var manualInput = document.getElementById('dv-cdek-pvz-manual');
+      if (manualInput) {
+        manualInput.style.display = 'block';
+        var pvzSel = document.getElementById('dv-pvz-selected');
+        pvzSel.style.display = 'block';
+        pvzSel.innerHTML = '<div class="dv-pvz-hint">Введите адрес пункта выдачи СДЭК вручную:</div>';
+      }
+    }
+  };
+  script.onerror = function() {
+    dvCloseCdekMap();
+    var manualInput = document.getElementById('dv-cdek-pvz-manual');
+    if (manualInput) manualInput.style.display = 'block';
+  };
+  document.head.appendChild(script);
+}
+
+function dvCloseCdekMap() {
+  var overlay = document.getElementById('cdek-widget-overlay');
+  if (overlay) overlay.remove();
 }
 
 function showCustomPage() {
@@ -978,7 +1046,10 @@ document.getElementById('submit-btn').addEventListener('click', async function()
       if (!cdekCity) { alert('Введите город для СДЭК'); return; }
       if (!cdekAddr) { alert('Укажите адрес пункта выдачи СДЭК'); return; }
       delivery.cdekCity = cdekCity;
-      delivery.cdekPickupPointAddress = cdekAddr;
+      delivery.cdekPickupPointAddress = window._cdekPvzAddress || cdekAddr;
+      delivery.cdekPickupPointCode = window._cdekPvzCode || '';
+      delivery.cdekPickupPointName = window._cdekPvzName || '';
+      delivery.cdekPickupPointWorkTime = window._cdekPvzWorkTime || '';
       delivery.city = cdekCity;
       delivery.address = cdekAddr;
     } else {
