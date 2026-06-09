@@ -1,3 +1,97 @@
+/* LANGUAGE DROPDOWN */
+.lang-dropdown-wrap {
+  position: relative;
+}
+
+.lang-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8);
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lang-dropdown-arrow {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  margin-left: 2px;
+}
+
+.lang-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #1e2d45;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 100;
+  min-width: 100px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.lang-dropdown-menu.lang-dropdown-open {
+  display: block;
+}
+
+.lang-dropdown-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 16px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.lang-dropdown-menu button:hover {
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+}
+
+/* SEGMENTED FILTER */
+.filter-bar-seg {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+.filter-seg-btn {
+  padding: 11px 0;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.filter-seg-active {
+  background: rgba(240,192,64,0.15);
+  color: #f0c040;
+  font-weight: 600;
+}
+
 * {
   margin: 0;
   padding: 0;
