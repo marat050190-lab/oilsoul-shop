@@ -703,7 +703,7 @@ function renderDeliveryForm() {
       '<div id="dv-cdek-block">' +
         '<div class="dv-label" style="margin-top:14px;">Город</div>' +
         '<div style="position:relative;">' +
-          '<input id="dv-cdek-city" class="dv-input" placeholder="Введите город" oninput="dvSearchCity(this.value)">' +
+          '<input id="dv-cdek-city" class="dv-input" placeholder="Введите город" oninput="dvSearchCity(this.value)" onblur="dvShowPvzIfCity()" onkeydown="if(event.key===\'Enter\'){dvShowPvzIfCity();}">' +
           '<div id="dv-cdek-city-list" class="dv-autocomplete" style="display:none;"></div>' +
         '</div>' +
         '<div id="dv-pvz-section" style="display:none;">' +
@@ -819,6 +819,14 @@ function dvSearchCity(val) {
       });
       list.style.display = list.children.length ? 'block' : 'none';
     }).catch(function() { list.style.display = 'none'; });
+}
+
+function dvShowPvzIfCity() {
+  var city = (document.getElementById('dv-cdek-city') || {}).value || '';
+  var pvzSection = document.getElementById('dv-pvz-section');
+  if (pvzSection && city.trim().length >= 2) {
+    pvzSection.style.display = 'block';
+  }
 }
 
 function dvOpenCdekMap() {
