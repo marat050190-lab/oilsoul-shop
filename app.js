@@ -514,15 +514,16 @@ function renderCatalog() {
         '</div>';
       }).join('') +
     '</div>' +
-    '<button class="faq-link-btn" onclick="showFaqPage()" style="margin-top:8px;width:100%;">Все вопросы →</button>';
+    '';
   mainEl.appendChild(faqSection);
 
-  // Footer with support
+  // Footer with support - inline with "all questions" button
   const footer = document.createElement('div');
   footer.id = 'main-footer';
-  footer.style.cssText = 'padding: 12px 16px 20px; text-align: center;';
+  footer.style.cssText = 'padding: 4px 0 20px; display:flex; justify-content:space-between; align-items:center;';
   footer.innerHTML =
-    '<a href="https://t.me/oilsoul_support" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:rgba(255,255,255,0.5);font-size:14px;text-decoration:none;transition:opacity 0.2s;">💬 @oilsoul_support</a>';
+    '<button class="faq-link-btn" onclick="showFaqPage()" style="margin:0;background:transparent;border:none;padding:4px 0;color:rgba(255,255,255,0.4);font-size:13px;">Все вопросы →</button>' +
+    '<a href="https://t.me/oilsoul_support" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.45);font-size:13px;text-decoration:none;">💬 @oilsoul_support</a>';
   mainEl.appendChild(footer);
 }
 
