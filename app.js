@@ -411,8 +411,6 @@ function toggleMainFaq(i) {
 
 function setFilter(filter) {
   currentFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(function(btn) { btn.classList.remove('filter-active'); });
-  document.getElementById('filter-' + filter).classList.add('filter-active');
   renderCatalog();
 }
 
@@ -421,11 +419,11 @@ function renderCatalog() {
   catalog.innerHTML = '';
 
   const filterBar = document.createElement('div');
-  filterBar.className = 'filter-bar';
+  filterBar.className = 'filter-bar-seg';
   filterBar.innerHTML =
-    '<button id="filter-all" class="filter-btn' + (currentFilter === 'all' ? ' filter-active' : '') + '" onclick="setFilter(\'all\')">' + t('filter_all') + '</button>' +
-    '<button id="filter-ready" class="filter-btn' + (currentFilter === 'ready' ? ' filter-active' : '') + '" onclick="setFilter(\'ready\')">' + t('filter_ready') + '</button>' +
-    '<button id="filter-custom" class="filter-btn' + (currentFilter === 'custom' ? ' filter-active' : '') + '" onclick="setFilter(\'custom\')">' + t('filter_custom') + '</button>';
+    '<button onclick="setFilter(\'all\')" style="border-right:1px solid rgba(255,255,255,0.1);" class="filter-seg-btn' + (currentFilter === 'all' ? ' filter-seg-active' : '') + '">' + t('filter_all') + '</button>' +
+    '<button onclick="setFilter(\'ready\')" style="border-right:1px solid rgba(255,255,255,0.1);" class="filter-seg-btn' + (currentFilter === 'ready' ? ' filter-seg-active' : '') + '">' + t('filter_ready') + '</button>' +
+    '<button onclick="setFilter(\'custom\')" class="filter-seg-btn' + (currentFilter === 'custom' ? ' filter-seg-active' : '') + '">' + t('filter_custom') + '</button>';
   catalog.appendChild(filterBar);
 
   if (currentFilter === 'all' || currentFilter === 'custom') {
