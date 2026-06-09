@@ -851,72 +851,23 @@ body {
   background: rgba(255,255,255,0.08);
 }
 
-/* LANGUAGE DROPDOWN */
-.lang-dropdown-wrap {
-  position: relative;
-}
-
-.lang-dropdown-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+/* LANGUAGE SWITCHER */
+.lang-btn {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.8);
-  padding: 6px 10px;
-  border-radius: 10px;
-  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap;
+  letter-spacing: 1px;
 }
 
-.lang-dropdown-btn:active {
-  opacity: 0.7;
-}
-
-.lang-dropdown-arrow {
-  font-size: 10px;
-  color: rgba(255,255,255,0.4);
-  margin-left: 2px;
-}
-
-.lang-dropdown-menu {
-  display: none;
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  background: #1e2d45;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
-  overflow: hidden;
-  z-index: 100;
-  min-width: 100px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-}
-
-.lang-dropdown-menu.lang-dropdown-open {
-  display: block;
-}
-
-.lang-dropdown-menu button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 11px 16px;
-  background: transparent;
-  border: none;
-  color: rgba(255,255,255,0.75);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-}
-
-.lang-dropdown-menu button:hover {
-  background: rgba(255,255,255,0.07);
-  color: #fff;
+.lang-active {
+  background: rgba(240,192,64,0.15);
+  border-color: #f0c040;
+  color: #f0c040;
 }
 .feature-icon-img {
   width: 52px;
@@ -925,18 +876,55 @@ body {
   object-fit: cover;
   flex-shrink: 0;
 }
+/* SEGMENTED FILTER */
+.filter-bar-seg {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+.filter-seg-btn {
+  padding: 11px 0;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.filter-seg-btn:active {
+  opacity: 0.7;
+}
+
+.filter-seg-active {
+  background: rgba(240,192,64,0.15);
+  color: #f0c040;
+  font-weight: 600;
+}
+
 /* ФИЛЬТР */
 .filter-bar {
   display: flex;
   gap: 8px;
-  justify-content: center;
+  overflow-x: auto;
+  scrollbar-width: none;
   padding: 4px 0 12px;
   grid-column: 1 / -1;
 }
 
+.filter-bar::-webkit-scrollbar { display: none; }
+
 .filter-btn {
   flex-shrink: 0;
-  padding: 8px 20px;
+  padding: 7px 14px;
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.15);
   background: rgba(255,255,255,0.06);
@@ -945,18 +933,12 @@ body {
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.18s;
-}
-
-.filter-btn:active {
-  opacity: 0.7;
 }
 
 .filter-active {
   background: rgba(240,192,64,0.15);
   border-color: #f0c040;
   color: #f0c040;
-  font-weight: 600;
 }
 
 /* КАТАЛОГ ГРИД */
