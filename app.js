@@ -791,6 +791,11 @@ function selectDvMethod(method) {
 
 function dvSearchCity(val) {
   var list = document.getElementById('dv-cdek-city-list');
+  var pvzSection = document.getElementById('dv-pvz-section');
+
+  // Show PVZ button as soon as user types something
+  if (pvzSection) pvzSection.style.display = val.length >= 2 ? 'block' : 'none';
+
   if (val.length < 2) { list.style.display = 'none'; return; }
   fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(val + ', Россия') + '&format=json&limit=5&addressdetails=1&accept-language=ru')
     .then(function(r) { return r.json(); })
@@ -808,7 +813,7 @@ function dvSearchCity(val) {
           e.preventDefault();
           document.getElementById('dv-cdek-city').value = city;
           list.style.display = 'none';
-          document.getElementById('dv-pvz-section').style.display = 'block';
+          if (pvzSection) pvzSection.style.display = 'block';
         };
         list.appendChild(div);
       });
