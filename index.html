@@ -135,7 +135,6 @@
   <script>
     var acTimer = null;
 
-    // Автодополнение адреса через Nominatim
     document.getElementById('field-address').addEventListener('input', function() {
       var val = this.value.trim();
       var dropdown = document.getElementById('address-dropdown');
@@ -176,15 +175,14 @@
       }, 500);
     });
 
-    // Для кастомной формы (создаётся динамически)
     function initCustomAutocomplete() {
       var addressEl = document.getElementById('custom-address');
       if (!addressEl) return;
+      var wrap = addressEl.parentNode;
+      if (wrap.style.position !== 'relative') wrap.style.position = 'relative';
       var dropdown = document.createElement('div');
-      dropdown.id = 'custom-address-dropdown';
       dropdown.style.cssText = 'display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;';
-      addressEl.parentNode.style.position = 'relative';
-      addressEl.parentNode.appendChild(dropdown);
+      wrap.appendChild(dropdown);
 
       addressEl.addEventListener('input', function() {
         var val = this.value.trim();
