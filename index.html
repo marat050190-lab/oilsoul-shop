@@ -84,8 +84,14 @@
       <div class="form-section">
         <h3>📦 Данные для доставки</h3>
         <input type="text" id="field-name" placeholder="Имя и фамилия *" autocomplete="name" required>
-        <input type="text" id="field-country" placeholder="Страна *" autocomplete="off" required>
-        <input type="text" id="field-city" placeholder="Город *" autocomplete="off" required>
+        <div style="position:relative;">
+          <input type="text" id="field-country" placeholder="Страна *" autocomplete="off" required>
+          <div id="country-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;"></div>
+        </div>
+        <div style="position:relative;">
+          <input type="text" id="field-city" placeholder="Город *" autocomplete="off" required>
+          <div id="city-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;"></div>
+        </div>
         <div style="position:relative;">
           <input type="text" id="field-address" placeholder="Адрес (улица, дом, квартира) *" autocomplete="off" required>
           <div id="address-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;"></div>
@@ -124,66 +130,136 @@
       var menu = document.getElementById('lang-dropdown-menu');
       if (menu) menu.classList.remove('lang-dropdown-open');
     }
-    if (!e.target.closest('#field-address') && !e.target.closest('#address-dropdown')) {
-      var dd = document.getElementById('address-dropdown');
-      if (dd) dd.style.display = 'none';
-    }
+    ['country-dropdown','city-dropdown','address-dropdown'].forEach(function(id) {
+      if (!e.target.closest('#field-' + id.replace('-dropdown','')) && !e.target.closest('#' + id)) {
+        var dd = document.getElementById(id);
+        if (dd) dd.style.display = 'none';
+      }
+    });
   });
   </script>
   <script src="products.js"></script>
   <script src="app.js"></script>
   <script>
     var acTimer = null;
+    var DD_STYLE = 'padding:10px 14px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.07);';
 
+    function nominatimSearch(query, lang, callback) {
+      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&limit=5&accept-language=' + (lang||'ru'))
+        .then(function(r) { return r.json(); })
+        .then(callback)
+        .catch(function() { callback([]); });
+    }
+
+    function showDropdown(dropdownId, items, onSelect) {
+      var dd = document.getElementById(dropdownId);
+      dd.innerHTML = '';
+      if (!items.length) { dd.style.display = 'none'; return; }
+      items.forEach(function(item) {
+        var div = document.createElement('div');
+        div.style.cssText = DD_STYLE;
+        div.textContent = item.label;
+        div.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          onSelect(item);
+          dd.style.display = 'none';
+        });
+        dd.appendChild(div);
+      });
+      dd.style.display = 'block';
+    }
+
+    // Страна
+    document.getElementById('field-country').addEventListener('input', function() {
+      var val = this.value.trim();
+      clearTimeout(acTimer);
+      var dd = document.getElementById('country-dropdown');
+      if (val.length < 2) { dd.style.display = 'none'; return; }
+      acTimer = setTimeout(function() {
+        nominatimSearch(val, 'ru', function(results) {
+          var seen = {};
+          var items = [];
+          results.forEach(function(r) {
+            var country = r.address && r.address.country;
+            if (country && !seen[country]) {
+              seen[country] = true;
+              items.push({ label: country, data: r });
+            }
+          });
+          showDropdown('country-dropdown', items, function(item) {
+            document.getElementById('field-country').value = item.label;
+          });
+        });
+      }, 400);
+    });
+
+    // Город
+    document.getElementById('field-city').addEventListener('input', function() {
+      var val = this.value.trim();
+      clearTimeout(acTimer);
+      var dd = document.getElementById('city-dropdown');
+      if (val.length < 2) { dd.style.display = 'none'; return; }
+      var country = document.getElementById('field-country').value.trim();
+      var query = val + (country ? ', ' + country : '');
+      acTimer = setTimeout(function() {
+        nominatimSearch(query, 'ru', function(results) {
+          var seen = {};
+          var items = [];
+          results.forEach(function(r) {
+            var addr = r.address || {};
+            var city = addr.city || addr.town || addr.village;
+            if (city && !seen[city]) {
+              seen[city] = true;
+              items.push({ label: city, data: r });
+            }
+          });
+          showDropdown('city-dropdown', items, function(item) {
+            var addr = item.data.address || {};
+            document.getElementById('field-city').value = item.label;
+            if (addr.country) document.getElementById('field-country').value = addr.country;
+            if (addr.postcode) document.getElementById('field-postal').value = addr.postcode;
+          });
+        });
+      }, 400);
+    });
+
+    // Адрес
     document.getElementById('field-address').addEventListener('input', function() {
       var val = this.value.trim();
-      var dropdown = document.getElementById('address-dropdown');
       clearTimeout(acTimer);
-      if (val.length < 3) { dropdown.style.display = 'none'; return; }
-      var city = (document.getElementById('field-city').value || '').trim();
-      var country = (document.getElementById('field-country').value || '').trim();
+      var dd = document.getElementById('address-dropdown');
+      if (val.length < 3) { dd.style.display = 'none'; return; }
+      var city = document.getElementById('field-city').value.trim();
+      var country = document.getElementById('field-country').value.trim();
       var query = val + (city ? ', ' + city : '') + (country ? ', ' + country : '');
       acTimer = setTimeout(function() {
-        fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&limit=5&accept-language=ru')
-          .then(function(r) { return r.json(); })
-          .then(function(results) {
-            dropdown.innerHTML = '';
-            if (!results.length) { dropdown.style.display = 'none'; return; }
-            results.forEach(function(item) {
-              var div = document.createElement('div');
-              div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.07);';
-              div.textContent = item.display_name;
-              div.addEventListener('mousedown', function(e) {
-                e.preventDefault();
-                var addr = item.address;
-                var road = addr.road || '';
-                var house = addr.house_number || '';
-                document.getElementById('field-address').value = road + (house ? ', ' + house : '');
-                if (addr.city || addr.town || addr.village)
-                  document.getElementById('field-city').value = addr.city || addr.town || addr.village;
-                if (addr.country)
-                  document.getElementById('field-country').value = addr.country;
-                if (addr.postcode)
-                  document.getElementById('field-postal').value = addr.postcode;
-                dropdown.style.display = 'none';
-              });
-              dropdown.appendChild(div);
-            });
-            dropdown.style.display = 'block';
-          })
-          .catch(function() { dropdown.style.display = 'none'; });
+        nominatimSearch(query, 'ru', function(results) {
+          var items = results.map(function(r) { return { label: r.display_name, data: r }; });
+          showDropdown('address-dropdown', items, function(item) {
+            var addr = item.data.address || {};
+            var road = addr.road || '';
+            var house = addr.house_number || '';
+            document.getElementById('field-address').value = road + (house ? ', ' + house : '');
+            if (addr.city || addr.town || addr.village)
+              document.getElementById('field-city').value = addr.city || addr.town || addr.village;
+            if (addr.country)
+              document.getElementById('field-country').value = addr.country;
+            if (addr.postcode)
+              document.getElementById('field-postal').value = addr.postcode;
+          });
+        });
       }, 500);
     });
 
+    // Кастомная форма
     function initCustomAutocomplete() {
       var addressEl = document.getElementById('custom-address');
       if (!addressEl) return;
       var wrap = addressEl.parentNode;
-      if (wrap.style.position !== 'relative') wrap.style.position = 'relative';
+      wrap.style.position = 'relative';
       var dropdown = document.createElement('div');
       dropdown.style.cssText = 'display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;';
       wrap.appendChild(dropdown);
-
       addressEl.addEventListener('input', function() {
         var val = this.value.trim();
         clearTimeout(acTimer);
@@ -192,37 +268,30 @@
         var country = (document.getElementById('custom-country') || {value:''}).value.trim();
         var query = val + (city ? ', ' + city : '') + (country ? ', ' + country : '');
         acTimer = setTimeout(function() {
-          fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&limit=5&accept-language=ru')
-            .then(function(r) { return r.json(); })
-            .then(function(results) {
-              dropdown.innerHTML = '';
-              if (!results.length) { dropdown.style.display = 'none'; return; }
-              results.forEach(function(item) {
-                var div = document.createElement('div');
-                div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.07);';
-                div.textContent = item.display_name;
-                div.addEventListener('mousedown', function(e) {
-                  e.preventDefault();
-                  var addr = item.address;
-                  var road = addr.road || '';
-                  var house = addr.house_number || '';
-                  addressEl.value = road + (house ? ', ' + house : '');
-                  var cityEl = document.getElementById('custom-city');
-                  var countryEl = document.getElementById('custom-country');
-                  var postalEl = document.getElementById('custom-postal');
-                  if (cityEl && (addr.city || addr.town || addr.village))
-                    cityEl.value = addr.city || addr.town || addr.village;
-                  if (countryEl && addr.country)
-                    countryEl.value = addr.country;
-                  if (postalEl && addr.postcode)
-                    postalEl.value = addr.postcode;
-                  dropdown.style.display = 'none';
-                });
-                dropdown.appendChild(div);
+          nominatimSearch(query, 'ru', function(results) {
+            dropdown.innerHTML = '';
+            if (!results.length) { dropdown.style.display = 'none'; return; }
+            results.forEach(function(item) {
+              var div = document.createElement('div');
+              div.style.cssText = DD_STYLE;
+              div.textContent = item.display_name;
+              div.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                var addr = item.address || {};
+                addressEl.value = (addr.road || '') + (addr.house_number ? ', ' + addr.house_number : '');
+                var cityEl = document.getElementById('custom-city');
+                var countryEl = document.getElementById('custom-country');
+                var postalEl = document.getElementById('custom-postal');
+                if (cityEl && (addr.city || addr.town || addr.village))
+                  cityEl.value = addr.city || addr.town || addr.village;
+                if (countryEl && addr.country) countryEl.value = addr.country;
+                if (postalEl && addr.postcode) postalEl.value = addr.postcode;
+                dropdown.style.display = 'none';
               });
-              dropdown.style.display = 'block';
-            })
-            .catch(function() { dropdown.style.display = 'none'; });
+              dropdown.appendChild(div);
+            });
+            dropdown.style.display = 'block';
+          });
         }, 500);
       });
     }
