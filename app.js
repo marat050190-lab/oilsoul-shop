@@ -672,44 +672,48 @@ function renderCheckout() {
   document.querySelector('#page-checkout header h1').textContent = t('checkout_title');
   document.getElementById('back-btn').textContent = t('back');
   document.getElementById('submit-btn').textContent = t('submit_btn');
-  renderDeliveryForm();
+
+  // Update placeholders for current language
+  var _f = function(id, val) { var el = document.getElementById(id); if (el) el.placeholder = val; };
+  _f('field-name',    t('field_name'));
+  _f('field-country', t('field_country'));
+  _f('field-city',    t('field_city'));
+  _f('field-address', t('field_address'));
+  _f('field-postal',  t('field_postal'));
+  _f('field-phone',   t('field_phone'));
+  _f('field-email',   t('field_email'));
+  _f('field-comment', t('field_comment'));
+
+  // Email validation
+  var emailEl = document.getElementById('field-email');
+  if (emailEl && !emailEl._validationAttached) {
+    emailEl._validationAttached = true;
+    // Add error div if not exists
+    if (!document.getElementById('email-error')) {
+      var errDiv = document.createElement('div');
+      errDiv.id = 'email-error';
+      errDiv.style.cssText = 'display:none;color:#e05c5c;font-size:12px;margin:-8px 0 4px 4px;';
+      emailEl.parentNode.insertBefore(errDiv, emailEl.nextSibling);
+    }
+    emailEl.addEventListener('input', function() {
+      var val = this.value.trim();
+      var errEl = document.getElementById('email-error');
+      if (!errEl) return;
+      if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+        errEl.textContent = lang === 'ar' ? 'صيغة البريد الإلكتروني غير صحيحة' : lang === 'en' ? 'Invalid email format' : 'Неверный формат email';
+        errEl.style.display = 'block';
+      } else {
+        errEl.style.display = 'none';
+      }
+    });
+  }
+
+  // Init Google Places autocomplete
   setTimeout(function() {
     if (window.googleMapsReady) initCheckoutAutocomplete();
   }, 100);
 }
 
-function renderDeliveryForm() {
-  var fs = document.querySelector('.form-section');
-  if (!fs) return;
-  fs.innerHTML =
-    '<h3>' + t('delivery_title') + '</h3>' +
-    '<input type="text" id="field-name" class="dv-input" placeholder="' + t('field_name') + '" autocomplete="name">' +
-    '<input type="text" id="field-country" class="dv-input" placeholder="' + t('field_country') + '" autocomplete="off">' +
-    '<input type="text" id="field-city" class="dv-input" placeholder="' + t('field_city') + '" autocomplete="off">' +
-    '<input type="text" id="field-address" class="dv-input" placeholder="' + t('field_address') + '" autocomplete="off">' +
-    '<input type="text" id="field-postal" class="dv-input" placeholder="' + t('field_postal') + '" autocomplete="postal-code">' +
-    '<input type="tel" id="field-phone" class="dv-input" placeholder="' + t('field_phone') + '" autocomplete="tel">' +
-    '<input type="email" id="field-email" class="dv-input" placeholder="' + t('field_email') + '" autocomplete="email">' +
-    '<div id="email-error" style="display:none;color:#e05c5c;font-size:12px;margin:-8px 0 4px 4px;"></div>' +
-    '<textarea id="field-comment" class="dv-input" style="height:60px;resize:none;" placeholder="' + t('field_comment') + '"></textarea>';
-
-  // Email validation on input
-  setTimeout(function() {
-    var emailEl = document.getElementById('field-email');
-    var emailErr = document.getElementById('email-error');
-    if (emailEl) {
-      emailEl.addEventListener('input', function() {
-        var val = this.value.trim();
-        if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
-          emailErr.textContent = lang === 'ar' ? 'صيغة البريد الإلكتروني غير صحيحة' : lang === 'en' ? 'Invalid email format' : 'Неверный формат email';
-          emailErr.style.display = 'block';
-        } else {
-          emailErr.style.display = 'none';
-        }
-      });
-    }
-  }, 50);
-}
 
 function dvSearchCountry(val) {
   var list = document.getElementById('dv-country-list');
