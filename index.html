@@ -44,6 +44,22 @@
 
   <style>
     .lang-dropdown-wrap { position: relative; }
+    .lang-dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      color: rgba(255,255,255,0.85);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .lang-dropdown-arrow { font-size: 10px; opacity: 0.6; }
     .lang-dropdown-menu {
       display: none;
       position: absolute;
@@ -51,11 +67,11 @@
       right: 0;
       background: #1a2b40;
       border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
       z-index: 999;
       min-width: 90px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
     .lang-dropdown-menu.lang-dropdown-open { display: block; }
     .lang-dropdown-menu button {
@@ -71,8 +87,9 @@
       font-weight: 600;
       cursor: pointer;
       text-align: left;
+      box-sizing: border-box;
     }
-    .lang-dropdown-menu button:hover { background: rgba(255,255,255,0.08); }
+    .lang-dropdown-menu button:active { background: rgba(255,255,255,0.08); }
   </style>
 </head>
 <body>
