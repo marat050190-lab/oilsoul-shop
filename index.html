@@ -41,6 +41,39 @@
     .apt-row > div { flex: 1; position: relative; }
     .apt-row input.apt-input { width: 100px; flex-shrink: 0; }
   </style>
+
+  <style>
+    .lang-dropdown-wrap { position: relative; }
+    .lang-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: #1a2b40;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 999;
+      min-width: 90px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    .lang-dropdown-menu.lang-dropdown-open { display: block; }
+    .lang-dropdown-menu button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.85);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+    }
+    .lang-dropdown-menu button:hover { background: rgba(255,255,255,0.08); }
+  </style>
 </head>
 <body>
 
