@@ -248,15 +248,16 @@ function setLang(l) {
   if (customBtn) customBtn.textContent = l === 'ar' ? '✍️ طلب خاص' : l === 'en' ? '✍️ Custom order' : '✍️ Под заказ';
 
   document.getElementById('checkout-btn').textContent = t('cart_btn');
-  document.getElementById('field-name').placeholder = t('field_name');
-  document.getElementById('field-country').placeholder = t('field_country');
-  document.getElementById('field-city').placeholder = t('field_city');
-  document.getElementById('field-address').placeholder = t('field_address');
-  document.getElementById('field-postal').placeholder = t('field_postal');
-  document.getElementById('field-phone').placeholder = t('field_phone');
-  document.getElementById('field-email').placeholder = t('field_email');
-  document.getElementById('field-comment').placeholder = t('field_comment');
-  document.getElementById('submit-btn').textContent = t('submit_btn');
+  var _f = function(id, prop, val) { var el = document.getElementById(id); if (el) el[prop] = val; };
+  _f('field-name',    'placeholder', t('field_name'));
+  _f('field-country', 'placeholder', t('field_country'));
+  _f('field-city',    'placeholder', t('field_city'));
+  _f('field-address', 'placeholder', t('field_address'));
+  _f('field-postal',  'placeholder', t('field_postal'));
+  _f('field-phone',   'placeholder', t('field_phone'));
+  _f('field-email',   'placeholder', t('field_email'));
+  _f('field-comment', 'placeholder', t('field_comment'));
+  _f('submit-btn',    'textContent', t('submit_btn'));
   renderCatalog();
 }
 
@@ -678,83 +679,33 @@ function renderDeliveryForm() {
   var fs = document.querySelector('.form-section');
   if (!fs) return;
   fs.innerHTML =
-    '<div class="dv-label">Страна доставки</div>' +
-    '<div style="position:relative;">' +
-      '<input id="dv-country-input" class="dv-input" placeholder="Введите страну..." oninput="dvSearchCountry(this.value)" autocomplete="off">' +
-      '<div id="dv-country-list" class="dv-autocomplete" style="display:none;"></div>' +
-    '</div>' +
-    '<div id="dv-russia" style="display:none;">' +
-      '<div class="dv-info-box">' +
-        '<div class="dv-info-title">Доставка по России</div>' +
-        '<div class="dv-info-sub">Стоимость доставки рассчитывается после оформления заказа</div>' +
-      '</div>' +
-      '<div class="dv-label">Способ доставки</div>' +
-      '<div id="dv-method-cdek" class="dv-method-card dv-method-active" onclick="selectDvMethod(\'cdek\')">' +
-        '<img src="icon_cdek.png" class="dv-method-logo" alt="CDEK">' +
-        '<span class="dv-method-label">СДЭК — пункт выдачи</span>' +
-        '<span class="dv-radio dv-radio-on" id="dv-radio-cdek"></span>' +
-      '</div>' +
-      '<div id="dv-method-post" class="dv-method-card" onclick="selectDvMethod(\'post\')">' +
-        '<img src="icon_post.png" class="dv-method-logo" alt="Почта России">' +
-        '<span class="dv-method-label">Почта России — отделение</span>' +
-        '<span class="dv-radio" id="dv-radio-post"></span>' +
-      '</div>' +
-      '<div id="dv-cdek-block">' +
-        '<div class="dv-label" style="margin-top:14px;">Город</div>' +
-        '<div style="position:relative;">' +
-          '<input id="dv-cdek-city" class="dv-input" placeholder="Введите город" oninput="dvSearchCity(this.value)" onblur="dvShowPvzIfCity()" onkeydown="if(event.key===\'Enter\'){dvShowPvzIfCity();}">' +
-          '<div id="dv-cdek-city-list" class="dv-autocomplete" style="display:none;"></div>' +
-        '</div>' +
-        '<div id="dv-pvz-section" style="display:none;">' +
-          '<div id="dv-pvz-selected" style="display:none;"></div>' +
-          '<button class="dv-btn-map" onclick="dvOpenCdekMap()">📍 Выбрать пункт выдачи СДЭК</button>' +
-          '<input id="dv-cdek-pvz-manual" class="dv-input" placeholder="Вставьте адрес выбранного ПВЗ *" style="margin-top:8px;display:none;">' +
-        '</div>' +
-      '</div>' +
-      '<div id="dv-post-block" style="display:none;">' +
-        '<div class="dv-label" style="margin-top:14px;">Город</div>' +
-        '<input id="dv-post-city" class="dv-input" placeholder="Город *">' +
-        '<div class="dv-label">Индекс отделения</div>' +
-        '<input id="dv-post-index" class="dv-input" placeholder="Например: 420111" maxlength="6">' +
-        '<div class="dv-label">Адрес отделения</div>' +
-        '<input id="dv-post-address" class="dv-input" placeholder="Улица, дом отделения *">' +
-      '</div>' +
-      '<div class="dv-sep"></div>' +
-      '<div class="dv-label">ФИО получателя</div>' +
-      '<input id="dv-ru-name" class="dv-input" placeholder="Иванов Иван Иванович *">' +
-      '<div class="dv-label">Телефон</div>' +
-      '<input id="dv-ru-phone" class="dv-input" type="tel" placeholder="+7 (999) 123-45-67 *">' +
-      '<div class="dv-label">Email</div>' +
-      '<input id="dv-ru-email" class="dv-input" type="email" placeholder="email@mail.ru *">' +
-      '<div class="dv-label">Комментарий</div>' +
-      '<textarea id="dv-ru-comment" class="dv-input" style="height:60px;resize:none;" placeholder="Необязательно"></textarea>' +
-    '</div>' +
-    '<div id="dv-intl" style="display:none;">' +
-      '<div class="dv-info-box dv-info-blue">' +
-        '<div class="dv-method-card-logo-wrap"><img src="icon_ems.png" class="dv-method-logo" alt="EMS" style="border-radius:8px;"></div>' +
-        '<div>' +
-          '<div class="dv-info-title" style="color:#7ab3f0;">EMS / International Post</div>' +
-          '<div class="dv-info-sub">Отправляем по всему миру. После отправки вы получите трек-номер.</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="dv-label">Full name / ФИО</div>' +
-      '<input id="dv-intl-name" class="dv-input" placeholder="Full name *">' +
-      '<div class="dv-label">Country / Страна</div>' +
-      '<input id="dv-intl-country" class="dv-input" placeholder="Country *">' +
-      '<div class="dv-label">City / Город</div>' +
-      '<input id="dv-intl-city" class="dv-input" placeholder="City *">' +
-      '<div class="dv-label">Address / Адрес</div>' +
-      '<input id="dv-intl-address" class="dv-input" placeholder="Street, building, apt *">' +
-      '<div class="dv-label">Postal code / Индекс</div>' +
-      '<input id="dv-intl-postal" class="dv-input" placeholder="Postal code *">' +
-      '<div class="dv-label">Phone / Телефон</div>' +
-      '<input id="dv-intl-phone" class="dv-input" type="tel" placeholder="+1 234 567 8900 *">' +
-      '<div class="dv-label">Email</div>' +
-      '<input id="dv-intl-email" class="dv-input" type="email" placeholder="email@example.com *">' +
-      '<div class="dv-label">Comment / Комментарий</div>' +
-      '<textarea id="dv-intl-comment" class="dv-input" style="height:60px;resize:none;" placeholder="Optional"></textarea>' +
-      '<div class="dv-intl-note">Стоимость международной доставки рассчитывается индивидуально после оформления заказа.</div>' +
-    '</div>';
+    '<h3>' + t('delivery_title') + '</h3>' +
+    '<input type="text" id="field-name" class="dv-input" placeholder="' + t('field_name') + '" autocomplete="name">' +
+    '<input type="text" id="field-country" class="dv-input" placeholder="' + t('field_country') + '" autocomplete="off">' +
+    '<input type="text" id="field-city" class="dv-input" placeholder="' + t('field_city') + '" autocomplete="off">' +
+    '<input type="text" id="field-address" class="dv-input" placeholder="' + t('field_address') + '" autocomplete="off">' +
+    '<input type="text" id="field-postal" class="dv-input" placeholder="' + t('field_postal') + '" autocomplete="postal-code">' +
+    '<input type="tel" id="field-phone" class="dv-input" placeholder="' + t('field_phone') + '" autocomplete="tel">' +
+    '<input type="email" id="field-email" class="dv-input" placeholder="' + t('field_email') + '" autocomplete="email">' +
+    '<div id="email-error" style="display:none;color:#e05c5c;font-size:12px;margin:-8px 0 4px 4px;"></div>' +
+    '<textarea id="field-comment" class="dv-input" style="height:60px;resize:none;" placeholder="' + t('field_comment') + '"></textarea>';
+
+  // Email validation on input
+  setTimeout(function() {
+    var emailEl = document.getElementById('field-email');
+    var emailErr = document.getElementById('email-error');
+    if (emailEl) {
+      emailEl.addEventListener('input', function() {
+        var val = this.value.trim();
+        if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+          emailErr.textContent = lang === 'ar' ? 'صيغة البريد الإلكتروني غير صحيحة' : lang === 'en' ? 'Invalid email format' : 'Неверный формат email';
+          emailErr.style.display = 'block';
+        } else {
+          emailErr.style.display = 'none';
+        }
+      });
+    }
+  }, 50);
 }
 
 function dvSearchCountry(val) {
@@ -1069,54 +1020,34 @@ document.getElementById('back-btn').addEventListener('click', function() {
 });
 
 document.getElementById('submit-btn').addEventListener('click', async function() {
-  var countryInput = (document.getElementById('dv-country-input') || {}).value || '';
-  var isRussia = countryInput.toLowerCase().indexOf('росси') !== -1 || countryInput.toLowerCase() === 'russia';
-  var delivery = {};
+  var name    = (document.getElementById('field-name')    || {value:''}).value.trim();
+  var country = (document.getElementById('field-country') || {value:''}).value.trim();
+  var city    = (document.getElementById('field-city')    || {value:''}).value.trim();
+  var address = (document.getElementById('field-address') || {value:''}).value.trim();
+  var postal  = (document.getElementById('field-postal')  || {value:''}).value.trim();
+  var phone   = (document.getElementById('field-phone')   || {value:''}).value.trim();
+  var email   = (document.getElementById('field-email')   || {value:''}).value.trim();
+  var comment = (document.getElementById('field-comment') || {value:''}).value.trim();
 
-  if (!countryInput.trim()) { alert('Пожалуйста, выберите страну доставки'); return; }
-
-  if (isRussia) {
-    var name = ((document.getElementById('dv-ru-name') || {}).value || '').trim();
-    var phone = ((document.getElementById('dv-ru-phone') || {}).value || '').trim();
-    var email = ((document.getElementById('dv-ru-email') || {}).value || '').trim();
-    var comment = ((document.getElementById('dv-ru-comment') || {}).value || '').trim();
-    if (!name || !phone || !email) { alert('Пожалуйста, заполните ФИО, телефон и email'); return; }
-    delivery = { deliveryCountry: 'Россия', deliveryMethod: deliveryMethod === 'cdek' ? 'СДЭК' : 'Почта России', recipientName: name, recipientPhone: phone, recipientEmail: email, comment: comment, trackingCarrier: deliveryMethod === 'cdek' ? 'CDEK' : 'Russian Post' };
-    if (deliveryMethod === 'cdek') {
-      var cdekCity = ((document.getElementById('dv-cdek-city') || {}).value || '').trim();
-      var cdekAddr = ((document.getElementById('dv-cdek-pvz-manual') || {}).value || '').trim();
-      if (!cdekCity) { alert('Введите город для СДЭК'); return; }
-      if (!cdekAddr) { alert('Укажите адрес пункта выдачи СДЭК'); return; }
-      delivery.cdekCity = cdekCity;
-      delivery.cdekPickupPointAddress = window._cdekPvzAddress || cdekAddr;
-      delivery.cdekPickupPointCode = window._cdekPvzCode || '';
-      delivery.cdekPickupPointName = window._cdekPvzName || '';
-      delivery.cdekPickupPointWorkTime = window._cdekPvzWorkTime || '';
-      delivery.city = cdekCity;
-      delivery.address = cdekAddr;
-    } else {
-      var postCity = ((document.getElementById('dv-post-city') || {}).value || '').trim();
-      var postIndex = ((document.getElementById('dv-post-index') || {}).value || '').trim();
-      var postAddr = ((document.getElementById('dv-post-address') || {}).value || '').trim();
-      if (!postCity || !postIndex || !postAddr) { alert('Заполните город, индекс и адрес отделения'); return; }
-      delivery.city = postCity;
-      delivery.postalOfficeIndex = postIndex;
-      delivery.postalOfficeAddress = postAddr;
-      delivery.address = postAddr;
-      delivery.postalCode = postIndex;
-    }
-  } else {
-    var name = ((document.getElementById('dv-intl-name') || {}).value || '').trim();
-    var country = ((document.getElementById('dv-intl-country') || {}).value || '').trim();
-    var city = ((document.getElementById('dv-intl-city') || {}).value || '').trim();
-    var address = ((document.getElementById('dv-intl-address') || {}).value || '').trim();
-    var postal = ((document.getElementById('dv-intl-postal') || {}).value || '').trim();
-    var phone = ((document.getElementById('dv-intl-phone') || {}).value || '').trim();
-    var email = ((document.getElementById('dv-intl-email') || {}).value || '').trim();
-    var comment = ((document.getElementById('dv-intl-comment') || {}).value || '').trim();
-    if (!name || !country || !city || !address || !postal || !phone || !email) { alert(t('fill_fields')); return; }
-    delivery = { deliveryCountry: country, deliveryMethod: 'EMS / International Post', recipientName: name, city: city, address: address, postalCode: postal, recipientPhone: phone, recipientEmail: email, comment: comment, trackingCarrier: 'EMS / International Post' };
+  if (!name || !country || !city || !address || !postal || !phone || !email) {
+    alert(t('fill_fields')); return;
   }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    var emailErr = document.getElementById('email-error');
+    if (emailErr) { emailErr.style.display = 'block'; emailErr.textContent = lang === 'ar' ? 'صيغة البريد الإلكتروني غير صحيحة' : lang === 'en' ? 'Invalid email format' : 'Неверный формат email'; }
+    alert(lang === 'en' ? 'Invalid email format' : 'Неверный формат email'); return;
+  }
+
+  var delivery = {
+    recipientName: name,
+    deliveryCountry: country,
+    city: city,
+    address: address,
+    postalCode: postal,
+    recipientPhone: phone,
+    recipientEmail: email,
+    comment: comment
+  };
 
   const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
   const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
