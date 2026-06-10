@@ -676,7 +676,6 @@ function renderCheckout() {
   var consentBox = document.getElementById('field-consent');
   if (submitBtn) {
     submitBtn.textContent = t('submit_btn');
-    submitBtn.disabled = true;
     submitBtn.style.opacity = '0.5';
     submitBtn.style.cursor = 'not-allowed';
   }
