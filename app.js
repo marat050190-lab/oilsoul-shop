@@ -679,11 +679,10 @@ function renderDeliveryForm() {
   if (!fs) return;
   fs.innerHTML =
     '<div class="dv-label">Страна доставки</div>' +
-    '<select id="dv-country" class="dv-select" onchange="onDvCountryChange()">' +
-      '<option value="">— Выберите страну —</option>' +
-      '<option value="ru">🇷🇺 Россия</option>' +
-      '<option value="other">🌍 Другая страна</option>' +
-    '</select>' +
+    '<div style="position:relative;">' +
+      '<input id="dv-country-input" class="dv-input" placeholder="Введите страну..." oninput="dvSearchCountry(this.value)" autocomplete="off">' +
+      '<div id="dv-country-list" class="dv-autocomplete" style="display:none;"></div>' +
+    '</div>' +
     '<div id="dv-russia" style="display:none;">' +
       '<div class="dv-info-box">' +
         '<div class="dv-info-title">Доставка по России</div>' +
@@ -758,10 +757,37 @@ function renderDeliveryForm() {
     '</div>';
 }
 
-function onDvCountryChange() {
-  var v = document.getElementById('dv-country').value;
-  document.getElementById('dv-russia').style.display = v === 'ru' ? 'block' : 'none';
-  document.getElementById('dv-intl').style.display = v === 'other' ? 'block' : 'none';
+function dvSearchCountry(val) {
+  var list = document.getElementById('dv-country-list');
+  if (val.length < 2) { list.style.display = 'none'; return; }
+  fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(val) + '&format=json&limit=7&addressdetails=1&accept-language=ru&featuretype=country')
+    .then(function(r) { return r.json(); })
+    .then(function(results) {
+      list.innerHTML = '';
+      var seen = {};
+      results.forEach(function(item) {
+        var country = item.address && item.address.country;
+        if (!country || seen[country]) return;
+        seen[country] = true;
+        var div = document.createElement('div');
+        div.className = 'dv-autocomplete-item';
+        div.textContent = country;
+        div.onmousedown = function(e) {
+          e.preventDefault();
+          document.getElementById('dv-country-input').value = country;
+          list.style.display = 'none';
+          var isRussia = country.toLowerCase().indexOf('росси') !== -1 || country.toLowerCase() === 'russia';
+          document.getElementById('dv-russia').style.display = isRussia ? 'block' : 'none';
+          document.getElementById('dv-intl').style.display = isRussia ? 'none' : 'block';
+          if (!isRussia) {
+            var intlCountry = document.getElementById('dv-intl-country');
+            if (intlCountry) intlCountry.value = country;
+          }
+        };
+        list.appendChild(div);
+      });
+      list.style.display = list.children.length ? 'block' : 'none';
+    }).catch(function() { list.style.display = 'none'; });
 }
 
 function selectDvMethod(method) {
@@ -1043,10 +1069,13 @@ document.getElementById('back-btn').addEventListener('click', function() {
 });
 
 document.getElementById('submit-btn').addEventListener('click', async function() {
-  var countryVal = (document.getElementById('dv-country') || {}).value || '';
+  var countryInput = (document.getElementById('dv-country-input') || {}).value || '';
+  var isRussia = countryInput.toLowerCase().indexOf('росси') !== -1 || countryInput.toLowerCase() === 'russia';
   var delivery = {};
 
-  if (countryVal === 'ru') {
+  if (!countryInput.trim()) { alert('Пожалуйста, выберите страну доставки'); return; }
+
+  if (isRussia) {
     var name = ((document.getElementById('dv-ru-name') || {}).value || '').trim();
     var phone = ((document.getElementById('dv-ru-phone') || {}).value || '').trim();
     var email = ((document.getElementById('dv-ru-email') || {}).value || '').trim();
@@ -1076,7 +1105,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
       delivery.address = postAddr;
       delivery.postalCode = postIndex;
     }
-  } else if (countryVal === 'other') {
+  } else {
     var name = ((document.getElementById('dv-intl-name') || {}).value || '').trim();
     var country = ((document.getElementById('dv-intl-country') || {}).value || '').trim();
     var city = ((document.getElementById('dv-intl-city') || {}).value || '').trim();
@@ -1087,8 +1116,6 @@ document.getElementById('submit-btn').addEventListener('click', async function()
     var comment = ((document.getElementById('dv-intl-comment') || {}).value || '').trim();
     if (!name || !country || !city || !address || !postal || !phone || !email) { alert(t('fill_fields')); return; }
     delivery = { deliveryCountry: country, deliveryMethod: 'EMS / International Post', recipientName: name, city: city, address: address, postalCode: postal, recipientPhone: phone, recipientEmail: email, comment: comment, trackingCarrier: 'EMS / International Post' };
-  } else {
-    alert('Пожалуйста, выберите страну доставки'); return;
   }
 
   const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
