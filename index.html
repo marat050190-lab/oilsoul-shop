@@ -174,7 +174,7 @@
           <p class="payment-note">После оплаты пришлите скриншот транзакции боту</p>
         </div>
       </div>
-      <button id="submit-btn" class="submit-btn" disabled style="opacity:0.5;cursor:not-allowed;">✅ Подтвердить заказ</button>
+      <button id="submit-btn" class="submit-btn" style="opacity:0.5;cursor:not-allowed;">✅ Подтвердить заказ</button>
     </div>
   </div>
 
@@ -215,7 +215,6 @@
   function updateSubmitBtn() {
     var btn = document.getElementById('submit-btn');
     var checked = document.getElementById('field-consent').checked;
-    btn.disabled = !checked;
     btn.style.opacity = checked ? '1' : '0.5';
     btn.style.cursor = checked ? 'pointer' : 'not-allowed';
   }
