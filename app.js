@@ -686,8 +686,8 @@ function renderDeliveryForm() {
     '</select>' +
     '<div id="dv-russia" style="display:none;">' +
       '<div class="dv-info-box">' +
-        '<div class="dv-info-title">Доставка по России — бесплатно</div>' +
-        '<div class="dv-info-sub">Выберите удобный способ получения</div>' +
+        '<div class="dv-info-title">Доставка по России</div>' +
+        '<div class="dv-info-sub">Стоимость доставки рассчитывается после оформления заказа</div>' +
       '</div>' +
       '<div class="dv-label">Способ доставки</div>' +
       '<div id="dv-method-cdek" class="dv-method-card dv-method-active" onclick="selectDvMethod(\'cdek\')">' +
