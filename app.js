@@ -1027,10 +1027,17 @@ document.getElementById('back-btn').addEventListener('click', function() {
 });
 
 document.getElementById('submit-btn').addEventListener('click', async function() {
+  var consent = document.getElementById('field-consent');
+  if (consent && !consent.checked) {
+    alert(lang === 'en' ? 'Please accept the privacy policy' : 'Пожалуйста, примите политику конфиденциальности');
+    return;
+  }
+
   var name    = (document.getElementById('field-name')    || {value:''}).value.trim();
   var country = (document.getElementById('field-country') || {value:''}).value.trim();
   var city    = (document.getElementById('field-city')    || {value:''}).value.trim();
   var address = (document.getElementById('field-address') || {value:''}).value.trim();
+  var apt     = (document.getElementById('field-apt')     || {value:''}).value.trim();
   var postal  = (document.getElementById('field-postal')  || {value:''}).value.trim();
   var phone   = (document.getElementById('field-phone')   || {value:''}).value.trim();
   var email   = (document.getElementById('field-email')   || {value:''}).value.trim();
@@ -1045,11 +1052,13 @@ document.getElementById('submit-btn').addEventListener('click', async function()
     alert(lang === 'en' ? 'Invalid email format' : 'Неверный формат email'); return;
   }
 
+  var fullAddress = address + (apt ? ', кв. ' + apt : '');
+
   var delivery = {
     recipientName: name,
     deliveryCountry: country,
     city: city,
-    address: address,
+    address: fullAddress,
     postalCode: postal,
     recipientPhone: phone,
     recipientEmail: email,
