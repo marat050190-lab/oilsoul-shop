@@ -9,8 +9,62 @@
   <title>Oil&Soul</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .privacy-modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;
+    }
+    .privacy-modal-overlay.active { display: flex; }
+    .privacy-modal {
+      background: #1a2b40; border: 1px solid rgba(255,255,255,0.15); border-radius: 16px;
+      padding: 24px 20px; max-width: 90%; max-height: 80vh; overflow-y: auto;
+      color: rgba(255,255,255,0.85); font-size: 13px; line-height: 1.6;
+    }
+    .privacy-modal h3 { color: #f0c040; font-size: 16px; margin: 0 0 16px; }
+    .privacy-modal-close {
+      display: block; width: 100%; margin-top: 20px; padding: 12px;
+      background: #f0c040; color: #0d1f38; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    .consent-block { margin: 16px 0 8px; }
+    .consent-label {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer; line-height: 1.5;
+    }
+    .consent-label input[type="checkbox"] {
+      width: 18px; height: 18px; min-width: 18px; margin-top: 1px; cursor: pointer;
+      accent-color: #f0c040;
+    }
+    .consent-link { color: #f0c040; text-decoration: underline; cursor: pointer; }
+    .consent-note { font-size: 11px; color: rgba(255,255,255,0.35); margin: 6px 0 0 28px; }
+    .apt-row { display: flex; gap: 8px; }
+    .apt-row > div { flex: 1; position: relative; }
+    .apt-row input.apt-input { width: 100px; flex-shrink: 0; }
+  </style>
 </head>
 <body>
+
+  <!-- Модальное окно политики конфиденциальности -->
+  <div class="privacy-modal-overlay" id="privacy-modal-overlay" onclick="closePrivacyModal(event)">
+    <div class="privacy-modal">
+      <h3>Политика конфиденциальности</h3>
+      <p>Oil&Soul — частный арт-проект, создающий физические картины маслом по мотивам коллекционных цифровых подарков.</p>
+      <p>Мы обрабатываем персональные данные покупателей только для оформления заказа, связи с покупателем и организации доставки картины.</p>
+      <p><strong>Какие данные мы собираем:</strong><br>
+      — страна доставки;<br>— город;<br>— регион / область / штат, если указан;<br>
+      — почтовый индекс;<br>— адрес доставки;<br>— имя и фамилия получателя;<br>
+      — телефон;<br>— email;<br>— комментарий к заказу, если покупатель его оставляет.</p>
+      <p><strong>Цели обработки данных:</strong><br>
+      — оформление заказа;<br>— связь с покупателем;<br>— уточнение деталей заказа;<br>
+      — организация доставки;<br>— поддержка покупателя по вопросам заказа.</p>
+      <p>Мы не продаём персональные данные третьим лицам.</p>
+      <p>Персональные данные могут передаваться только тем лицам и сервисам, которые участвуют в исполнении заказа: службам доставки, почтовым операторам, платёжным, техническим и иным подрядчикам, если это необходимо для оформления, оплаты, доставки или поддержки заказа.</p>
+      <p>Мы не запрашиваем паспортные данные, дату рождения и другие избыточные сведения.</p>
+      <p>Покупатель может запросить доступ к своим данным, исправление или удаление данных, написав нам по контактам, указанным в приложении.</p>
+      <p>Для пользователей из разных стран могут действовать дополнительные права в соответствии с применимым законодательством о защите персональных данных.</p>
+      <button class="privacy-modal-close" onclick="closePrivacyModal()">Понятно</button>
+    </div>
+  </div>
 
   <div id="page-catalog">
     <header class="main-header">
@@ -92,14 +146,25 @@
           <input type="text" id="field-city" placeholder="Город *" autocomplete="off" required>
           <div id="city-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;"></div>
         </div>
-        <div style="position:relative;">
-          <input type="text" id="field-address" placeholder="Адрес (улица, дом, квартира) *" autocomplete="off" required>
-          <div id="address-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;"></div>
+        <div class="apt-row">
+          <div>
+            <input type="text" id="field-address" placeholder="Улица и номер дома *" autocomplete="off" required style="width:100%;">
+            <div id="address-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;"></div>
+          </div>
+          <input type="text" id="field-apt" placeholder="Кв./офис" autocomplete="off" class="apt-input">
         </div>
         <input type="text" id="field-postal" placeholder="Почтовый индекс *" autocomplete="postal-code" required>
         <input type="tel" id="field-phone" placeholder="Телефон *" autocomplete="tel" required>
         <input type="email" id="field-email" placeholder="Email *" autocomplete="email" required>
         <textarea id="field-comment" placeholder="Комментарий к заказу (необязательно)" autocomplete="off"></textarea>
+
+        <div class="consent-block">
+          <label class="consent-label">
+            <input type="checkbox" id="field-consent" onchange="updateSubmitBtn()">
+            <span>Я согласен(на) на обработку моих персональных данных для оформления заказа, связи со мной и организации доставки. Я ознакомлен(а) с <span class="consent-link" onclick="openPrivacyModal(event)">Политикой конфиденциальности</span>.</span>
+          </label>
+          <div class="consent-note">Мы используем ваши данные только для оформления заказа, связи с вами и организации доставки картины.</div>
+        </div>
       </div>
       <div class="form-section">
         <h3>💎 Оплата</h3>
@@ -109,7 +174,7 @@
           <p class="payment-note">После оплаты пришлите скриншот транзакции боту</p>
         </div>
       </div>
-      <button id="submit-btn" class="submit-btn">✅ Подтвердить заказ</button>
+      <button id="submit-btn" class="submit-btn" disabled style="opacity:0.5;cursor:not-allowed;">✅ Подтвердить заказ</button>
     </div>
   </div>
 
@@ -131,12 +196,29 @@
       if (menu) menu.classList.remove('lang-dropdown-open');
     }
     ['country-dropdown','city-dropdown','address-dropdown'].forEach(function(id) {
-      if (!e.target.closest('#field-' + id.replace('-dropdown','')) && !e.target.closest('#' + id)) {
+      var fieldId = 'field-' + id.replace('-dropdown','');
+      if (!e.target.closest('#' + fieldId) && !e.target.closest('#' + id)) {
         var dd = document.getElementById(id);
         if (dd) dd.style.display = 'none';
       }
     });
   });
+
+  function openPrivacyModal(e) {
+    if (e) e.stopPropagation();
+    document.getElementById('privacy-modal-overlay').classList.add('active');
+  }
+  function closePrivacyModal(e) {
+    if (e && e.target !== document.getElementById('privacy-modal-overlay')) return;
+    document.getElementById('privacy-modal-overlay').classList.remove('active');
+  }
+  function updateSubmitBtn() {
+    var btn = document.getElementById('submit-btn');
+    var checked = document.getElementById('field-consent').checked;
+    btn.disabled = !checked;
+    btn.style.opacity = checked ? '1' : '0.5';
+    btn.style.cursor = checked ? 'pointer' : 'not-allowed';
+  }
   </script>
   <script src="products.js"></script>
   <script src="app.js"></script>
@@ -144,8 +226,8 @@
     var acTimer = null;
     var DD_STYLE = 'padding:10px 14px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.07);';
 
-    function nominatimSearch(query, lang, callback) {
-      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&limit=5&accept-language=' + (lang||'ru'))
+    function nominatimSearch(query, callback) {
+      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&limit=5&accept-language=ru')
         .then(function(r) { return r.json(); })
         .then(callback)
         .catch(function() { callback([]); });
@@ -173,18 +255,13 @@
     document.getElementById('field-country').addEventListener('input', function() {
       var val = this.value.trim();
       clearTimeout(acTimer);
-      var dd = document.getElementById('country-dropdown');
-      if (val.length < 2) { dd.style.display = 'none'; return; }
+      if (val.length < 2) { document.getElementById('country-dropdown').style.display = 'none'; return; }
       acTimer = setTimeout(function() {
-        nominatimSearch(val, 'ru', function(results) {
-          var seen = {};
-          var items = [];
+        nominatimSearch(val, function(results) {
+          var seen = {}, items = [];
           results.forEach(function(r) {
-            var country = r.address && r.address.country;
-            if (country && !seen[country]) {
-              seen[country] = true;
-              items.push({ label: country, data: r });
-            }
+            var c = r.address && r.address.country;
+            if (c && !seen[c]) { seen[c] = true; items.push({ label: c, data: r }); }
           });
           showDropdown('country-dropdown', items, function(item) {
             document.getElementById('field-country').value = item.label;
@@ -197,21 +274,15 @@
     document.getElementById('field-city').addEventListener('input', function() {
       var val = this.value.trim();
       clearTimeout(acTimer);
-      var dd = document.getElementById('city-dropdown');
-      if (val.length < 2) { dd.style.display = 'none'; return; }
+      if (val.length < 2) { document.getElementById('city-dropdown').style.display = 'none'; return; }
       var country = document.getElementById('field-country').value.trim();
-      var query = val + (country ? ', ' + country : '');
       acTimer = setTimeout(function() {
-        nominatimSearch(query, 'ru', function(results) {
-          var seen = {};
-          var items = [];
+        nominatimSearch(val + (country ? ', ' + country : ''), function(results) {
+          var seen = {}, items = [];
           results.forEach(function(r) {
             var addr = r.address || {};
             var city = addr.city || addr.town || addr.village;
-            if (city && !seen[city]) {
-              seen[city] = true;
-              items.push({ label: city, data: r });
-            }
+            if (city && !seen[city]) { seen[city] = true; items.push({ label: city, data: r }); }
           });
           showDropdown('city-dropdown', items, function(item) {
             var addr = item.data.address || {};
@@ -227,25 +298,19 @@
     document.getElementById('field-address').addEventListener('input', function() {
       var val = this.value.trim();
       clearTimeout(acTimer);
-      var dd = document.getElementById('address-dropdown');
-      if (val.length < 3) { dd.style.display = 'none'; return; }
+      if (val.length < 3) { document.getElementById('address-dropdown').style.display = 'none'; return; }
       var city = document.getElementById('field-city').value.trim();
       var country = document.getElementById('field-country').value.trim();
-      var query = val + (city ? ', ' + city : '') + (country ? ', ' + country : '');
       acTimer = setTimeout(function() {
-        nominatimSearch(query, 'ru', function(results) {
+        nominatimSearch(val + (city ? ', ' + city : '') + (country ? ', ' + country : ''), function(results) {
           var items = results.map(function(r) { return { label: r.display_name, data: r }; });
           showDropdown('address-dropdown', items, function(item) {
             var addr = item.data.address || {};
-            var road = addr.road || '';
-            var house = addr.house_number || '';
-            document.getElementById('field-address').value = road + (house ? ', ' + house : '');
+            document.getElementById('field-address').value = (addr.road || '') + (addr.house_number ? ', ' + addr.house_number : '');
             if (addr.city || addr.town || addr.village)
               document.getElementById('field-city').value = addr.city || addr.town || addr.village;
-            if (addr.country)
-              document.getElementById('field-country').value = addr.country;
-            if (addr.postcode)
-              document.getElementById('field-postal').value = addr.postcode;
+            if (addr.country) document.getElementById('field-country').value = addr.country;
+            if (addr.postcode) document.getElementById('field-postal').value = addr.postcode;
           });
         });
       }, 500);
@@ -266,9 +331,8 @@
         if (val.length < 3) { dropdown.style.display = 'none'; return; }
         var city = (document.getElementById('custom-city') || {value:''}).value.trim();
         var country = (document.getElementById('custom-country') || {value:''}).value.trim();
-        var query = val + (city ? ', ' + city : '') + (country ? ', ' + country : '');
         acTimer = setTimeout(function() {
-          nominatimSearch(query, 'ru', function(results) {
+          nominatimSearch(val + (city ? ', ' + city : '') + (country ? ', ' + country : ''), function(results) {
             dropdown.innerHTML = '';
             if (!results.length) { dropdown.style.display = 'none'; return; }
             results.forEach(function(item) {
@@ -282,8 +346,7 @@
                 var cityEl = document.getElementById('custom-city');
                 var countryEl = document.getElementById('custom-country');
                 var postalEl = document.getElementById('custom-postal');
-                if (cityEl && (addr.city || addr.town || addr.village))
-                  cityEl.value = addr.city || addr.town || addr.village;
+                if (cityEl && (addr.city || addr.town)) cityEl.value = addr.city || addr.town;
                 if (countryEl && addr.country) countryEl.value = addr.country;
                 if (postalEl && addr.postcode) postalEl.value = addr.postcode;
                 dropdown.style.display = 'none';
