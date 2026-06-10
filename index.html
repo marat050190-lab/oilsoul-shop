@@ -86,7 +86,10 @@
         <input type="text" id="field-name" placeholder="Имя и фамилия *" autocomplete="name" required>
         <input type="text" id="field-country" placeholder="Страна *" autocomplete="off" required>
         <input type="text" id="field-city" placeholder="Город *" autocomplete="off" required>
-        <input type="text" id="field-address" placeholder="Адрес (улица, дом, квартира) *" autocomplete="off" required>
+        <div style="position:relative;">
+          <input type="text" id="field-address" placeholder="Адрес (улица, дом, квартира) *" autocomplete="off" required>
+          <div id="address-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;"></div>
+        </div>
         <input type="text" id="field-postal" placeholder="Почтовый индекс *" autocomplete="postal-code" required>
         <input type="tel" id="field-phone" placeholder="Телефон *" autocomplete="tel" required>
         <input type="email" id="field-email" placeholder="Email *" autocomplete="email" required>
@@ -121,80 +124,110 @@
       var menu = document.getElementById('lang-dropdown-menu');
       if (menu) menu.classList.remove('lang-dropdown-open');
     }
+    if (!e.target.closest('#field-address') && !e.target.closest('#address-dropdown')) {
+      var dd = document.getElementById('address-dropdown');
+      if (dd) dd.style.display = 'none';
+    }
   });
   </script>
   <script src="products.js"></script>
   <script src="app.js"></script>
   <script>
-    function initGooglePlaces() {
-      window.googleMapsReady = true;
-      initCheckoutAutocomplete();
-    }
+    var acTimer = null;
 
-    function initCheckoutAutocomplete() {
-      var addressEl = document.getElementById('field-address');
-      if (!addressEl || !window.google) return;
+    // Автодополнение адреса через Nominatim
+    document.getElementById('field-address').addEventListener('input', function() {
+      var val = this.value.trim();
+      var dropdown = document.getElementById('address-dropdown');
+      clearTimeout(acTimer);
+      if (val.length < 3) { dropdown.style.display = 'none'; return; }
+      var city = (document.getElementById('field-city').value || '').trim();
+      var country = (document.getElementById('field-country').value || '').trim();
+      var query = val + (city ? ', ' + city : '') + (country ? ', ' + country : '');
+      acTimer = setTimeout(function() {
+        fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&limit=5&accept-language=ru')
+          .then(function(r) { return r.json(); })
+          .then(function(results) {
+            dropdown.innerHTML = '';
+            if (!results.length) { dropdown.style.display = 'none'; return; }
+            results.forEach(function(item) {
+              var div = document.createElement('div');
+              div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.07);';
+              div.textContent = item.display_name;
+              div.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                var addr = item.address;
+                var road = addr.road || '';
+                var house = addr.house_number || '';
+                document.getElementById('field-address').value = road + (house ? ', ' + house : '');
+                if (addr.city || addr.town || addr.village)
+                  document.getElementById('field-city').value = addr.city || addr.town || addr.village;
+                if (addr.country)
+                  document.getElementById('field-country').value = addr.country;
+                if (addr.postcode)
+                  document.getElementById('field-postal').value = addr.postcode;
+                dropdown.style.display = 'none';
+              });
+              dropdown.appendChild(div);
+            });
+            dropdown.style.display = 'block';
+          })
+          .catch(function() { dropdown.style.display = 'none'; });
+      }, 500);
+    });
 
-      var autocomplete = new google.maps.places.Autocomplete(addressEl, {
-        types: ['address'],
-        fields: ['address_components', 'formatted_address']
-      });
-
-      autocomplete.addListener('place_changed', function() {
-        var place = autocomplete.getPlace();
-        if (!place.address_components) return;
-        var street = '', streetNum = '', city = '', country = '', postal = '';
-        place.address_components.forEach(function(c) {
-          var t = c.types;
-          if (t.includes('street_number'))  streetNum = c.long_name;
-          if (t.includes('route'))          street    = c.long_name;
-          if (t.includes('locality'))       city      = c.long_name;
-          if (t.includes('country'))        country   = c.long_name;
-          if (t.includes('postal_code'))    postal    = c.long_name;
-        });
-        addressEl.value = street + (streetNum ? ', ' + streetNum : '');
-        var cityEl    = document.getElementById('field-city');
-        var countryEl = document.getElementById('field-country');
-        var postalEl  = document.getElementById('field-postal');
-        if (cityEl    && city)    cityEl.value    = city;
-        if (countryEl && country) countryEl.value = country;
-        if (postalEl  && postal)  postalEl.value  = postal;
-      });
-    }
-
+    // Для кастомной формы (создаётся динамически)
     function initCustomAutocomplete() {
       var addressEl = document.getElementById('custom-address');
-      if (!addressEl || !window.google) return;
+      if (!addressEl) return;
+      var dropdown = document.createElement('div');
+      dropdown.id = 'custom-address-dropdown';
+      dropdown.style.cssText = 'display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;';
+      addressEl.parentNode.style.position = 'relative';
+      addressEl.parentNode.appendChild(dropdown);
 
-      var autocomplete = new google.maps.places.Autocomplete(addressEl, {
-        types: ['address'],
-        fields: ['address_components', 'formatted_address']
-      });
-
-      autocomplete.addListener('place_changed', function() {
-        var place = autocomplete.getPlace();
-        if (!place.address_components) return;
-        var street = '', streetNum = '', city = '', country = '', postal = '';
-        place.address_components.forEach(function(c) {
-          var t = c.types;
-          if (t.includes('street_number'))  streetNum = c.long_name;
-          if (t.includes('route'))          street    = c.long_name;
-          if (t.includes('locality'))       city      = c.long_name;
-          if (t.includes('country'))        country   = c.long_name;
-          if (t.includes('postal_code'))    postal    = c.long_name;
-        });
-        addressEl.value = street + (streetNum ? ', ' + streetNum : '');
-        var cityEl    = document.getElementById('custom-city');
-        var countryEl = document.getElementById('custom-country');
-        var postalEl  = document.getElementById('custom-postal');
-        if (cityEl    && city)    cityEl.value    = city;
-        if (countryEl && country) countryEl.value = country;
-        if (postalEl  && postal)  postalEl.value  = postal;
+      addressEl.addEventListener('input', function() {
+        var val = this.value.trim();
+        clearTimeout(acTimer);
+        if (val.length < 3) { dropdown.style.display = 'none'; return; }
+        var city = (document.getElementById('custom-city') || {value:''}).value.trim();
+        var country = (document.getElementById('custom-country') || {value:''}).value.trim();
+        var query = val + (city ? ', ' + city : '') + (country ? ', ' + country : '');
+        acTimer = setTimeout(function() {
+          fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&limit=5&accept-language=ru')
+            .then(function(r) { return r.json(); })
+            .then(function(results) {
+              dropdown.innerHTML = '';
+              if (!results.length) { dropdown.style.display = 'none'; return; }
+              results.forEach(function(item) {
+                var div = document.createElement('div');
+                div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.07);';
+                div.textContent = item.display_name;
+                div.addEventListener('mousedown', function(e) {
+                  e.preventDefault();
+                  var addr = item.address;
+                  var road = addr.road || '';
+                  var house = addr.house_number || '';
+                  addressEl.value = road + (house ? ', ' + house : '');
+                  var cityEl = document.getElementById('custom-city');
+                  var countryEl = document.getElementById('custom-country');
+                  var postalEl = document.getElementById('custom-postal');
+                  if (cityEl && (addr.city || addr.town || addr.village))
+                    cityEl.value = addr.city || addr.town || addr.village;
+                  if (countryEl && addr.country)
+                    countryEl.value = addr.country;
+                  if (postalEl && addr.postcode)
+                    postalEl.value = addr.postcode;
+                  dropdown.style.display = 'none';
+                });
+                dropdown.appendChild(div);
+              });
+              dropdown.style.display = 'block';
+            })
+            .catch(function() { dropdown.style.display = 'none'; });
+        }, 500);
       });
     }
   </script>
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3eRiZa4L-CJzWQ3SHY5z5WxgtNL1aI88&libraries=places&callback=initGooglePlaces&language=ru"
-    async defer></script>
 </body>
 </html>
