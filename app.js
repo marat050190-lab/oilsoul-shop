@@ -673,6 +673,9 @@ function renderCheckout() {
   document.getElementById('back-btn').textContent = t('back');
   document.getElementById('submit-btn').textContent = t('submit_btn');
   renderDeliveryForm();
+  setTimeout(function() {
+    if (window.googleMapsReady) initCheckoutAutocomplete();
+  }, 100);
 }
 
 function renderDeliveryForm() {
