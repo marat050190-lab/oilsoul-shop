@@ -258,13 +258,13 @@ def order():
     admin_text += (
         f'\n💎 <b>Итого: {total_ton} TON</b>\n\n'
         f'📦 <b>Доставка:</b>\n'
-        f'Имя: {delivery.get("name", "—")}\n'
-        f'Страна: {delivery.get("country", "—")}\n'
+        f'Имя: {delivery.get("recipientName", delivery.get("name", "—"))}\n'
+        f'Страна: {delivery.get("deliveryCountry", delivery.get("country", "—"))}\n'
         f'Город: {delivery.get("city", "—")}\n'
         f'Адрес: {delivery.get("address", "—")}\n'
-        f'Индекс: {delivery.get("postal", "—")}\n'
-        f'Телефон: {delivery.get("phone", "—")}\n'
-        f'Email: {delivery.get("email", "—")}\n'
+        f'Индекс: {delivery.get("postalCode", delivery.get("postal", "—"))}\n'
+        f'Телефон: {delivery.get("recipientPhone", delivery.get("phone", "—"))}\n'
+        f'Email: {delivery.get("recipientEmail", delivery.get("email", "—"))}\n'
     )
     if delivery.get('comment'):
         admin_text += f'Комментарий: {delivery.get("comment")}\n'
@@ -310,13 +310,13 @@ def custom_order():
         f'🔗 <b>Подарок:</b> {gift_link}\n\n'
         f'🖼 30×30 см · 149 TON\n\n'
         f'📦 <b>Доставка:</b>\n'
-        f'Имя: {delivery.get("name", "—")}\n'
-        f'Страна: {delivery.get("country", "—")}\n'
+        f'Имя: {delivery.get("recipientName", delivery.get("name", "—"))}\n'
+        f'Страна: {delivery.get("deliveryCountry", delivery.get("country", "—"))}\n'
         f'Город: {delivery.get("city", "—")}\n'
         f'Адрес: {delivery.get("address", "—")}\n'
-        f'Индекс: {delivery.get("postal", "—")}\n'
-        f'Телефон: {delivery.get("phone", "—")}\n'
-        f'Email: {delivery.get("email", "—")}\n'
+        f'Индекс: {delivery.get("postalCode", delivery.get("postal", "—"))}\n'
+        f'Телефон: {delivery.get("recipientPhone", delivery.get("phone", "—"))}\n'
+        f'Email: {delivery.get("recipientEmail", delivery.get("email", "—"))}\n'
     )
     if delivery.get('comment'):
         admin_text += f'Комментарий: {delivery.get("comment")}\n'
