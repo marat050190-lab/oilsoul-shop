@@ -671,7 +671,16 @@ function renderCheckout() {
   document.getElementById('ton-address-display').textContent = TON_WALLET;
   document.querySelector('#page-checkout header h1').textContent = t('checkout_title');
   document.getElementById('back-btn').textContent = t('back');
-  document.getElementById('submit-btn').textContent = t('submit_btn');
+  // Reset submit button and consent on each checkout open
+  var submitBtn = document.getElementById('submit-btn');
+  var consentBox = document.getElementById('field-consent');
+  if (submitBtn) {
+    submitBtn.textContent = t('submit_btn');
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.5';
+    submitBtn.style.cursor = 'not-allowed';
+  }
+  if (consentBox) consentBox.checked = false;
 
   // Update placeholders for current language
   var _f = function(id, val) { var el = document.getElementById(id); if (el) el.placeholder = val; };
@@ -1042,6 +1051,9 @@ document.getElementById('submit-btn').addEventListener('click', async function()
   var phone   = (document.getElementById('field-phone')   || {value:''}).value.trim();
   var email   = (document.getElementById('field-email')   || {value:''}).value.trim();
   var comment = (document.getElementById('field-comment') || {value:''}).value.trim();
+
+  // DEBUG - убрать после теста
+  alert('name=' + name + '\ncountry=' + country + '\ncity=' + city + '\naddress=' + address + '\npostal=' + postal + '\nphone=' + phone + '\nemail=' + email);
 
   if (!name || !country || !city || !address || !postal || !phone || !email) {
     alert(t('fill_fields')); return;
