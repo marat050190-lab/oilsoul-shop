@@ -84,18 +84,9 @@
       <div class="form-section">
         <h3>📦 Данные для доставки</h3>
         <input type="text" id="field-name" placeholder="Имя и фамилия *" autocomplete="name" required>
-        <div class="autocomplete-wrap">
-          <input type="text" id="field-country" placeholder="Страна *" autocomplete="off" required>
-          <div class="autocomplete-list" id="list-country"></div>
-        </div>
-        <div class="autocomplete-wrap">
-          <input type="text" id="field-city" placeholder="Город *" autocomplete="off" required>
-          <div class="autocomplete-list" id="list-city"></div>
-        </div>
-        <div class="autocomplete-wrap">
-          <input type="text" id="field-address" placeholder="Адрес (улица, дом, квартира) *" autocomplete="off" required>
-          <div class="autocomplete-list" id="list-address"></div>
-        </div>
+        <input type="text" id="field-country" placeholder="Страна *" autocomplete="off" required>
+        <input type="text" id="field-city" placeholder="Город *" autocomplete="off" required>
+        <input type="text" id="field-address" placeholder="Адрес (улица, дом, квартира) *" autocomplete="off" required>
         <input type="text" id="field-postal" placeholder="Почтовый индекс *" autocomplete="postal-code" required>
         <input type="tel" id="field-phone" placeholder="Телефон *" autocomplete="tel" required>
         <input type="email" id="field-email" placeholder="Email *" autocomplete="email" required>
@@ -135,133 +126,75 @@
   <script src="products.js"></script>
   <script src="app.js"></script>
   <script>
-    let acTimer = null;
-
-    async function nominatimSearch(query) {
-      if (query.length < 2) return [];
-      try {
-        const params = new URLSearchParams({ q: query, format: 'json', addressdetails: 1, limit: 5, 'accept-language': 'ru,en,ar' });
-        const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, { headers: { 'Accept-Language': 'ru,en,ar' } });
-        return await res.json();
-      } catch (e) { return []; }
+    function initGooglePlaces() {
+      window.googleMapsReady = true;
+      initCheckoutAutocomplete();
     }
 
-    function showList(listId, items, onSelect) {
-      const list = document.getElementById(listId);
-      if (!list) return;
-      list.innerHTML = '';
-      if (!items.length) { list.style.display = 'none'; return; }
-      items.forEach(function(item) {
-        const div = document.createElement('div');
-        div.className = 'autocomplete-item';
-        div.textContent = item.display_name;
-        div.addEventListener('mousedown', function(e) { e.preventDefault(); onSelect(item); list.style.display = 'none'; });
-        list.appendChild(div);
+    function initCheckoutAutocomplete() {
+      var addressEl = document.getElementById('field-address');
+      if (!addressEl || !window.google) return;
+
+      var autocomplete = new google.maps.places.Autocomplete(addressEl, {
+        types: ['address'],
+        fields: ['address_components', 'formatted_address']
       });
-      list.style.display = 'block';
-    }
 
-    function showDynamicList(inputEl, items, onSelect) {
-      var existing = inputEl.parentNode.querySelector('.autocomplete-list');
-      if (!existing) { existing = document.createElement('div'); existing.className = 'autocomplete-list'; inputEl.parentNode.appendChild(existing); }
-      existing.innerHTML = '';
-      if (!items.length) { existing.style.display = 'none'; return; }
-      items.forEach(function(item) {
-        var div = document.createElement('div');
-        div.className = 'autocomplete-item';
-        div.textContent = item.display_name;
-        div.addEventListener('mousedown', function(e) { e.preventDefault(); onSelect(item); existing.style.display = 'none'; });
-        existing.appendChild(div);
+      autocomplete.addListener('place_changed', function() {
+        var place = autocomplete.getPlace();
+        if (!place.address_components) return;
+        var street = '', streetNum = '', city = '', country = '', postal = '';
+        place.address_components.forEach(function(c) {
+          var t = c.types;
+          if (t.includes('street_number'))  streetNum = c.long_name;
+          if (t.includes('route'))          street    = c.long_name;
+          if (t.includes('locality'))       city      = c.long_name;
+          if (t.includes('country'))        country   = c.long_name;
+          if (t.includes('postal_code'))    postal    = c.long_name;
+        });
+        addressEl.value = street + (streetNum ? ', ' + streetNum : '');
+        var cityEl    = document.getElementById('field-city');
+        var countryEl = document.getElementById('field-country');
+        var postalEl  = document.getElementById('field-postal');
+        if (cityEl    && city)    cityEl.value    = city;
+        if (countryEl && country) countryEl.value = country;
+        if (postalEl  && postal)  postalEl.value  = postal;
       });
-      existing.style.display = 'block';
     }
-
-    function hideAllLists() {
-      document.querySelectorAll('.autocomplete-list').forEach(function(l) { l.style.display = 'none'; });
-    }
-
-    document.getElementById('field-country').addEventListener('input', function() {
-      clearTimeout(acTimer); var val = this.value;
-      acTimer = setTimeout(async function() {
-        var results = await nominatimSearch(val);
-        showList('list-country', results, function(item) { document.getElementById('field-country').value = item.address.country || item.display_name; });
-      }, 400);
-    });
-
-    document.getElementById('field-city').addEventListener('input', function() {
-      clearTimeout(acTimer); var val = this.value;
-      acTimer = setTimeout(async function() {
-        var results = await nominatimSearch(val);
-        showList('list-city', results, function(item) {
-          var addr = item.address;
-          document.getElementById('field-city').value = addr.city || addr.town || addr.village || val;
-          if (addr.country) document.getElementById('field-country').value = addr.country;
-          if (addr.postcode) document.getElementById('field-postal').value = addr.postcode;
-        });
-      }, 400);
-    });
-
-    document.getElementById('field-address').addEventListener('input', function() {
-      clearTimeout(acTimer); var val = this.value;
-      var city = document.getElementById('field-city').value;
-      var query = city ? val + ', ' + city : val;
-      acTimer = setTimeout(async function() {
-        var results = await nominatimSearch(query);
-        showList('list-address', results, function(item) {
-          var addr = item.address;
-          var road = addr.road || ''; var house = addr.house_number || '';
-          document.getElementById('field-address').value = house ? road + ', ' + house : road || item.display_name;
-          if (addr.city || addr.town) document.getElementById('field-city').value = addr.city || addr.town;
-          if (addr.country) document.getElementById('field-country').value = addr.country;
-          if (addr.postcode) document.getElementById('field-postal').value = addr.postcode;
-        });
-      }, 500);
-    });
 
     function initCustomAutocomplete() {
-      var countryEl = document.getElementById('custom-country');
-      var cityEl = document.getElementById('custom-city');
       var addressEl = document.getElementById('custom-address');
-      var postalEl = document.getElementById('custom-postal');
-      if (!countryEl) return;
-      countryEl.addEventListener('input', function() {
-        clearTimeout(acTimer); var val = this.value; var el = this;
-        acTimer = setTimeout(async function() {
-          var results = await nominatimSearch(val);
-          showDynamicList(el, results, function(item) { countryEl.value = item.address.country || item.display_name; });
-        }, 400);
+      if (!addressEl || !window.google) return;
+
+      var autocomplete = new google.maps.places.Autocomplete(addressEl, {
+        types: ['address'],
+        fields: ['address_components', 'formatted_address']
       });
-      cityEl.addEventListener('input', function() {
-        clearTimeout(acTimer); var val = this.value; var el = this;
-        acTimer = setTimeout(async function() {
-          var results = await nominatimSearch(val);
-          showDynamicList(el, results, function(item) {
-            var addr = item.address;
-            cityEl.value = addr.city || addr.town || addr.village || val;
-            if (addr.country) countryEl.value = addr.country;
-            if (addr.postcode && postalEl) postalEl.value = addr.postcode;
-          });
-        }, 400);
-      });
-      addressEl.addEventListener('input', function() {
-        clearTimeout(acTimer); var val = this.value; var el = this;
-        var city = cityEl ? cityEl.value : '';
-        var query = city ? val + ', ' + city : val;
-        acTimer = setTimeout(async function() {
-          var results = await nominatimSearch(query);
-          showDynamicList(el, results, function(item) {
-            var addr = item.address;
-            var road = addr.road || ''; var house = addr.house_number || '';
-            addressEl.value = house ? road + ', ' + house : road || item.display_name;
-            if (addr.city || addr.town) cityEl.value = addr.city || addr.town;
-            if (addr.country) countryEl.value = addr.country;
-            if (addr.postcode && postalEl) postalEl.value = addr.postcode;
-          });
-        }, 500);
+
+      autocomplete.addListener('place_changed', function() {
+        var place = autocomplete.getPlace();
+        if (!place.address_components) return;
+        var street = '', streetNum = '', city = '', country = '', postal = '';
+        place.address_components.forEach(function(c) {
+          var t = c.types;
+          if (t.includes('street_number'))  streetNum = c.long_name;
+          if (t.includes('route'))          street    = c.long_name;
+          if (t.includes('locality'))       city      = c.long_name;
+          if (t.includes('country'))        country   = c.long_name;
+          if (t.includes('postal_code'))    postal    = c.long_name;
+        });
+        addressEl.value = street + (streetNum ? ', ' + streetNum : '');
+        var cityEl    = document.getElementById('custom-city');
+        var countryEl = document.getElementById('custom-country');
+        var postalEl  = document.getElementById('custom-postal');
+        if (cityEl    && city)    cityEl.value    = city;
+        if (countryEl && country) countryEl.value = country;
+        if (postalEl  && postal)  postalEl.value  = postal;
       });
     }
-
-    document.addEventListener('click', hideAllLists);
   </script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdjj6zSl3tCpLj9fCtz0A_3YAqBud5flo&libraries=places&callback=initGooglePlaces&language=ru"
+    async defer></script>
 </body>
 </html>
