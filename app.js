@@ -1051,9 +1051,6 @@ document.getElementById('submit-btn').addEventListener('click', async function()
   var email   = (document.getElementById('field-email')   || {value:''}).value.trim();
   var comment = (document.getElementById('field-comment') || {value:''}).value.trim();
 
-  // DEBUG - убрать после теста
-  alert('name=' + name + '\ncountry=' + country + '\ncity=' + city + '\naddress=' + address + '\npostal=' + postal + '\nphone=' + phone + '\nemail=' + email);
-
   if (!name || !country || !city || !address || !postal || !phone || !email) {
     alert(t('fill_fields')); return;
   }
