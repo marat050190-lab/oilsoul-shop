@@ -187,7 +187,9 @@
       <div id="order-summary" class="order-summary"></div>
       <div class="form-section">
         <h3>📦 Данные для доставки</h3>
-        <input type="text" id="field-name" placeholder="Имя и фамилия *" autocomplete="name" required>
+        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;border:1px solid rgba(255,255,255,0.08);">
+          💡 Доставка рассчитывается индивидуально. После оформления заказа мы уточним стоимость и срок доставки в вашу страну или город. Картина будет надёжно упакована для безопасной пересылки.
+        </div>
         <div style="position:relative;">
           <input type="text" id="field-country" placeholder="Страна *" autocomplete="off" required>
           <div id="country-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;"></div>
@@ -204,6 +206,7 @@
           <input type="text" id="field-apt" placeholder="Кв./офис" autocomplete="off" class="apt-input">
         </div>
         <input type="text" id="field-postal" placeholder="Почтовый индекс *" autocomplete="postal-code" required>
+        <input type="text" id="field-name" placeholder="Имя и фамилия *" autocomplete="name" required>
         <input type="tel" id="field-phone" placeholder="Телефон *" autocomplete="tel" required>
         <input type="email" id="field-email" placeholder="Email *" autocomplete="email" required>
         <textarea id="field-comment" placeholder="Комментарий к заказу (необязательно)" autocomplete="off"></textarea>
