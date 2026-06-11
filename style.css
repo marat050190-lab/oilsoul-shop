@@ -1579,6 +1579,61 @@ body {
 
 /* ===================== DESKTOP ===================== */
 @media (min-width: 768px) {
+  /* Правильный контейнер каталога */
+  #catalog {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  .catalog-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px;
+  }
+
+  /* Карточка под заказ — горизонтальная на десктопе */
+  .custom-order-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+
+  .custom-order-card-img {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .custom-order-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .custom-order-card-body {
+    flex: 1;
+  }
+
+  .custom-order-card-title {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .custom-order-card-desc {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  /* Фильтр */
+  .filter-bar-seg {
+    max-width: 400px;
+    margin: 12px 0;
+  }
   body {
     background: #0a1628;
   }
@@ -1716,6 +1771,12 @@ body {
 
   .catalog {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  #catalog { max-width: 1100px; }
+
+  .catalog-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
   }
 
   .hero-banner {
