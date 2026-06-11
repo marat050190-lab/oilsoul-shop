@@ -1576,3 +1576,151 @@ body {
   cursor: pointer;
   padding: 0;
 }
+
+/* ===================== DESKTOP ===================== */
+@media (min-width: 768px) {
+  body {
+    background: #0a1628;
+  }
+
+  /* Центрированный контейнер */
+  #page-catalog,
+  #page-checkout,
+  #page-detail {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Хедер */
+  .main-header {
+    padding: 20px 32px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .main-header-title { font-size: 24px; }
+  .main-header-sub { font-size: 13px; }
+  .main-header-logo { font-size: 42px; }
+
+  /* Hero баннер */
+  .hero-banner {
+    margin: 20px 32px;
+    min-height: 260px;
+    padding: 36px 40px;
+    border-radius: 24px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+    margin-bottom: 16px;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    max-width: 340px;
+  }
+
+  /* Плитки преимуществ */
+  .features-row {
+    padding: 0 32px 8px;
+    gap: 12px;
+  }
+
+  .feature-card {
+    padding: 20px 12px;
+  }
+
+  .feature-label { font-size: 13px; }
+
+  .feature-icon-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Каталог — 3 колонки */
+  .catalog {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 20px 32px;
+  }
+
+  .card {
+    border-radius: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+
+  .card-title { font-size: 15px; }
+  .card-price { font-size: 14px; }
+  .card-body { padding: 14px; }
+
+  .card-btn-detail,
+  .card-btn {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  /* Нижняя панель */
+  .bottom-bar {
+    max-width: 900px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px 20px 0 0;
+    padding: 14px 32px;
+  }
+
+  /* Фильтр */
+  .filter-bar {
+    padding: 0 32px 12px;
+  }
+
+  /* Форма заказа */
+  #page-checkout {
+    padding-bottom: 60px;
+  }
+
+  #page-checkout header {
+    padding: 20px 32px;
+    border-radius: 0;
+  }
+
+  .checkout-form {
+    padding: 24px 32px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* Кастомная страница */
+  .custom-page {
+    padding: 20px 32px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  #page-catalog,
+  #page-checkout,
+  #page-detail {
+    max-width: 1100px;
+  }
+
+  .main-header { max-width: 1100px; }
+
+  .catalog {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .hero-banner {
+    min-height: 300px;
+  }
+
+  .hero-title { font-size: 42px; }
+}
