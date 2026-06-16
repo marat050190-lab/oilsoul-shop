@@ -12,7 +12,7 @@ TOKEN = os.environ.get('BOT_TOKEN')
 ADMIN_ID = 364102600
 WEBHOOK_URL = os.environ.get('WEBHOOK_URL')
 DATABASE_URL = os.environ.get('DATABASE_URL')
-TON_WALLET = 'UQCbHnRC6iUeksoheBxy2Xo_Lh0qGkr98J10nUCzHsG8KLq_'
+TON_WALLET = 'UQB1gcgRoxQ88K6uEHr31G6j4F9_29olrnAXCozRp029Xzom'
 TON_API_KEY = 'e7ea536bf5ab4a139c669310f6d77c8513e7151feab6ef0686a3a7d2a1636d51'
 
 app = Flask(__name__)
