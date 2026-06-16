@@ -108,6 +108,18 @@
     .pay-btn-tonconnect strong { font-size: 15px; }
     .pay-btn-tonconnect small { font-size: 11px; opacity: 0.75; }
   </style>
+  <!-- Telegram Mini Apps Analytics SDK -->
+  <script src="https://tganalytics.xyz/index.js" defer></script>
+  <script>
+    window.addEventListener('load', function() {
+      if (typeof telegramAnalytics !== 'undefined') {
+        telegramAnalytics.init({
+          token: 'eyJhcHBfbmFtZSI6Im9pbF9zb3VsIiwiYXBwX3VybCI6Imh0dHBzOi8vdC5tZS9PaWxTb3VsQm90IiwiYXBwX2RvbWFpbiI6Imh0dHBzOi8vb2lsc291bC5zaG9wIn0=!3fozeA3NMgnSAoJKbl3/xbgRSb5U+6v8fAe0z2I6yV8=',
+          appName: 'oil_soul'
+        });
+      }
+    });
+  </script>
 </head>
 <body>
 
