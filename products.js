@@ -67,4 +67,4 @@ const products = [
   }
 ];
 
-const TON_WALLET = "UQCbHnRC6iUeksoheBxy2Xo_Lh0qGkr98J10nUCzHsG8KLq_";
+const TON_WALLET = "UQB1gcgRoxQ88K6uEHr31G6j4F9_29olrnAXCozRp029Xzom";
