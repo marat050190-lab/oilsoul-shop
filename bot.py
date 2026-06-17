@@ -359,7 +359,7 @@ def track_event():
             headers={'Content-Type': 'application/json'},
             timeout=5
         )
-        print(f"Amplitude track: {data.get('event')} -> {r.status_code}")
+        print(f"Amplitude track: {data.get('event')} -> {r.status_code} | {r.text[:200]}")
         return {'ok': True}
     except Exception as e:
         print(f'track_event error: {e}')
