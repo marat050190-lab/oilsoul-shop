@@ -223,23 +223,8 @@ const i18n = {
   }
 };
 
-// ─── Analytics ───────────────────────────────────────────────────────────────
-function track(event, props) {
-  try {
-    var user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-    var userId = user ? String(user.id) : 'anonymous';
-    fetch('https://oilsoul-bot.onrender.com/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event: event,
-        props: props || {},
-        user_id: userId,
-        time: Date.now()
-      })
-    }).catch(function(){});
-  } catch(e) {}
-}
+// ─── Analytics (disabled until paid hosting) ─────────────────────────────────
+function track(event, props) {}
 // ─────────────────────────────────────────────────────────────────────────────
 
 function t(key) {
