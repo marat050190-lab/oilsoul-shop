@@ -1,5 +1,13 @@
 const tg = window.Telegram?.WebApp;
 if (tg) tg.expand();
+// Track app open after SDK loads
+window.addEventListener('load', function() {
+  var user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  track('app_opened', {
+    lang: tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.language_code : null,
+    platform: tg ? tg.platform : 'unknown'
+  });
+});
 
 let cart = [];
 let tonPrice = null;
@@ -214,12 +222,24 @@ const i18n = {
     faq_title: 'FAQ',
   }
 };
+
+// ─── Amplitude Analytics ─────────────────────────────────────────────────────
+function track(event, props) {
+  try {
+    if (window.amplitude) {
+      window.amplitude.track(event, props || {});
+    }
+  } catch(e) {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function t(key) {
   return i18n[lang][key] || key;
 }
 
 function setLang(l) {
   lang = l;
+  track('language_changed', { lang: l });
   // update dropdown display
   var flags = { ru: '🇷🇺', en: '🇬🇧', ar: '🇸🇦' };
   var flagEl = document.getElementById('lang-current-flag');
@@ -412,6 +432,7 @@ function toggleMainFaq(i) {
 
 function setFilter(filter) {
   currentFilter = filter;
+  track('catalog_filtered', { filter: filter });
   renderCatalog();
 }
 
@@ -527,6 +548,8 @@ function renderCatalog() {
 }
 
 function showDetail(id) {
+  var p = products.find(function(x){ return x.id === id; });
+  if (p) track('product_viewed', { product_id: id, title: p.title });
   savedScrollY = window.scrollY;
   const product = products.find(function(p) { return p.id === id; });
   const inCart = cart.find(function(i) { return i.id === id; });
@@ -627,6 +650,9 @@ function detailToggleCart(id) {
 }
 
 function toggleCart(id) {
+  var p = products.find(function(x){ return x.id === id; });
+  var inCart = cart.find(function(i){ return i.id === id; });
+  if (p && !inCart) track('add_to_cart', { product_id: id, title: p.title, price: p.ton });
   const product = products.find(function(p) { return p.id === id; });
   if (product.status === 'sold') return;
   const index = cart.findIndex(function(i) { return i.id === id; });
@@ -1026,6 +1052,7 @@ async function submitCustomOrder() {
 document.getElementById('checkout-btn').addEventListener('click', function() {
   if (cart.length === 0) return;
   renderCheckout();
+  track('checkout_opened', { items: cart.length });
   showPage('page-checkout');
 });
 
@@ -1089,7 +1116,10 @@ document.getElementById('submit-btn').addEventListener('click', async function()
   try {
     const res = await fetch('https://oilsoul-bot.onrender.com/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(orderData) });
     const result = await res.json();
-    if (result.ok) { showPayment(totalTon, orderId); }
+    if (result.ok) {
+      track('order_placed', { order_id: orderId, total_gram: totalTon });
+      showPayment(totalTon, orderId);
+    }
   } catch (e) { alert(t('connection_error')); }
 });
 
@@ -1189,6 +1219,7 @@ function initTonConnect() {
 }
 
 async function payWithTonConnect(totalTon, orderId) {
+  track('payment_initiated', { method: 'ton_connect', amount: totalTon });
   var statusEl = document.getElementById('tc-status');
   if (!_tonConnectUI) { initTonConnect(); }
   if (!_tonConnectUI) {
@@ -1205,6 +1236,7 @@ async function payWithTonConnect(totalTon, orderId) {
     };
     await _tonConnectUI.sendTransaction(tx);
     if (statusEl) statusEl.textContent = '✅ Транзакция отправлена! Ожидаем подтверждения...';
+    track('payment_sent', { method: 'ton_connect' });
   } catch(e) {
     console.log('TON Connect error:', e);
     if (statusEl) statusEl.textContent = 'Ошибка. Попробуйте через Tonkeeper.';
@@ -1212,6 +1244,7 @@ async function payWithTonConnect(totalTon, orderId) {
 }
 
 function openTonkeeper() {
+  track('payment_initiated', { method: 'tonkeeper' });
   openExternalLink(window._tonkeeperLink || '');
 }
 
