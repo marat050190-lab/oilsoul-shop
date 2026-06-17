@@ -6,7 +6,6 @@ let tonPrice = null;
 let lang = 'ru';
 let currentFilter = 'all';
 let savedScrollY = 0;
-let selectedCurrency = 'gram'; // 'gram' or 'usdt'
 
 const i18n = {
   ru: {
@@ -656,29 +655,6 @@ function updateCartBar() {
 var deliveryMethod = 'cdek';
 var cdekSelectedPvz = null;
 
-function setCurrency(cur) {
-  selectedCurrency = cur;
-  var gramBtn = document.getElementById('cur-btn-gram');
-  var usdtBtn = document.getElementById('cur-btn-usdt');
-  if (gramBtn) gramBtn.classList.toggle('currency-btn-active', cur === 'gram');
-  if (usdtBtn) usdtBtn.classList.toggle('currency-btn-active', cur === 'usdt');
-
-  // Update total display
-  var totalEl = document.getElementById('checkout-total-display');
-  if (totalEl) {
-    var totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
-    if (cur === 'usdt') {
-      var usdAmt = tonPrice ? (totalTon * tonPrice.usd).toFixed(0) : (totalTon * 1.7).toFixed(0);
-      totalEl.textContent = usdAmt + ' USDT (~$' + usdAmt + ')';
-      // Store usdt amount for order
-      window._usdtAmount = parseFloat(usdAmt);
-    } else {
-      totalEl.textContent = totalTon + ' GRAM' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
-      window._usdtAmount = null;
-    }
-  }
-}
-
 function renderCheckout() {
   const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
   const summary = document.getElementById('order-summary');
@@ -690,17 +666,6 @@ function renderCheckout() {
     '<div class="order-total">' +
       '<span>' + t('order_total') + '</span>' +
       '<span id="checkout-total-display">' + totalTon + ' TON' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '') + '</span>' +
-    '</div>' +
-    '<div class="currency-switcher">' +
-      '<div class="currency-switcher-label">Способ оплаты:</div>' +
-      '<div class="currency-switcher-btns">' +
-        '<button id="cur-btn-gram" class="currency-btn currency-btn-active" onclick="setCurrency(\'gram\')">' +
-          '<span>💎</span> GRAM' +
-        '</button>' +
-        '<button id="cur-btn-usdt" class="currency-btn" onclick="setCurrency(\'usdt\')">' +
-          '<span>💵</span> USDT' +
-        '</button>' +
-      '</div>' +
     '</div>';
   document.getElementById('ton-amount').textContent = totalTon;
   document.getElementById('ton-address-display').textContent = TON_WALLET;
@@ -1109,28 +1074,22 @@ document.getElementById('submit-btn').addEventListener('click', async function()
   };
 
   const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-  const totalTonGram = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
+  const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
   const orderId = 'OS-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-  // For USDT: use pre-calculated USD amount, for GRAM: use TON amount
-  const isUsdt = selectedCurrency === 'usdt';
-  const totalAmount = isUsdt
-    ? (window._usdtAmount || parseFloat((totalTonGram * (tonPrice ? tonPrice.usd : 1.7)).toFixed(0)))
-    : totalTonGram;
   const orderData = {
     action: 'order',
     chat_id: user ? user.id : null,
     user_name: user ? ((user.first_name || '') + ' ' + (user.last_name || '')).trim() : delivery.recipientName,
     items: cart.map(function(i) { return { id: i.id, title: i.title, ton: i.ton }; }),
-    total_ton: totalAmount,
+    total_ton: totalTon,
     order_id: orderId,
-    currency: selectedCurrency,
     delivery: delivery
   };
 
   try {
     const res = await fetch('https://oilsoul-bot.onrender.com/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(orderData) });
     const result = await res.json();
-    if (result.ok) { showPayment(totalAmount, orderId, selectedCurrency); }
+    if (result.ok) { showPayment(totalTon, orderId); }
   } catch (e) { alert(t('connection_error')); }
 });
 
@@ -1146,42 +1105,17 @@ function copyToClipboard(text, btn) {
   });
 }
 
-function showPayment(totalTon, orderId, currency) {
-  currency = currency || 'gram';
+function showPayment(totalTon, orderId) {
   cart = [];
   updateCartBar();
 
-  var isUsdt = (currency === 'usdt');
-  var currencySymbol = isUsdt ? 'USDT' : 'GRAM';
   var amountNano = Math.round(totalTon * 1e9);
-
   var tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + amountNano + '&text=' + orderId;
-  // MyTonWallet: try deep link, fallback to App Store / Google Play via universal link
   var mytonDeepLink = 'https://app.mytonwallet.io/transfer/' + TON_WALLET + '?amount=' + amountNano + '&comment=' + orderId;
-  // For USDT jetton transfer in MyTonWallet: use jetton param
-  var USDT_MASTER = 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs';
-  var usdtAmountMicro = Math.round(totalTon * 1e6); // USDT has 6 decimals
-  var mytonUsdtLink = 'https://app.mytonwallet.io/transfer/' + TON_WALLET + '?amount=' + usdtAmountMicro + '&jetton=' + USDT_MASTER + '&comment=' + orderId;
+  window._mytonLink = mytonDeepLink;
 
-  var usdDisplay = '';
-  if (!isUsdt && tonPrice) {
-    usdDisplay = ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')';
-  } else if (isUsdt) {
-    usdDisplay = ' (~$' + totalTon + ')';
-  }
-  var amountDisplay = totalTon + ' ' + currencySymbol + usdDisplay;
+  var amountDisplay = totalTon + ' GRAM' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
   var shortWallet = TON_WALLET.substring(0, 10) + '...' + TON_WALLET.substring(TON_WALLET.length - 6);
-
-  var usdtNote = isUsdt
-    ? '<div class="payment-note-info" style="background:rgba(38,161,123,0.12);border-color:rgba(38,161,123,0.3);margin-bottom:8px;">\u26a0\ufe0f \u041f\u0435\u0440\u0435\u0432\u043e\u0434\u0438\u0442\u0435 \u0438\u043c\u0435\u043d\u043d\u043e USDT (TON \u0441\u0435\u0442\u044c), \u043d\u0435 GRAM. \u0410\u0434\u0440\u0435\u0441 \u043a\u043e\u0448\u0435\u043b\u044c\u043a\u0430 \u0442\u043e\u0442 \u0436\u0435.</div>'
-    : '';
-
-  var tonConnectBtn = !isUsdt
-    ? '<button class="pay-btn pay-btn-tonconnect" onclick="payWithTonConnect(' + totalTon + ', \'' + orderId + '\')"><span class="pay-btn-icon">\ud83d\udc8e</span><span class="pay-btn-text"><strong>\u041e\u043f\u043b\u0430\u0442\u0438\u0442\u044c \u0447\u0435\u0440\u0435\u0437 \u043a\u043e\u0448\u0435\u043b\u0451\u043a</strong><small>TON Connect</small></span></button>'
-    : '';
-
-  var _activeMytonLink = isUsdt ? mytonUsdtLink : mytonDeepLink;
-  window._mytonLink = _activeMytonLink;
 
   var page = document.getElementById('page-detail');
   page.innerHTML =
@@ -1206,7 +1140,7 @@ function showPayment(totalTon, orderId, currency) {
         '<div class="payment-req-row">' +
           '<div class="payment-req-name">\u0421\u0443\u043c\u043c\u0430</div>' +
           '<div class="payment-req-content">' +
-            '<div class="payment-req-value payment-req-amount">' + totalTon + ' ' + currencySymbol + '</div>' +
+            '<div class="payment-req-value payment-req-amount">' + totalTon + ' GRAM</div>' +
             '<button class="copy-btn" onclick="copyToClipboard(\'' + totalTon + '\', this)">' + t('copy') + '</button>' +
           '</div>' +
         '</div>' +
@@ -1219,17 +1153,17 @@ function showPayment(totalTon, orderId, currency) {
           '</div>' +
         '</div>' +
       '</div>' +
-      usdtNote +
       '<div class="payment-note-info">\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0437\u0430\u043a\u0430\u0437\u0430 \u0432 \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0438 \u043a \u043f\u0435\u0440\u0435\u0432\u043e\u0434\u0443 \u2014 \u043e\u043f\u043b\u0430\u0442\u0430 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438</div>' +
       '<div class="payment-buttons">' +
-        (isUsdt ? '' : tonConnectBtn) +
-        (isUsdt ? '' :
-          '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">' +
-            '<span class="pay-btn-icon">\ud83d\udd35</span>' +
-            '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
-          '</a>'
-        ) +
-        '<a href="' + (isUsdt ? mytonUsdtLink : mytonDeepLink) + '" class="pay-btn pay-btn-mytonwallet" onclick="handleMyTonWalletClick(event)">' +
+        '<button class="pay-btn pay-btn-tonconnect" onclick="payWithTonConnect(' + totalTon + ', \'' + orderId + '\')">' +
+          '<span class="pay-btn-icon">\ud83d\udc8e</span>' +
+          '<span class="pay-btn-text"><strong>\u041e\u043f\u043b\u0430\u0442\u0438\u0442\u044c \u0447\u0435\u0440\u0435\u0437 \u043a\u043e\u0448\u0435\u043b\u0451\u043a</strong><small>TON Connect</small></span>' +
+        '</button>' +
+        '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">' +
+          '<span class="pay-btn-icon">\ud83d\udd35</span>' +
+          '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
+        '</a>' +
+        '<a href="' + mytonDeepLink + '" class="pay-btn pay-btn-mytonwallet" onclick="handleMyTonWalletClick(event)">' +
           '<span class="pay-btn-icon">\ud83d\udcab</span>' +
           '<span class="pay-btn-text"><strong>\u041e\u043f\u043b\u0430\u0442\u0438\u0442\u044c \u0447\u0435\u0440\u0435\u0437 MyTonWallet</strong><small>\u041c\u043e\u0431\u0438\u043b\u044c\u043d\u043e\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435</small></span>' +
         '</a>' +
@@ -1240,7 +1174,7 @@ function showPayment(totalTon, orderId, currency) {
   showPage('page-detail');
   window._currentOrderId = orderId;
   window._currentAmountNano = amountNano;
-  if (!isUsdt) { initTonConnect(); }
+  initTonConnect();
 }
 
 var _tonConnectUI = null;
@@ -1310,40 +1244,7 @@ renderCatalog();
 (function() {
   var style = document.createElement('style');
   style.textContent = `
-    .currency-switcher {
-      margin: 12px 0 4px;
-      padding: 12px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-    }
-    .currency-switcher-label {
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .currency-switcher-btns {
-      display: flex;
-      gap: 8px;
-    }
-    .currency-btn {
-      flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1.5px solid rgba(255,255,255,0.15);
-      background: transparent;
-      color: rgba(255,255,255,0.6);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .currency-btn-active {
-      border-color: #f0a500;
-      background: rgba(240,165,0,0.15);
-      color: #f0a500;
-    }
+
     .pay-btn-mytonwallet {
       background: linear-gradient(135deg, rgba(36,99,235,0.2), rgba(36,99,235,0.1));
       border-color: rgba(36,99,235,0.4);
