@@ -1,4 +1,4 @@
-ёimport os
+import os
 import json
 import threading
 import time
