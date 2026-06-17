@@ -260,14 +260,9 @@
           <div class="consent-note">Мы используем ваши данные только для оформления заказа, связи с вами и организации доставки картины.</div>
         </div>
       </div>
-      <div class="form-section">
-        <h3>💎 Оплата</h3>
-        <div class="payment-info">
-          <p>Переведите <strong id="ton-amount"></strong> TON на адрес:</p>
-          <div class="ton-address" id="ton-address-display"></div>
-
-        </div>
-      </div>
+      <!-- ton-amount and ton-address-display kept as hidden anchors for JS compatibility -->
+      <span id="ton-amount" style="display:none"></span>
+      <span id="ton-address-display" style="display:none"></span>
       <button id="submit-btn" class="submit-btn" style="opacity:0.5;cursor:not-allowed;">✅ Подтвердить заказ</button>
     </div>
   </div>
