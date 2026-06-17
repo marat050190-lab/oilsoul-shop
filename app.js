@@ -1156,7 +1156,12 @@ function showPayment(totalTon, orderId, currency) {
   var amountNano = Math.round(totalTon * 1e9);
 
   var tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + amountNano + '&text=' + orderId;
-  var mytonLink = 'https://app.mytonwallet.io/transfer/' + TON_WALLET + '?amount=' + amountNano + '&comment=' + orderId;
+  // MyTonWallet: try deep link, fallback to App Store / Google Play via universal link
+  var mytonDeepLink = 'https://app.mytonwallet.io/transfer/' + TON_WALLET + '?amount=' + amountNano + '&comment=' + orderId;
+  // For USDT jetton transfer in MyTonWallet: use jetton param
+  var USDT_MASTER = 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs';
+  var usdtAmountMicro = Math.round(totalTon * 1e6); // USDT has 6 decimals
+  var mytonUsdtLink = 'https://app.mytonwallet.io/transfer/' + TON_WALLET + '?amount=' + usdtAmountMicro + '&jetton=' + USDT_MASTER + '&comment=' + orderId;
 
   var usdDisplay = '';
   if (!isUsdt && tonPrice) {
@@ -1175,10 +1180,13 @@ function showPayment(totalTon, orderId, currency) {
     ? '<button class="pay-btn pay-btn-tonconnect" onclick="payWithTonConnect(' + totalTon + ', \'' + orderId + '\')"><span class="pay-btn-icon">\ud83d\udc8e</span><span class="pay-btn-text"><strong>\u041e\u043f\u043b\u0430\u0442\u0438\u0442\u044c \u0447\u0435\u0440\u0435\u0437 \u043a\u043e\u0448\u0435\u043b\u0451\u043a</strong><small>TON Connect</small></span></button>'
     : '';
 
+  var _activeMytonLink = isUsdt ? mytonUsdtLink : mytonDeepLink;
+  window._mytonLink = _activeMytonLink;
+
   var page = document.getElementById('page-detail');
   page.innerHTML =
     '<header>' +
-      '<button onclick="showPage(\'page-catalog\')">' + t('back_catalog') + '</button>' +
+      '<button onclick="showPage(\'page-checkout\')">← ' + t('back') + '</button>' +
       '<h1>' + t('payment_page_title') + '</h1>' +
     '</header>' +
     '<div class="detail-content">' +
@@ -1214,12 +1222,14 @@ function showPayment(totalTon, orderId, currency) {
       usdtNote +
       '<div class="payment-note-info">\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0437\u0430\u043a\u0430\u0437\u0430 \u0432 \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0438 \u043a \u043f\u0435\u0440\u0435\u0432\u043e\u0434\u0443 \u2014 \u043e\u043f\u043b\u0430\u0442\u0430 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438</div>' +
       '<div class="payment-buttons">' +
-        tonConnectBtn +
-        '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">' +
-          '<span class="pay-btn-icon">\ud83d\udd35</span>' +
-          '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
-        '</a>' +
-        '<a href="' + mytonLink + '" class="pay-btn pay-btn-mytonwallet">' +
+        (isUsdt ? '' : tonConnectBtn) +
+        (isUsdt ? '' :
+          '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">' +
+            '<span class="pay-btn-icon">\ud83d\udd35</span>' +
+            '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
+          '</a>'
+        ) +
+        '<a href="' + (isUsdt ? mytonUsdtLink : mytonDeepLink) + '" class="pay-btn pay-btn-mytonwallet" onclick="handleMyTonWalletClick(event)">' +
           '<span class="pay-btn-icon">\ud83d\udcab</span>' +
           '<span class="pay-btn-text"><strong>\u041e\u043f\u043b\u0430\u0442\u0438\u0442\u044c \u0447\u0435\u0440\u0435\u0437 MyTonWallet</strong><small>\u041c\u043e\u0431\u0438\u043b\u044c\u043d\u043e\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435</small></span>' +
         '</a>' +
@@ -1269,6 +1279,29 @@ async function payWithTonConnect(totalTon, orderId) {
     console.log('TON Connect error:', e);
     if (statusEl) statusEl.textContent = 'Ошибка. Попробуйте через Tonkeeper.';
   }
+}
+
+function handleMyTonWalletClick(e) {
+  e.preventDefault();
+  var deepLink = window._mytonLink || 'https://app.mytonwallet.io';
+  var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var storeUrl = isIos
+    ? 'https://apps.apple.com/app/mytonwallet/id6443682511'
+    : 'https://play.google.com/store/apps/details?id=org.mytonwallet.app';
+
+  // Try to open the app via deep link
+  window.location.href = deepLink;
+
+  // If app not installed, open store after 1.5s
+  var timer = setTimeout(function() {
+    window.location.href = storeUrl;
+  }, 1500);
+
+  // App opened — cancel store redirect
+  window.addEventListener('blur', function onBlur() {
+    clearTimeout(timer);
+    window.removeEventListener('blur', onBlur);
+  }, { once: true });
 }
 fetchTonPrice();
 renderCatalog();
