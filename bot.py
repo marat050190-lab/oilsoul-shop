@@ -354,7 +354,7 @@ def track_event():
             'events': [event_data]
         }
         r = requests.post(
-            'https://api2.amplitude.com/2/httpapi',
+            'https://api2.eu.amplitude.com/2/httpapi',
             json=payload,
             headers={'Content-Type': 'application/json'},
             timeout=5
