@@ -694,10 +694,10 @@ function renderCheckout() {
     '<div class="currency-switcher">' +
       '<div class="currency-switcher-label">Способ оплаты:</div>' +
       '<div class="currency-switcher-btns">' +
-        '<button id="cur-btn-gram" class="currency-btn currency-btn-active" onclick="setCurrency('gram')">' +
+        '<button id="cur-btn-gram" class="currency-btn currency-btn-active" onclick="setCurrency(\'gram\')">' +
           '<span>💎</span> GRAM' +
         '</button>' +
-        '<button id="cur-btn-usdt" class="currency-btn" onclick="setCurrency('usdt')">' +
+        '<button id="cur-btn-usdt" class="currency-btn" onclick="setCurrency(\'usdt\')">' +
           '<span>💵</span> USDT' +
         '</button>' +
       '</div>' +
@@ -1168,68 +1168,64 @@ function showPayment(totalTon, orderId, currency) {
   var shortWallet = TON_WALLET.substring(0, 10) + '...' + TON_WALLET.substring(TON_WALLET.length - 6);
 
   var usdtNote = isUsdt
-    ? '<div class="payment-note-info" style="background:rgba(38,161,123,0.12);border-color:rgba(38,161,123,0.3);margin-bottom:8px;">⚠️ Переводите именно USDT (TON сеть), не GRAM. Адрес кошелька тот же.</div>'
+    ? '<div class="payment-note-info" style="background:rgba(38,161,123,0.12);border-color:rgba(38,161,123,0.3);margin-bottom:8px;">\u26a0\ufe0f \u041f\u0435\u0440\u0435\u0432\u043e\u0434\u0438\u0442\u0435 \u0438\u043c\u0435\u043d\u043d\u043e USDT (TON \u0441\u0435\u0442\u044c), \u043d\u0435 GRAM. \u0410\u0434\u0440\u0435\u0441 \u043a\u043e\u0448\u0435\u043b\u044c\u043a\u0430 \u0442\u043e\u0442 \u0436\u0435.</div>'
     : '';
 
   var tonConnectBtn = !isUsdt
-    ? '<button class="pay-btn pay-btn-tonconnect" onclick="payWithTonConnect(' + totalTon + ', '' + orderId + '')">' +
-        '<span class="pay-btn-icon">💎</span>' +
-        '<span class="pay-btn-text"><strong>Оплатить через кошелёк</strong><small>TON Connect</small></span>' +
-      '</button>'
+    ? '<button class="pay-btn pay-btn-tonconnect" onclick="payWithTonConnect(' + totalTon + ', \'' + orderId + '\')"><span class="pay-btn-icon">\ud83d\udc8e</span><span class="pay-btn-text"><strong>\u041e\u043f\u043b\u0430\u0442\u0438\u0442\u044c \u0447\u0435\u0440\u0435\u0437 \u043a\u043e\u0448\u0435\u043b\u0451\u043a</strong><small>TON Connect</small></span></button>'
     : '';
 
   var page = document.getElementById('page-detail');
-  page.innerHTML = [
-    '<header>',
-      '<button onclick="showPage('page-catalog')">' + t('back_catalog') + '</button>',
-      '<h1>' + t('payment_page_title') + '</h1>',
-    '</header>',
-    '<div class="detail-content">',
-      '<div class="payment-success-icon">💎</div>',
-      '<div class="payment-success-title">' + t('payment_done') + '</div>',
-      '<div class="payment-success-sub">' + t('payment_sub') + ' ' + amountDisplay + '</div>',
-      '<div class="payment-requisites">',
-        '<div class="payment-req-label">Реквизиты для оплаты</div>',
-        '<div class="payment-req-row">',
-          '<div class="payment-req-name">Адрес кошелька</div>',
-          '<div class="payment-req-content">',
-            '<div class="payment-req-value">' + shortWallet + '</div>',
-            '<button class="copy-btn" onclick="copyToClipboard('' + TON_WALLET + '', this)">' + t('copy') + '</button>',
-          '</div>',
-        '</div>',
-        '<div class="payment-req-divider"></div>',
-        '<div class="payment-req-row">',
-          '<div class="payment-req-name">Сумма</div>',
-          '<div class="payment-req-content">',
-            '<div class="payment-req-value payment-req-amount">' + totalTon + ' ' + currencySymbol + '</div>',
-            '<button class="copy-btn" onclick="copyToClipboard('' + totalTon + '', this)">' + t('copy') + '</button>',
-          '</div>',
-        '</div>',
-        '<div class="payment-req-divider"></div>',
-        '<div class="payment-req-row">',
-          '<div class="payment-req-name">Комментарий</div>',
-          '<div class="payment-req-content">',
-            '<div class="payment-req-value payment-req-order">' + orderId + '</div>',
-            '<button class="copy-btn" onclick="copyToClipboard('' + orderId + '', this)">' + t('copy') + '</button>',
-          '</div>',
-        '</div>',
-      '</div>',
-      usdtNote,
-      '<div class="payment-note-info">Укажите номер заказа в комментарии к переводу — оплата подтвердится автоматически</div>',
-      '<div class="payment-buttons">',
-        tonConnectBtn,
-        '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">',
-          '<span class="pay-btn-icon">🔵</span>',
-          '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>',
-        '</a>',
-        '<a href="' + mytonLink + '" class="pay-btn pay-btn-mytonwallet">',
-          '<span class="pay-btn-icon">💫</span>',
-          '<span class="pay-btn-text"><strong>Оплатить через MyTonWallet</strong><small>Мобильное приложение</small></span>',
-        '</a>',
-      '</div>',
-      '<div id="tc-status" style="text-align:center;font-size:13px;color:rgba(255,255,255,0.5);margin-top:8px;padding:0 16px;"></div>',
-    '</div>'
-  ].join('');
+  page.innerHTML =
+    '<header>' +
+      '<button onclick="showPage(\'page-catalog\')">' + t('back_catalog') + '</button>' +
+      '<h1>' + t('payment_page_title') + '</h1>' +
+    '</header>' +
+    '<div class="detail-content">' +
+      '<div class="payment-success-icon">\ud83d\udc8e</div>' +
+      '<div class="payment-success-title">' + t('payment_done') + '</div>' +
+      '<div class="payment-success-sub">' + t('payment_sub') + ' ' + amountDisplay + '</div>' +
+      '<div class="payment-requisites">' +
+        '<div class="payment-req-label">\u0420\u0435\u043a\u0432\u0438\u0437\u0438\u0442\u044b \u0434\u043b\u044f \u043e\u043f\u043b\u0430\u0442\u044b</div>' +
+        '<div class="payment-req-row">' +
+          '<div class="payment-req-name">\u0410\u0434\u0440\u0435\u0441 \u043a\u043e\u0448\u0435\u043b\u044c\u043a\u0430</div>' +
+          '<div class="payment-req-content">' +
+            '<div class="payment-req-value">' + shortWallet + '</div>' +
+            '<button class="copy-btn" onclick="copyToClipboard(\'' + TON_WALLET + '\', this)">' + t('copy') + '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="payment-req-divider"></div>' +
+        '<div class="payment-req-row">' +
+          '<div class="payment-req-name">\u0421\u0443\u043c\u043c\u0430</div>' +
+          '<div class="payment-req-content">' +
+            '<div class="payment-req-value payment-req-amount">' + totalTon + ' ' + currencySymbol + '</div>' +
+            '<button class="copy-btn" onclick="copyToClipboard(\'' + totalTon + '\', this)">' + t('copy') + '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="payment-req-divider"></div>' +
+        '<div class="payment-req-row">' +
+          '<div class="payment-req-name">\u041a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0439</div>' +
+          '<div class="payment-req-content">' +
+            '<div class="payment-req-value payment-req-order">' + orderId + '</div>' +
+            '<button class="copy-btn" onclick="copyToClipboard(\'' + orderId + '\', this)">' + t('copy') + '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      usdtNote +
+      '<div class="payment-note-info">\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0437\u0430\u043a\u0430\u0437\u0430 \u0432 \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0438 \u043a \u043f\u0435\u0440\u0435\u0432\u043e\u0434\u0443 \u2014 \u043e\u043f\u043b\u0430\u0442\u0430 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0441\u044f \u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438</div>' +
+      '<div class="payment-buttons">' +
+        tonConnectBtn +
+        '<a href="' + tonkeeperLink + '" class="pay-btn pay-btn-tonkeeper">' +
+          '<span class="pay-btn-icon">\ud83d\udd35</span>' +
+          '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
+        '</a>' +
+        '<a href="' + mytonLink + '" class="pay-btn pay-btn-mytonwallet">' +
+          '<span class="pay-btn-icon">\ud83d\udcab</span>' +
+          '<span class="pay-btn-text"><strong>\u041e\u043f\u043b\u0430\u0442\u0438\u0442\u044c \u0447\u0435\u0440\u0435\u0437 MyTonWallet</strong><small>\u041c\u043e\u0431\u0438\u043b\u044c\u043d\u043e\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435</small></span>' +
+        '</a>' +
+      '</div>' +
+      '<div id="tc-status" style="text-align:center;font-size:13px;color:rgba(255,255,255,0.5);margin-top:8px;padding:0 16px;"></div>' +
+    '</div>';
 
   showPage('page-detail');
   window._currentOrderId = orderId;
