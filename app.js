@@ -1111,7 +1111,7 @@ function showPayment(totalTon, orderId) {
 
   var amountNano = Math.round(totalTon * 1e9);
   var tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + amountNano + '&text=' + orderId;
-  var mytonDeepLink = 'https://app.mytonwallet.io/transfer/' + TON_WALLET + '?amount=' + amountNano + '&comment=' + orderId;
+  var mytonDeepLink = 'ton://transfer/' + TON_WALLET + '?amount=' + amountNano + '&text=' + orderId;
   window._mytonLink = mytonDeepLink;
 
   var amountDisplay = totalTon + ' GRAM' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
