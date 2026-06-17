@@ -1111,8 +1111,6 @@ function showPayment(totalTon, orderId) {
 
   var amountNano = Math.round(totalTon * 1e9);
   var tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + amountNano + '&text=' + orderId;
-  var mytonDeepLink = 'https://app.mytonwallet.io/transfer/' + TON_WALLET + '?amount=' + amountNano + '&comment=' + orderId;
-  window._mytonLink = mytonDeepLink;
   window._tonkeeperLink = tonkeeperLink;
 
   var amountDisplay = totalTon + ' GRAM' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
@@ -1164,10 +1162,7 @@ function showPayment(totalTon, orderId) {
           '<span class="pay-btn-icon">\ud83d\udd35</span>' +
           '<span class="pay-btn-text"><strong>' + t('pay_tonkeeper') + '</strong><small>' + t('pay_tonkeeper_sub') + '</small></span>' +
         '</button>' +
-        '<button class="pay-btn pay-btn-mytonwallet" onclick="handleMyTonWalletClick()">' +
-          '<span class="pay-btn-icon">\ud83d\udcab</span>' +
-          '<span class="pay-btn-text"><strong>\u041e\u043f\u043b\u0430\u0442\u0438\u0442\u044c \u0447\u0435\u0440\u0435\u0437 MyTonWallet</strong><small>\u041c\u043e\u0431\u0438\u043b\u044c\u043d\u043e\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435</small></span>' +
-        '</button>' +
+
       '</div>' +
       '<div id="tc-status" style="text-align:center;font-size:13px;color:rgba(255,255,255,0.5);margin-top:8px;padding:0 16px;"></div>' +
     '</div>';
@@ -1232,18 +1227,7 @@ function openExternalLink(url) {
   }
 }
 
-function handleMyTonWalletClick() {
-  var deepLink = window._mytonLink || 'https://app.mytonwallet.io';
-  try {
-    if (tg && tg.openLink) {
-      tg.openLink(deepLink);
-    } else {
-      window.open(deepLink, '_blank');
-    }
-  } catch(e) {
-    window.open(deepLink, '_blank');
-  }
-}
+
 fetchTonPrice();
 renderCatalog();
 
@@ -1252,13 +1236,7 @@ renderCatalog();
   var style = document.createElement('style');
   style.textContent = `
 
-    .pay-btn-mytonwallet {
-      background: linear-gradient(135deg, rgba(36,99,235,0.2), rgba(36,99,235,0.1));
-      border-color: rgba(36,99,235,0.4);
-    }
-    .pay-btn-mytonwallet:hover {
-      background: linear-gradient(135deg, rgba(36,99,235,0.3), rgba(36,99,235,0.2));
-    }
+
   `;
   document.head.appendChild(style);
 })();
