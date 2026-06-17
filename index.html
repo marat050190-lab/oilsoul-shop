@@ -110,6 +110,13 @@
   </style>
   <!-- Telegram Mini Apps Analytics SDK -->
   <script src="https://tganalytics.xyz/index.js" defer></script>
+  <script src="https://cdn.amplitude.com/libs/analytics-browser-2.3.1-min.js.gz"></script>
+  <script>
+    window.amplitude && window.amplitude.init('16ca19e366e3c0934b941de8fc7c87b', {
+      defaultTracking: false,
+      serverUrl: 'https://api2.amplitude.com/2/httpapi'
+    });
+  </script>
   <script>
     window.addEventListener('load', function() {
       if (typeof telegramAnalytics !== 'undefined') {
