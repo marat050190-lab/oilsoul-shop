@@ -332,6 +332,31 @@ def custom_order():
     send_message(ADMIN_ID, admin_text)
     return {'ok': True}
 
+
+@app.route('/track', methods=['POST', 'OPTIONS'])
+def track_event():
+    if request.method == 'OPTIONS':
+        return '', 204
+    data = request.json
+    if not data:
+        return {'ok': False}
+    try:
+        payload = {
+            'api_key': '16ca19e366e3c0934b941de8fc7c87b',
+            'events': [{
+                'user_id': str(data.get('user_id', 'anonymous')),
+                'event_type': data.get('event', 'unknown'),
+                'event_properties': data.get('props', {}),
+                'time': int(data.get('time', __import__('time').time() * 1000))
+            }]
+        }
+        r = requests.post('https://api2.amplitude.com/2/httpapi', json=payload, timeout=5)
+        print(f"Amplitude track: {data.get('event')} -> {r.status_code}")
+        return {'ok': True}
+    except Exception as e:
+        print(f'track_event error: {e}')
+        return {'ok': False}
+
 # Инициализация БД и запуск мониторинга при старте
 init_db()
 _start_monitor_once()
