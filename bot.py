@@ -1,4 +1,4 @@
-import os
+ёimport os
 import json
 import threading
 import time
@@ -341,16 +341,24 @@ def track_event():
     if not data:
         return {'ok': False}
     try:
+        event_data = {
+            'user_id': str(data.get('user_id', 'anonymous')),
+            'event_type': data.get('event', 'unknown'),
+            'event_properties': data.get('props', {}),
+            'time': int(data.get('time', time.time() * 1000)),
+            'platform': 'Web',
+            'insert_id': str(data.get('user_id', 'anon')) + '_' + str(int(time.time() * 1000))
+        }
         payload = {
             'api_key': '16ca19e366e3c0934b941de8fc7c87b',
-            'events': [{
-                'user_id': str(data.get('user_id', 'anonymous')),
-                'event_type': data.get('event', 'unknown'),
-                'event_properties': data.get('props', {}),
-                'time': int(data.get('time', __import__('time').time() * 1000))
-            }]
+            'events': [event_data]
         }
-        r = requests.post('https://api2.amplitude.com/2/httpapi', json=payload, timeout=5)
+        r = requests.post(
+            'https://api2.amplitude.com/2/httpapi',
+            json=payload,
+            headers={'Content-Type': 'application/json'},
+            timeout=5
+        )
         print(f"Amplitude track: {data.get('event')} -> {r.status_code}")
         return {'ok': True}
     except Exception as e:
