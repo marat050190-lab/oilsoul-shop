@@ -333,58 +333,6 @@ def custom_order():
     return {'ok': True}
 
 
-@app.route('/custom_order', methods=['POST', 'OPTIONS'])
-def custom_order():
-    if request.method == 'OPTIONS':
-        return '', 204
-    data = request.json
-    if not data:
-        return {'ok': False}
-
-    chat_id = data.get('chat_id')
-    user_name = data.get('user_name', 'Неизвестен')
-    gift_link = data.get('gift_link', '—')
-    delivery = data.get('delivery', {})
-    order_id = data.get('order_id', 'OS-' + str(int(time.time())))
-
-    save_order(order_id, chat_id, 149, user_name)
-
-    if chat_id:
-        send_message(chat_id,
-            f'✅ <b>Заказ {order_id} принят!</b>\n\n'
-            f'🔗 Подарок: {gift_link}\n'
-            f'🖼 Размер: 30×30 см, масло на холсте\n'
-            f'🔢 Уникальный номер на картине\n'
-            f'💎 Стоимость: <b>149 GRAM</b>\n'
-            f'⏱ Срок изготовления: 21 день + доставка\n\n'
-            f'💳 Оплата:\n'
-            f'Адрес: <code>{TON_WALLET}</code>\n'
-            f'Сумма: <b>149 GRAM</b>\n'
-            f'Комментарий: <code>{order_id}</code>\n\n'
-            f'Переведите точную сумму с комментарием — оплата подтвердится автоматически. 🎨'
-        )
-
-    admin_text = (
-        '🖌 <b>НОВЫЙ КАСТОМНЫЙ ЗАКАЗ!</b>\n\n'
-        f'👤 {user_name}\n'
-        f'🆔 ID: {chat_id}\n'
-        f'🔑 Заказ: {order_id}\n\n'
-        f'🔗 <b>Подарок:</b> {gift_link}\n\n'
-        f'🖼 30×30 см · 149 GRAM\n\n'
-        f'📦 <b>Доставка:</b>\n'
-        f'Имя: {delivery.get("recipientName", delivery.get("name", "—"))}\n'
-        f'Страна: {delivery.get("deliveryCountry", delivery.get("country", "—"))}\n'
-        f'Город: {delivery.get("city", "—")}\n'
-        f'Адрес: {delivery.get("address", "—")}\n'
-        f'Индекс: {delivery.get("postalCode", delivery.get("postal", "—"))}\n'
-        f'Телефон: {delivery.get("recipientPhone", delivery.get("phone", "—"))}\n'
-        f'Email: {delivery.get("recipientEmail", delivery.get("email", "—"))}\n'
-    )
-    if delivery.get('comment'):
-        admin_text += f'Комментарий: {delivery.get("comment")}\n'
-    send_message(ADMIN_ID, admin_text)
-    return {'ok': True}
-
 
 @app.route('/track', methods=['POST', 'OPTIONS'])
 def track_event():
