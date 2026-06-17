@@ -15,6 +15,9 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 TON_WALLET = 'UQB1gcgRoxQ88K6uEHr31G6j4F9_29olrnAXCozRp029Xzom'
 TON_API_KEY = 'e7ea536bf5ab4a139c669310f6d77c8513e7151feab6ef0686a3a7d2a1636d51'
 
+# USDT jetton master address on TON mainnet
+USDT_MASTER = 'EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs'
+
 app = Flask(__name__)
 CORS(app)
 
@@ -33,8 +36,13 @@ def init_db():
                     chat_id BIGINT,
                     total_ton FLOAT,
                     user_name TEXT,
+                    currency TEXT DEFAULT 'gram',
                     created_at TIMESTAMP DEFAULT NOW()
                 )
+            ''')
+            # Add currency column if it doesn't exist yet (for existing DBs)
+            cur.execute('''
+                ALTER TABLE pending_orders ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'gram'
             ''')
             cur.execute('''
                 CREATE TABLE IF NOT EXISTS confirmed_orders (
@@ -54,18 +62,18 @@ def init_db():
             time.sleep(3)
     print('DB init FAILED after 5 attempts')
 
-def save_order(order_id, chat_id, total_ton, user_name):
+def save_order(order_id, chat_id, total_ton, user_name, currency='gram'):
     try:
         conn = get_db()
         cur = conn.cursor()
         cur.execute(
-            'INSERT INTO pending_orders (order_id, chat_id, total_ton, user_name) VALUES (%s, %s, %s, %s) ON CONFLICT (order_id) DO NOTHING',
-            (order_id, chat_id, total_ton, user_name)
+            'INSERT INTO pending_orders (order_id, chat_id, total_ton, user_name, currency) VALUES (%s, %s, %s, %s, %s) ON CONFLICT (order_id) DO NOTHING',
+            (order_id, chat_id, total_ton, user_name, currency)
         )
         conn.commit()
         cur.close()
         conn.close()
-        print(f'Order saved to DB: {order_id}')
+        print(f'Order saved to DB: {order_id} currency={currency}')
     except Exception as e:
         print(f'save_order error: {e}')
 
@@ -123,6 +131,8 @@ def set_webhook_once():
     r = requests.post(url, json={'url': WEBHOOK_URL})
     print('Webhook set:', r.json())
 
+# ─── GRAM monitor ───────────────────────────────────────────────────────────
+
 def check_ton_transactions():
     last_lt = None
     first_run = True
@@ -149,13 +159,13 @@ def check_ton_transactions():
                     amount = int(msg.get('value', 0))
                     comment = msg.get('message', '').strip()
                     if comment:
-                        print(f'TX comment: {comment}')
+                        print(f'GRAM TX comment: {comment}')
 
-                    print(f'TX: comment={comment}, amount={amount}')
+                    print(f'GRAM TX: comment={comment}, amount={amount}')
 
                     if comment.startswith('OS-') and not is_confirmed(comment):
                         order = get_pending_order(comment)
-                        if order:
+                        if order and order.get('currency', 'gram') == 'gram':
                             expected_nano = int(order['total_ton'] * 1e9)
                             if amount >= expected_nano * 0.99:
                                 confirm_order(comment)
@@ -163,25 +173,140 @@ def check_ton_transactions():
                                 if chat_id:
                                     send_message(chat_id,
                                         f'✅ <b>Оплата по заказу {comment} получена!</b>\n\n'
-                                        f'💎 {order["total_ton"]} TON — подтверждено\n\n'
+                                        f'💎 {order["total_ton"]} GRAM — подтверждено\n\n'
                                         '🖼 Мы приступаем к работе.\n'
                                         'Срок изготовления: 21 день.\n\n'
                                         'Мы свяжемся с вами когда картина будет готова к отправке.'
                                     )
                                 send_message(ADMIN_ID,
-                                    f'💰 <b>ОПЛАТА ПОЛУЧЕНА!</b>\n\n'
+                                    f'💰 <b>ОПЛАТА ПОЛУЧЕНА! (GRAM)</b>\n\n'
                                     f'👤 {order.get("user_name", "—")}\n'
                                     f'🆔 ID: {chat_id}\n'
-                                    f'💎 {order["total_ton"]} TON\n'
+                                    f'💎 {order["total_ton"]} GRAM\n'
                                     f'🔑 Заказ: {comment}'
                                 )
-                                print(f'Order confirmed: {comment}')
+                                print(f'GRAM order confirmed: {comment}')
 
                     if last_lt is None or int(tx_lt) > int(last_lt):
                         last_lt = tx_lt
 
         except Exception as e:
-            print(f'TON monitor error: {e}')
+            print(f'GRAM monitor error: {e}')
+
+        first_run = False
+        time.sleep(30)
+
+# ─── USDT monitor ────────────────────────────────────────────────────────────
+
+def get_usdt_wallet_address():
+    """Get the USDT jetton wallet address for our TON wallet"""
+    try:
+        r = requests.get(
+            f'https://toncenter.com/api/v2/runGetMethod',
+            params={
+                'address': USDT_MASTER,
+                'method': 'get_wallet_address',
+                'stack': json.dumps([['tvm.Slice', TON_WALLET]]),
+                'api_key': TON_API_KEY
+            },
+            timeout=10
+        )
+        # Fallback: use v3 jetton wallets endpoint
+        r2 = requests.get(
+            f'https://toncenter.com/api/v3/jetton/wallets',
+            params={
+                'owner_address': TON_WALLET,
+                'jetton_address': USDT_MASTER,
+                'limit': 1,
+                'api_key': TON_API_KEY
+            },
+            timeout=10
+        )
+        data = r2.json()
+        wallets = data.get('jetton_wallets', [])
+        if wallets:
+            addr = wallets[0].get('address')
+            print(f'USDT jetton wallet: {addr}')
+            return addr
+    except Exception as e:
+        print(f'get_usdt_wallet_address error: {e}')
+    return None
+
+def check_usdt_transactions():
+    """Monitor incoming USDT jetton transfers"""
+    last_lt = None
+    first_run = True
+    usdt_wallet = None
+
+    while True:
+        try:
+            # Get our USDT jetton wallet address (retry if not found)
+            if not usdt_wallet:
+                usdt_wallet = get_usdt_wallet_address()
+                if not usdt_wallet:
+                    print('USDT wallet not found yet, retrying in 60s...')
+                    time.sleep(60)
+                    continue
+
+            # Get recent jetton transfers to our wallet via v3 API
+            r = requests.get(
+                'https://toncenter.com/api/v3/jetton/transfers',
+                params={
+                    'direction': 'in',
+                    'address': TON_WALLET,
+                    'jetton_master': USDT_MASTER,
+                    'limit': 20,
+                    'api_key': TON_API_KEY
+                },
+                timeout=10
+            )
+            data = r.json()
+            transfers = data.get('jetton_transfers', [])
+
+            for tx in transfers:
+                tx_lt = str(tx.get('transaction_lt', ''))
+                if tx_lt == last_lt:
+                    break
+                if last_lt is None and not first_run:
+                    last_lt = tx_lt
+                    break
+
+                # amount is in minimal units (USDT has 6 decimals)
+                amount_raw = int(tx.get('amount', 0))
+                amount_usdt = amount_raw / 1e6
+                comment = tx.get('comment', '').strip()
+
+                print(f'USDT TX: comment={comment}, amount={amount_usdt} USDT')
+
+                if comment.startswith('OS-') and not is_confirmed(comment):
+                    order = get_pending_order(comment)
+                    if order and order.get('currency', 'gram') == 'usdt':
+                        expected_usdt = order['total_ton']  # stored as usdt amount
+                        if amount_usdt >= expected_usdt * 0.99:
+                            confirm_order(comment)
+                            chat_id = order.get('chat_id')
+                            if chat_id:
+                                send_message(chat_id,
+                                    f'✅ <b>Оплата по заказу {comment} получена!</b>\n\n'
+                                    f'💵 {order["total_ton"]} USDT — подтверждено\n\n'
+                                    '🖼 Мы приступаем к работе.\n'
+                                    'Срок изготовления: 21 день.\n\n'
+                                    'Мы свяжемся с вами когда картина будет готова к отправке.'
+                                )
+                            send_message(ADMIN_ID,
+                                f'💰 <b>ОПЛАТА ПОЛУЧЕНА! (USDT)</b>\n\n'
+                                f'👤 {order.get("user_name", "—")}\n'
+                                f'🆔 ID: {chat_id}\n'
+                                f'💵 {order["total_ton"]} USDT\n'
+                                f'🔑 Заказ: {comment}'
+                            )
+                            print(f'USDT order confirmed: {comment}')
+
+                if last_lt is None or int(tx_lt) > int(last_lt if last_lt else 0):
+                    last_lt = tx_lt
+
+        except Exception as e:
+            print(f'USDT monitor error: {e}')
 
         first_run = False
         time.sleep(30)
@@ -190,7 +315,11 @@ def _start_monitor_once():
     if not any(t.name == 'ton_monitor' for t in threading.enumerate()):
         t = threading.Thread(target=check_ton_transactions, daemon=True, name='ton_monitor')
         t.start()
-        print('TON monitor started')
+        print('GRAM monitor started')
+    if not any(t.name == 'usdt_monitor' for t in threading.enumerate()):
+        t = threading.Thread(target=check_usdt_transactions, daemon=True, name='usdt_monitor')
+        t.start()
+        print('USDT monitor started')
 
 @app.route('/')
 def index():
@@ -229,18 +358,21 @@ def order():
     total_ton = data.get('total_ton', sum(i.get('ton', 0) for i in items))
     delivery = data.get('delivery', {})
     order_id = data.get('order_id') or ('OS-' + str(int(time.time())))
+    currency = data.get('currency', 'gram')  # 'gram' or 'usdt'
 
-    save_order(order_id, chat_id, total_ton, user_name)
+    save_order(order_id, chat_id, total_ton, user_name, currency)
+
+    currency_symbol = 'USDT' if currency == 'usdt' else 'GRAM'
 
     if chat_id:
         order_text = f'✅ <b>Заказ {order_id} принят!</b>\n\n'
         for item in items:
-            order_text += f'🎨 {item["title"]} — {item.get("ton", 0)} TON\n'
+            order_text += f'🎨 {item["title"]} — {item.get("ton", 0)} {currency_symbol}\n'
         order_text += (
-            f'\n💎 Итого: <b>{total_ton} TON</b>\n\n'
+            f'\n💎 Итого: <b>{total_ton} {currency_symbol}</b>\n\n'
             f'💳 Оплата:\n'
             f'Адрес: <code>{TON_WALLET}</code>\n'
-            f'Сумма: <b>{total_ton} TON</b>\n'
+            f'Сумма: <b>{total_ton} {currency_symbol}</b>\n'
             f'Комментарий: <code>{order_id}</code>\n\n'
             f'Переведите точную сумму с комментарием — оплата подтвердится автоматически.'
         )
@@ -250,13 +382,14 @@ def order():
         '🛍 <b>НОВЫЙ ЗАКАЗ!</b>\n\n'
         f'👤 {user_name}\n'
         f'🆔 ID: {chat_id}\n'
-        f'🔑 Заказ: {order_id}\n\n'
+        f'🔑 Заказ: {order_id}\n'
+        f'💱 Валюта: {currency_symbol}\n\n'
         '<b>Товары:</b>\n'
     )
     for item in items:
-        admin_text += f'🎨 {item["title"]} — {item.get("ton", 0)} TON\n'
+        admin_text += f'🎨 {item["title"]} — {item.get("ton", 0)} {currency_symbol}\n'
     admin_text += (
-        f'\n💎 <b>Итого: {total_ton} TON</b>\n\n'
+        f'\n💎 <b>Итого: {total_ton} {currency_symbol}</b>\n\n'
         f'📦 <b>Доставка:</b>\n'
         f'Имя: {delivery.get("recipientName", delivery.get("name", "—"))}\n'
         f'Страна: {delivery.get("deliveryCountry", delivery.get("country", "—"))}\n'
@@ -285,7 +418,7 @@ def custom_order():
     delivery = data.get('delivery', {})
     order_id = data.get('order_id', 'OS-' + str(int(time.time())))
 
-    save_order(order_id, chat_id, 149, user_name)
+    save_order(order_id, chat_id, 149, user_name, 'gram')
 
     if chat_id:
         send_message(chat_id,
@@ -293,11 +426,11 @@ def custom_order():
             f'🔗 Подарок: {gift_link}\n'
             f'🖼 Размер: 30×30 см, масло на холсте\n'
             f'🔢 Уникальный номер на картине\n'
-            f'💎 Стоимость: <b>149 TON</b>\n'
+            f'💎 Стоимость: <b>149 GRAM</b>\n'
             f'⏱ Срок изготовления: 21 день + доставка\n\n'
             f'💳 Оплата:\n'
             f'Адрес: <code>{TON_WALLET}</code>\n'
-            f'Сумма: <b>149 TON</b>\n'
+            f'Сумма: <b>149 GRAM</b>\n'
             f'Комментарий: <code>{order_id}</code>\n\n'
             f'Переведите точную сумму с комментарием — оплата подтвердится автоматически. 🎨'
         )
@@ -308,7 +441,7 @@ def custom_order():
         f'🆔 ID: {chat_id}\n'
         f'🔑 Заказ: {order_id}\n\n'
         f'🔗 <b>Подарок:</b> {gift_link}\n\n'
-        f'🖼 30×30 см · 149 TON\n\n'
+        f'🖼 30×30 см · 149 GRAM\n\n'
         f'📦 <b>Доставка:</b>\n'
         f'Имя: {delivery.get("recipientName", delivery.get("name", "—"))}\n'
         f'Страна: {delivery.get("deliveryCountry", delivery.get("country", "—"))}\n'
