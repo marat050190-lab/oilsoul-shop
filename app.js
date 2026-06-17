@@ -1111,7 +1111,7 @@ function showPayment(totalTon, orderId) {
 
   var amountNano = Math.round(totalTon * 1e9);
   var tonkeeperLink = 'https://app.tonkeeper.com/transfer/' + TON_WALLET + '?amount=' + amountNano + '&text=' + orderId;
-  var mytonDeepLink = 'ton://transfer/' + TON_WALLET + '?amount=' + amountNano + '&text=' + orderId;
+  var mytonDeepLink = 'https://app.mytonwallet.io/transfer/' + TON_WALLET + '?amount=' + amountNano + '&comment=' + orderId;
   window._mytonLink = mytonDeepLink;
 
   var amountDisplay = totalTon + ' GRAM' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '');
@@ -1218,24 +1218,11 @@ async function payWithTonConnect(totalTon, orderId) {
 function handleMyTonWalletClick(e) {
   e.preventDefault();
   var deepLink = window._mytonLink || 'https://app.mytonwallet.io';
-  var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  var storeUrl = isIos
-    ? 'https://apps.apple.com/app/mytonwallet/id6443682511'
-    : 'https://play.google.com/store/apps/details?id=org.mytonwallet.app';
-
-  // Try to open the app via deep link
-  window.location.href = deepLink;
-
-  // If app not installed, open store after 1.5s
-  var timer = setTimeout(function() {
-    window.location.href = storeUrl;
-  }, 1500);
-
-  // App opened — cancel store redirect
-  window.addEventListener('blur', function onBlur() {
-    clearTimeout(timer);
-    window.removeEventListener('blur', onBlur);
-  }, { once: true });
+  if (tg && tg.openLink) {
+    tg.openLink(deepLink);
+  } else {
+    window.open(deepLink, '_blank');
+  }
 }
 fetchTonPrice();
 renderCatalog();
