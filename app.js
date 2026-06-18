@@ -1163,7 +1163,7 @@ document.getElementById('submit-btn').addEventListener('click', async function()
     if (result.ok) {
       track('order_placed', { order_id: orderId, total_gram: totalTon });
       if (isAnon) {
-        showAnonConfirmation(orderId);
+        showAnonConfirmation(orderId, country);
       } else {
         showPayment(totalTon, orderId);
       }
@@ -1184,7 +1184,7 @@ function copyToClipboard(text, btn) {
 }
 
 
-function showAnonConfirmation(orderId) {
+function showAnonConfirmation(orderId, country) {
   cart = [];
   updateCartBar();
 
@@ -1210,18 +1210,28 @@ function showAnonConfirmation(orderId) {
         '<div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,0.4);">Мы свяжемся с вами в Telegram в течение нескольких часов</div>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:10px;">' +
-        '<a href="https://www.cdek.ru/ru/offices/" onclick="if(tg&&tg.openLink){tg.openLink(\'https://www.cdek.ru/ru/offices/\');return false;}" style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(0,160,100,0.12);border:1px solid rgba(0,160,100,0.3);border-radius:14px;text-decoration:none;">' +
-          '<span style="font-size:24px;">🗺</span>' +
-          '<div>' +
-            '<div style="font-size:15px;font-weight:600;color:#00c878;">Открыть карту СДЭК</div>' +
-            '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">Найдите удобный постамат или ПВЗ</div>' +
-          '</div>' +
-        '</a>' +
+        (country && country.toLowerCase().indexOf('росси') !== -1 ?
+          '<a href="https://www.cdek.ru/ru/offices/" onclick="if(tg&&tg.openLink){tg.openLink(\'https://www.cdek.ru/ru/offices/\');return false;}" style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(0,160,100,0.12);border:1px solid rgba(0,160,100,0.3);border-radius:14px;text-decoration:none;">' +
+            '<span style="font-size:24px;">🗺</span>' +
+            '<div>' +
+              '<div style="font-size:15px;font-weight:600;color:#00c878;">Открыть карту СДЭК</div>' +
+              '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">Найдите удобный постамат или ПВЗ</div>' +
+            '</div>' +
+          '</a>'
+        :
+          '<div style="display:flex;align-items:flex-start;gap:12px;padding:16px;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.25);border-radius:14px;">' +
+            '<span style="font-size:22px;flex-shrink:0;">🌍</span>' +
+            '<div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;">' +
+              '<div style="font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:4px;">Доставка за рубеж</div>' +
+              'Для отправки в вашу страну нам потребуется полный адрес доставки. Напишите нам в поддержку — мы согласуем детали и стоимость.' +
+            '</div>' +
+          '</div>'
+        ) +
         '<a href="https://t.me/oilsoul_support" onclick="if(tg&&tg.openLink){tg.openLink(\'https://t.me/oilsoul_support\');return false;}" style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.3);border-radius:14px;text-decoration:none;">' +
           '<span style="font-size:24px;">💬</span>' +
           '<div>' +
             '<div style="font-size:15px;font-weight:600;color:#f0a500;">Написать в поддержку</div>' +
-            '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">Мы поможем выбрать пункт выдачи</div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">' + (country && country.toLowerCase().indexOf('росси') !== -1 ? 'Мы поможем выбрать пункт выдачи' : 'Уточним адрес и стоимость доставки') + '</div>' +
           '</div>' +
         '</a>' +
       '</div>' +
