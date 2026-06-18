@@ -578,6 +578,7 @@ function showDetail(id) {
     '<header>' +
       '<button onclick="showPage(\'page-catalog\')">' + t('back') + '</button>' +
       '<h1>' + product.title + '</h1>' +
+      '<a href="https://t.me/oilsoul_support" onclick="if(tg&&tg.openLink){tg.openLink(\'https://t.me/oilsoul_support\');return false;}" style="margin-left:auto;padding:5px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.5);font-size:11px;text-decoration:none;white-space:nowrap;">💬 Помощь</a>' +
     '</header>' +
     '<div class="detail-content">' +
       galleryHtml +
@@ -674,6 +675,44 @@ function updateCartBar() {
 
 var deliveryMethod = 'cdek';
 var cdekSelectedPvz = null;
+
+
+function toggleAnonDelivery() {
+  var anon = document.getElementById('field-anon');
+  var isAnon = anon && anon.checked;
+
+  // Fields to hide in anon mode
+  var hideFields = ['field-address', 'field-apt', 'field-postal', 'field-name', 'field-phone', 'field-email'];
+  var showFields = ['field-telegram'];
+
+  hideFields.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.style.display = isAnon ? 'none' : '';
+      el.required = !isAnon;
+    }
+  });
+  // Also hide apt-row wrapper
+  var aptRow = document.querySelector('.apt-row');
+  if (aptRow) aptRow.style.display = isAnon ? 'none' : '';
+
+  showFields.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.style.display = isAnon ? '' : 'none';
+      el.required = isAnon;
+    }
+  });
+
+  // City becomes optional in anon mode
+  var cityEl = document.getElementById('field-city');
+  if (cityEl) {
+    cityEl.placeholder = isAnon ? 'Город (необязательно)' : 'Город *';
+    cityEl.required = !isAnon;
+  }
+
+  updateSubmitBtn();
+}
 
 function renderCheckout() {
   const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
@@ -1083,15 +1122,20 @@ document.getElementById('submit-btn').addEventListener('click', async function()
 
   var fullAddress = address + (apt ? ', кв. ' + apt : '');
 
+  var anonEl = document.getElementById('field-anon');
+  var isAnon = anonEl && anonEl.checked;
+  var telegramContact = isAnon ? (document.getElementById('field-telegram') ? document.getElementById('field-telegram').value.trim() : '') : '';
+
   var delivery = {
-    recipientName: name,
+    recipientName: isAnon ? 'Анонимный заказ' : name,
     deliveryCountry: country,
     city: city,
-    address: fullAddress,
-    postalCode: postal,
-    recipientPhone: phone,
-    recipientEmail: email,
-    comment: comment
+    address: isAnon ? 'Обсудить лично' : fullAddress,
+    postalCode: isAnon ? '—' : postal,
+    recipientPhone: isAnon ? '—' : phone,
+    recipientEmail: isAnon ? telegramContact : email,
+    comment: isAnon ? ('Telegram: ' + telegramContact + (comment ? ' | ' + comment : '')) : comment,
+    anonymous: isAnon
   };
 
   const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
@@ -1145,6 +1189,7 @@ function showPayment(totalTon, orderId) {
     '<header>' +
       '<button onclick="showPage(\'page-checkout\')">← ' + t('back') + '</button>' +
       '<h1>' + t('payment_page_title') + '</h1>' +
+      '<a href="https://t.me/oilsoul_support" onclick="if(tg&&tg.openLink){tg.openLink(\'https://t.me/oilsoul_support\');return false;}" style="margin-left:auto;padding:5px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.5);font-size:11px;text-decoration:none;white-space:nowrap;">💬 Помощь</a>' +
     '</header>' +
     '<div class="detail-content">' +
       '<div class="payment-success-icon">\ud83d\udc8e</div>' +
