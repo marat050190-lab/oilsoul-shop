@@ -224,6 +224,7 @@
     <header>
       <button id="back-btn">← Назад</button>
       <h1>Оформление заказа</h1>
+      <a href="https://t.me/oilsoul_support" id="checkout-support-link" style="margin-left:auto;padding:5px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.5);font-size:11px;text-decoration:none;white-space:nowrap;">💬 Помощь</a>
     </header>
     <div class="checkout-form">
       <div id="order-summary" class="order-summary"></div>
@@ -231,6 +232,16 @@
         <h3>📦 Данные для доставки</h3>
         <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;border:1px solid rgba(255,255,255,0.08);">
           💡 Доставка рассчитывается индивидуально. После оформления заказа мы уточним стоимость и срок доставки в вашу страну или город. Картина будет надёжно упакована для безопасной пересылки.
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;">
+            <input type="checkbox" id="field-anon" onchange="toggleAnonDelivery()" style="width:18px;height:18px;cursor:pointer;accent-color:#f0a500;">
+            <div>
+              <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500;">🕵️ Хочу обсудить доставку лично</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:2px;">Укажите только страну и контакт — детали обсудим в Telegram</div>
+            </div>
+          </label>
         </div>
         <div style="position:relative;">
           <input type="text" id="field-country" placeholder="Страна *" autocomplete="off" required>
@@ -251,6 +262,7 @@
         <input type="text" id="field-name" placeholder="Имя и фамилия *" autocomplete="name" required>
         <input type="tel" id="field-phone" placeholder="Телефон *" autocomplete="tel" required>
         <input type="email" id="field-email" placeholder="Email *" autocomplete="email" required>
+        <input type="text" id="field-telegram" placeholder="Ваш Telegram @username" autocomplete="off" style="display:none;">
         <textarea id="field-comment" placeholder="Комментарий к заказу (необязательно)" autocomplete="off"></textarea>
 
         <div class="consent-block">
