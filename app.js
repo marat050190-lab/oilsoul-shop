@@ -1192,7 +1192,7 @@ function showAnonConfirmation(orderId, country) {
   var page = document.getElementById('page-detail');
   page.innerHTML =
     '<header>' +
-      '<button onclick="showPage(\'page-catalog\')">← ' + t('back') + '</button>' +
+      '<button onclick="showPage(\'page-catalog\')"> ' + t('back') + '</button>' +
       '<h1>Заявка принята</h1>' +
     '</header>' +
     '<div class="detail-content" style="padding:24px 20px 32px;">' +
@@ -1201,6 +1201,7 @@ function showAnonConfirmation(orderId, country) {
         '<div style="font-size:20px;font-weight:700;color:#f0a500;margin-bottom:8px;">Заявка принята!</div>' +
         '<div style="font-size:13px;color:rgba(255,255,255,0.5);">Номер: <strong style="color:rgba(255,255,255,0.8);">' + orderId + '</strong></div>' +
       '</div>' +
+      (!isRussia ? '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7;">Для вашей страны доставка сейчас доступна только по полному адресу получателя. Пожалуйста, заполните адрес для оформления доставки.</div>' : '') +
       (isRussia ?
         '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7;">' +
           '<div style="font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:10px;">Что дальше:</div>' +
