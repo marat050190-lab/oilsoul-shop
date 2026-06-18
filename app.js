@@ -1188,6 +1188,7 @@ function showAnonConfirmation(orderId, country) {
   cart = [];
   updateCartBar();
 
+  var isRussia = country && country.toLowerCase().indexOf('росси') !== -1;
   var page = document.getElementById('page-detail');
   page.innerHTML =
     '<header>' +
@@ -1202,11 +1203,15 @@ function showAnonConfirmation(orderId, country) {
       '</div>' +
       '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7;">' +
         '<div style="font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:10px;">Что дальше:</div>' +
-        '<div>1. Выберите удобный постамат или ПВЗ СДЭК</div>' +
-        '<div>2. Пришлите нам его адрес или название</div>' +
-        '<div>3. Мы подтвердим и пришлём реквизиты для оплаты</div>' +
-        '<div>4. Напишем картину (~21 день) и отправим</div>' +
-        '<div>5. Когда посылка прибудет — пришлём трек и код получения</div>' +
+        (isRussia ?
+          '<div>1. Выберите удобный постамат или ПВЗ СДЭК</div>' +
+          '<div>2. Пришлите нам его адрес или название</div>' +
+          '<div>3. Мы подтвердим и пришлём реквизиты для оплаты</div>' +
+          '<div>4. Напишем картину (~21 день) и отправим</div>' +
+          '<div>5. Когда посылка прибудет — пришлём трек и код получения</div>'
+        :
+          '<div>Мы свяжемся с вами в Telegram для уточнения деталей доставки и пришлём реквизиты для оплаты.</div>'
+        ) +
         '<div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,0.4);">Мы свяжемся с вами в Telegram в течение нескольких часов</div>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:10px;">' +
@@ -1223,7 +1228,7 @@ function showAnonConfirmation(orderId, country) {
             '<span style="font-size:22px;flex-shrink:0;">🌍</span>' +
             '<div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;">' +
               '<div style="font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:4px;">Доставка за рубеж</div>' +
-              'Для отправки в вашу страну нам потребуется полный адрес доставки. Напишите нам в поддержку — мы согласуем детали и стоимость.' +
+              'Для отправки в вашу страну нам потребуется полный адрес доставки. Воспользуйтесь формой ниже — укажите полный адрес и мы уточним стоимость доставки.' +
             '</div>' +
           '</div>'
         ) +
@@ -1231,7 +1236,7 @@ function showAnonConfirmation(orderId, country) {
           '<span style="font-size:24px;">💬</span>' +
           '<div>' +
             '<div style="font-size:15px;font-weight:600;color:#f0a500;">Написать в поддержку</div>' +
-            '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">' + (country && country.toLowerCase().indexOf('росси') !== -1 ? 'Мы поможем выбрать пункт выдачи' : 'Уточним адрес и стоимость доставки') + '</div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">' + (country && country.toLowerCase().indexOf('росси') !== -1 ? 'Мы поможем выбрать пункт выдачи' : 'Воспользуйтесь формой или напишите нам') + '</div>' +
           '</div>' +
         '</a>' +
       '</div>' +
