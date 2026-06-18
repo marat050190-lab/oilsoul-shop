@@ -704,11 +704,11 @@ function toggleAnonDelivery() {
     }
   });
 
-  // City becomes optional in anon mode
+  // City always required
   var cityEl = document.getElementById('field-city');
   if (cityEl) {
-    cityEl.placeholder = isAnon ? 'Город (необязательно)' : 'Город *';
-    cityEl.required = !isAnon;
+    cityEl.placeholder = 'Город *';
+    cityEl.required = true;
   }
 
   updateSubmitBtn();
@@ -1156,7 +1156,11 @@ document.getElementById('submit-btn').addEventListener('click', async function()
     const result = await res.json();
     if (result.ok) {
       track('order_placed', { order_id: orderId, total_gram: totalTon });
-      showPayment(totalTon, orderId);
+      if (isAnon) {
+        showAnonConfirmation(orderId);
+      } else {
+        showPayment(totalTon, orderId);
+      }
     }
   } catch (e) { alert(t('connection_error')); }
 });
@@ -1171,6 +1175,28 @@ function copyToClipboard(text, btn) {
       btn.style.background = '';
     }, 2000);
   });
+}
+
+
+function showAnonConfirmation(orderId) {
+  cart = [];
+  updateCartBar();
+
+  var page = document.getElementById('page-detail');
+  page.innerHTML =
+    '<header>' +
+      '<button onclick="showPage(\'page-catalog\')">← ' + t('back') + '</button>' +
+      '<h1>Заявка принята</h1>' +
+    '</header>' +
+    '<div class="detail-content" style="text-align:center;padding:32px 20px;">' +
+      '<div style="font-size:56px;margin-bottom:16px;">📦</div>' +
+      '<div style="font-size:20px;font-weight:700;color:#f0a500;margin-bottom:12px;">Заявка принята!</div>' +
+      '<div style="font-size:15px;color:rgba(255,255,255,0.7);line-height:1.6;margin-bottom:8px;">Номер заявки: <strong style="color:#fff;">' + orderId + '</strong></div>' +
+      '<div style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:28px;">Мы свяжемся с вами в Telegram в течение нескольких часов.<br>Согласуем удобный способ и адрес доставки,<br>после чего пришлём реквизиты для оплаты.</div>' +
+      '<a href="https://t.me/oilsoul_support" onclick="if(tg&&tg.openLink){tg.openLink(\'https://t.me/oilsoul_support\');return false;}" style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;background:rgba(240,165,0,0.15);border:1px solid rgba(240,165,0,0.4);border-radius:14px;color:#f0a500;font-size:15px;font-weight:600;text-decoration:none;">💬 Написать нам сейчас</a>' +
+    '</div>';
+
+  showPage('page-detail');
 }
 
 function showPayment(totalTon, orderId) {
