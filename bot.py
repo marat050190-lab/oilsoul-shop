@@ -254,29 +254,50 @@ def order():
         )
         send_message(chat_id, order_text)
 
-    admin_text = (
-        '🛍 <b>НОВЫЙ ЗАКАЗ!</b>\n\n'
-        f'👤 {user_name}\n'
-        f'🆔 ID: {chat_id}\n'
-        f'🔑 Заказ: {order_id}\n'
+    is_anon = delivery.get('anonymous', False)
+    comment_field = delivery.get('comment', '')
+    tg_contact = ''
+    if is_anon and comment_field.startswith('Telegram:'):
+        tg_contact = comment_field.split('|')[0].replace('Telegram:', '').strip()
 
-        '<b>Товары:</b>\n'
-    )
-    for item in items:
-        admin_text += f'🎨 {item["title"]} — {item.get("ton", 0)} {currency_symbol}\n'
-    admin_text += (
-        f'\n💎 <b>Итого: {total_ton} {currency_symbol}</b>\n\n'
-        f'📦 <b>Доставка:</b>\n'
-        f'Имя: {delivery.get("recipientName", delivery.get("name", "—"))}\n'
-        f'Страна: {delivery.get("deliveryCountry", delivery.get("country", "—"))}\n'
-        f'Город: {delivery.get("city", "—")}\n'
-        f'Адрес: {delivery.get("address", "—")}\n'
-        f'Индекс: {delivery.get("postalCode", delivery.get("postal", "—"))}\n'
-        f'Телефон: {delivery.get("recipientPhone", delivery.get("phone", "—"))}\n'
-        f'Email: {delivery.get("recipientEmail", delivery.get("email", "—"))}\n'
-    )
-    if delivery.get('comment'):
-        admin_text += f'Комментарий: {delivery.get("comment")}\n'
+    if is_anon:
+        admin_text = (
+            '📦 <b>АНОНИМНЫЙ ЗАКАЗ — НУЖНО СОГЛАСОВАТЬ ДОСТАВКУ!</b>\n\n'
+            f'🔑 Заказ: {order_id}\n'
+            f'🆔 Telegram ID: {chat_id}\n'
+            f'💬 Telegram: {tg_contact or "—"}\n\n'
+            '<b>Товары:</b>\n'
+        )
+        for item in items:
+            admin_text += f'🎨 {item["title"]} — {item.get("ton", 0)} GRAM\n'
+        admin_text += (
+            f'\n📍 Страна: {delivery.get("deliveryCountry", "—")}\n'
+            f'📍 Город: {delivery.get("city", "—")}\n\n'
+            '⚠️ Напишите клиенту, уточните ПВЗ СДЭК, затем пришлите реквизиты для оплаты.'
+        )
+    else:
+        admin_text = (
+            '🛍 <b>НОВЫЙ ЗАКАЗ!</b>\n\n'
+            f'👤 {user_name}\n'
+            f'🆔 ID: {chat_id}\n'
+            f'🔑 Заказ: {order_id}\n\n'
+            '<b>Товары:</b>\n'
+        )
+        for item in items:
+            admin_text += f'🎨 {item["title"]} — {item.get("ton", 0)} GRAM\n'
+        admin_text += (
+            f'\n💎 <b>Итого: {total_ton} GRAM</b>\n\n'
+            f'📦 <b>Доставка:</b>\n'
+            f'Имя: {delivery.get("recipientName", delivery.get("name", "—"))}\n'
+            f'Страна: {delivery.get("deliveryCountry", delivery.get("country", "—"))}\n'
+            f'Город: {delivery.get("city", "—")}\n'
+            f'Адрес: {delivery.get("address", "—")}\n'
+            f'Индекс: {delivery.get("postalCode", delivery.get("postal", "—"))}\n'
+            f'Телефон: {delivery.get("recipientPhone", delivery.get("phone", "—"))}\n'
+            f'Email: {delivery.get("recipientEmail", delivery.get("email", "—"))}\n'
+        )
+        if delivery.get('comment'):
+            admin_text += f'Комментарий: {delivery.get("comment")}\n'
     send_message(ADMIN_ID, admin_text)
     return {'ok': True}
 
