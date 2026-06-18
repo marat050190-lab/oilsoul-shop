@@ -1101,6 +1101,9 @@ document.getElementById('submit-btn').addEventListener('click', async function()
     return;
   }
 
+  var anonEl = document.getElementById('field-anon');
+  var isAnon = anonEl && anonEl.checked;
+
   var name    = (document.getElementById('field-name')    || {value:''}).value.trim();
   var country = (document.getElementById('field-country') || {value:''}).value.trim();
   var city    = (document.getElementById('field-city')    || {value:''}).value.trim();
@@ -1110,21 +1113,24 @@ document.getElementById('submit-btn').addEventListener('click', async function()
   var phone   = (document.getElementById('field-phone')   || {value:''}).value.trim();
   var email   = (document.getElementById('field-email')   || {value:''}).value.trim();
   var comment = (document.getElementById('field-comment') || {value:''}).value.trim();
+  var telegramContact = isAnon ? (document.getElementById('field-telegram') ? document.getElementById('field-telegram').value.trim() : '') : '';
 
-  if (!name || !country || !city || !address || !postal || !phone || !email) {
-    alert(t('fill_fields')); return;
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    var emailErr = document.getElementById('email-error');
-    if (emailErr) { emailErr.style.display = 'block'; emailErr.textContent = lang === 'ar' ? 'صيغة البريد الإلكتروني غير صحيحة' : lang === 'en' ? 'Invalid email format' : 'Неверный формат email'; }
-    alert(lang === 'en' ? 'Invalid email format' : 'Неверный формат email'); return;
+  if (isAnon) {
+    if (!country || !city || !telegramContact) {
+      alert('Пожалуйста, укажите страну, город и Telegram @username'); return;
+    }
+  } else {
+    if (!name || !country || !city || !address || !postal || !phone || !email) {
+      alert(t('fill_fields')); return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      var emailErr = document.getElementById('email-error');
+      if (emailErr) { emailErr.style.display = 'block'; emailErr.textContent = lang === 'ar' ? 'صيغة البريد الإلكتروني غير صحيحة' : lang === 'en' ? 'Invalid email format' : 'Неверный формат email'; }
+      alert(lang === 'en' ? 'Invalid email format' : 'Неверный формат email'); return;
+    }
   }
 
   var fullAddress = address + (apt ? ', кв. ' + apt : '');
-
-  var anonEl = document.getElementById('field-anon');
-  var isAnon = anonEl && anonEl.checked;
-  var telegramContact = isAnon ? (document.getElementById('field-telegram') ? document.getElementById('field-telegram').value.trim() : '') : '';
 
   var delivery = {
     recipientName: isAnon ? 'Анонимный заказ' : name,
