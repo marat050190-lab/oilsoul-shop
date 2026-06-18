@@ -307,11 +307,17 @@ def order():
     if is_anon and comment_field.startswith('Telegram:'):
         tg_contact = comment_field.split('|')[0].replace('Telegram:', '').strip()
 
+    country_val = delivery.get("deliveryCountry", "").lower()
+    is_russia = 'росси' in country_val or 'russia' in country_val
+
+    # Non-Russia anon orders should not be treated as anon — treat as regular order
+    if is_anon and not is_russia:
+        is_anon = False
+
     if is_anon:
         # Auto-send template message to client
         if chat_id:
-            country_val = delivery.get("deliveryCountry", "").lower()
-            is_russia = 'росси' in country_val or 'russia' in country_val
+            is_russia = True  # already guaranteed above
 
             if is_russia:
                 client_msg = (
