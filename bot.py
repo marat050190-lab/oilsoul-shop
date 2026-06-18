@@ -216,6 +216,35 @@ def webhook():
             'Уникальные картины маслом в стиле Telegram-подарков.\n\n'
             'Откройте магазин кнопкой ниже.'
         )
+    elif text.startswith('/pay') and chat_id == ADMIN_ID:
+        # Format: /pay OS-XXXX
+        parts = text.strip().split()
+        if len(parts) < 2:
+            send_message(chat_id, '❌ Формат: /pay OS-XXXX')
+        else:
+            order_id = parts[1].upper()
+            order = get_pending_order(order_id)
+            if not order:
+                send_message(chat_id, f'❌ Заказ {order_id} не найден в базе.')
+            elif is_confirmed(order_id):
+                send_message(chat_id, f'✅ Заказ {order_id} уже оплачен.')
+            else:
+                client_chat_id = order.get('chat_id')
+                total_ton = order.get('total_ton', 99)
+                if client_chat_id:
+                    send_message(client_chat_id,
+                        f'💎 <b>Реквизиты для оплаты заказа {order_id}</b>\n\n'
+                        f'Адрес кошелька:\n<code>{TON_WALLET}</code>\n\n'
+                        f'Сумма: <b>{total_ton} GRAM</b>\n'
+                        f'Комментарий: <code>{order_id}</code>\n\n'
+                        '⚠️ Обязательно укажите номер заказа в комментарии к переводу — оплата подтвердится автоматически.\n\n'
+                        'После получения оплаты мы приступим к написанию картины. Срок изготовления — 21 день.'
+                    )
+                    send_message(chat_id, f'✅ Реквизиты отправлены клиенту (ID: {client_chat_id}).')
+                else:
+                    send_message(chat_id, f'❌ Не удалось найти Telegram ID клиента для заказа {order_id}.')
+    elif text.startswith('/pay'):
+        pass  # ignore /pay from non-admins silently
     else:
         send_message(chat_id, '🎨 Откройте магазин Oil&Soul чтобы сделать заказ.')
     return 'ok'
