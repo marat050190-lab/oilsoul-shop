@@ -1201,21 +1201,18 @@ function showAnonConfirmation(orderId, country) {
         '<div style="font-size:20px;font-weight:700;color:#f0a500;margin-bottom:8px;">Заявка принята!</div>' +
         '<div style="font-size:13px;color:rgba(255,255,255,0.5);">Номер: <strong style="color:rgba(255,255,255,0.8);">' + orderId + '</strong></div>' +
       '</div>' +
-      '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7;">' +
-        '<div style="font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:10px;">Что дальше:</div>' +
-        (isRussia ?
+      (isRussia ?
+        '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7;">' +
+          '<div style="font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:10px;">Что дальше:</div>' +
           '<div>1. Выберите удобный постамат или ПВЗ СДЭК</div>' +
           '<div>2. Пришлите нам его адрес или название</div>' +
           '<div>3. Мы подтвердим и пришлём реквизиты для оплаты</div>' +
           '<div>4. Напишем картину (~21 день) и отправим</div>' +
-          '<div>5. Когда посылка прибудет — пришлём трек и код получения</div>'
-        :
-          '<div>Мы свяжемся с вами в Telegram для уточнения деталей доставки и пришлём реквизиты для оплаты.</div>'
-        ) +
-        '<div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,0.4);">Мы свяжемся с вами в Telegram в течение нескольких часов</div>' +
-      '</div>' +
+          '<div>5. Когда посылка прибудет — пришлём трек и код получения</div>' +
+        '</div>'
+      : '') +
       '<div style="display:flex;flex-direction:column;gap:10px;">' +
-        (country && country.toLowerCase().indexOf('росси') !== -1 ?
+        (isRussia ?
           '<a href="https://www.cdek.ru/ru/offices/" onclick="if(tg&&tg.openLink){tg.openLink(\'https://www.cdek.ru/ru/offices/\');return false;}" style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(0,160,100,0.12);border:1px solid rgba(0,160,100,0.3);border-radius:14px;text-decoration:none;">' +
             '<span style="font-size:24px;">🗺</span>' +
             '<div>' +
@@ -1224,19 +1221,19 @@ function showAnonConfirmation(orderId, country) {
             '</div>' +
           '</a>'
         :
-          '<div style="display:flex;align-items:flex-start;gap:12px;padding:16px;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.25);border-radius:14px;">' +
-            '<span style="font-size:22px;flex-shrink:0;">🌍</span>' +
-            '<div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;">' +
-              '<div style="font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:4px;">Доставка за рубеж</div>' +
-              'Для отправки в вашу страну нам потребуется полный адрес доставки. Воспользуйтесь формой ниже — укажите полный адрес и мы уточним стоимость доставки.' +
+          '<button onclick="showPage(\'page-checkout\')" style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,200,0,0.1);border:1px solid rgba(255,200,0,0.3);border-radius:14px;width:100%;cursor:pointer;">' +
+            '<span style="font-size:24px;">📋</span>' +
+            '<div style="text-align:left;">' +
+              '<div style="font-size:15px;font-weight:600;color:#f0d000;">Заполнить полный адрес</div>' +
+              '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">Вернуться к форме доставки</div>' +
             '</div>' +
-          '</div>'
+          '</button>'
         ) +
         '<a href="https://t.me/oilsoul_support" onclick="if(tg&&tg.openLink){tg.openLink(\'https://t.me/oilsoul_support\');return false;}" style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.3);border-radius:14px;text-decoration:none;">' +
           '<span style="font-size:24px;">💬</span>' +
           '<div>' +
             '<div style="font-size:15px;font-weight:600;color:#f0a500;">Написать в поддержку</div>' +
-            '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">' + (country && country.toLowerCase().indexOf('росси') !== -1 ? 'Мы поможем выбрать пункт выдачи' : 'Воспользуйтесь формой или напишите нам') + '</div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">' + (isRussia ? 'Мы поможем выбрать пункт выдачи' : 'Уточним детали и стоимость доставки') + '</div>' +
           '</div>' +
         '</a>' +
       '</div>' +
