@@ -286,19 +286,21 @@ def order():
 
     save_order(order_id, chat_id, total_ton, user_name)
 
-    currency_symbol = 'USDT' if currency == 'usdt' else 'GRAM'
+    is_anon_check = data.get('delivery', {}).get('anonymous', False)
 
-    if chat_id:
+    if chat_id and not is_anon_check:
         order_text = f'✅ <b>Заказ {order_id} принят!</b>\n\n'
-        for item in items:
-            order_text += f'🎨 {item["title"]} — {item.get("ton", 0)} {currency_symbol}\n'
         order_text += (
-            f'\n💎 Итого: <b>{total_ton} {currency_symbol}</b>\n\n'
+            f'🔗 Подарок: {gift_link}\n'
+            f'🖼 Размер: 30×30 см, масло на холсте\n'
+            f'🔢 Уникальный номер на картине\n'
+            f'💎 Стоимость: <b>1 GRAM</b>\n'
+            f'⏱ Срок изготовления: 21 день + доставка\n\n'
             f'💳 Оплата:\n'
             f'Адрес: <code>{TON_WALLET}</code>\n'
-            f'Сумма: <b>{total_ton} {currency_symbol}</b>\n'
+            f'Сумма: <b>1 GRAM</b>\n'
             f'Комментарий: <code>{order_id}</code>\n\n'
-            f'Переведите точную сумму с комментарием — оплата подтвердится автоматически.'
+            f'Переведите точную сумму с комментарием — оплата подтвердится автоматически. 🎨'
         )
         send_message(chat_id, order_text)
 
