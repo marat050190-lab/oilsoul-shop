@@ -1025,7 +1025,7 @@ function showCustomPage() {
         '<div class="custom-section custom-conditions">' +
           '<div class="custom-section-title">' + t('custom_conditions_label') + '</div>' +
           '<div class="custom-condition-row"><span>' + t('custom_size') + '</span><span>30×30 см</span></div>' +
-          '<div class="custom-condition-row"><span>' + t('custom_price') + '</span><span class="custom-condition-value">99 TON' + (tonPrice ? ' (~$' + (99 * tonPrice.usd).toFixed(0) + ')' : '') + '</span></div>' +
+          '<div class="custom-condition-row"><span>' + t('custom_price') + '</span><span class="custom-condition-value">1 GRAM' + (tonPrice ? ' (~$' + (1 * tonPrice.usd).toFixed(2) + ')' : '') + '</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_deadline') + '</span><span>21 день + доставка</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
         '</div>' +
