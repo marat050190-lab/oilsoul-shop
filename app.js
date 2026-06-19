@@ -1010,7 +1010,6 @@ function showCustomPage() {
               '<div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:2px;">Укажите страну, город и Telegram — мы подберём удобный вариант</div>' +
             '</div>' +
           '</label>' +
-          '<input type="text" id="custom-name" class="custom-input" placeholder="' + t('field_name') + '">' +
           '<div class="autocomplete-wrap" style="position:relative;">' +
             '<input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '" autocomplete="off">' +
           '</div>' +
@@ -1025,6 +1024,7 @@ function showCustomPage() {
               '<input type="text" id="custom-apt" class="custom-input apt-input" placeholder="Кв./офис" style="width:90px;">' +
             '</div>' +
             '<input type="text" id="custom-postal" class="custom-input" placeholder="' + t('field_postal') + '">' +
+            '<input type="text" id="custom-name" class="custom-input" placeholder="' + t('field_name') + '">' +
             '<input type="tel" id="custom-phone" class="custom-input" placeholder="' + t('field_phone') + '">' +
             '<input type="email" id="custom-email" class="custom-input" placeholder="' + t('field_email') + '">' +
           '</div>' +
@@ -1067,10 +1067,8 @@ function toggleCustomAnon() {
   var isAnon = anon && anon.checked;
   var fullFields = document.getElementById('custom-full-fields');
   var tgField = document.getElementById('custom-telegram');
-  var nameField = document.getElementById('custom-name');
   if (fullFields) fullFields.style.display = isAnon ? 'none' : '';
   if (tgField) { tgField.style.display = isAnon ? '' : 'none'; }
-  if (nameField) nameField.style.display = isAnon ? 'none' : '';
 }
 
 async function submitCustomOrder() {
