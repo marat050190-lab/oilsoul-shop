@@ -1003,13 +1003,23 @@ function showCustomPage() {
         '</div>' +
         '<div class="custom-section">' +
           '<div class="custom-section-title">' + t('custom_delivery_label') + '</div>' +
+          '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;margin-bottom:12px;">' +
+            '<input type="checkbox" id="custom-field-anon" onchange="toggleCustomAnon()" style="width:18px;height:18px;cursor:pointer;accent-color:#f0a500;">' +
+            '<div>' +
+              '<div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500;">📦 Согласовать доставку в Telegram</div>' +
+              '<div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:2px;">Укажите страну, город и Telegram — мы подберём удобный вариант</div>' +
+            '</div>' +
+          '</label>' +
           '<input type="text" id="custom-name" class="custom-input" placeholder="' + t('field_name') + '">' +
           '<div class="autocomplete-wrap"><input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '"></div>' +
           '<div class="autocomplete-wrap"><input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '"></div>' +
-          '<div class="autocomplete-wrap"><input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '"></div>' +
-          '<input type="text" id="custom-postal" class="custom-input" placeholder="' + t('field_postal') + '">' +
-          '<input type="tel" id="custom-phone" class="custom-input" placeholder="' + t('field_phone') + '">' +
-          '<input type="email" id="custom-email" class="custom-input" placeholder="' + t('field_email') + '">' +
+          '<div id="custom-full-fields">' +
+            '<div class="autocomplete-wrap"><input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '"></div>' +
+            '<input type="text" id="custom-postal" class="custom-input" placeholder="' + t('field_postal') + '">' +
+            '<input type="tel" id="custom-phone" class="custom-input" placeholder="' + t('field_phone') + '">' +
+            '<input type="email" id="custom-email" class="custom-input" placeholder="' + t('field_email') + '">' +
+          '</div>' +
+          '<input type="text" id="custom-telegram" class="custom-input" placeholder="Ваш Telegram @username" style="display:none;">' +
           '<textarea id="custom-comment" class="custom-input custom-textarea" placeholder="' + t('field_comment') + '"></textarea>' +
         '</div>' +
         '<div class="custom-section custom-conditions">' +
@@ -1028,24 +1038,67 @@ function showCustomPage() {
   setTimeout(initCustomAutocomplete, 100);
 }
 
+function toggleCustomAnon() {
+  var anon = document.getElementById('custom-field-anon');
+  var isAnon = anon && anon.checked;
+  var fullFields = document.getElementById('custom-full-fields');
+  var tgField = document.getElementById('custom-telegram');
+  var nameField = document.getElementById('custom-name');
+  if (fullFields) fullFields.style.display = isAnon ? 'none' : '';
+  if (tgField) { tgField.style.display = isAnon ? '' : 'none'; }
+  if (nameField) nameField.style.display = isAnon ? 'none' : '';
+}
+
 async function submitCustomOrder() {
   const giftLink = document.getElementById('custom-gift-link').value.trim();
-  const name = document.getElementById('custom-name').value.trim();
+  const anonEl = document.getElementById('custom-field-anon');
+  const isAnon = anonEl && anonEl.checked;
+  const name = (document.getElementById('custom-name') || {value:''}).value.trim();
   const country = document.getElementById('custom-country').value.trim();
   const city = document.getElementById('custom-city').value.trim();
-  const address = document.getElementById('custom-address').value.trim();
-  const postal = document.getElementById('custom-postal').value.trim();
-  const phone = document.getElementById('custom-phone').value.trim();
-  const email = document.getElementById('custom-email').value.trim();
+  const address = isAnon ? '' : (document.getElementById('custom-address') || {value:''}).value.trim();
+  const postal = isAnon ? '' : (document.getElementById('custom-postal') || {value:''}).value.trim();
+  const phone = isAnon ? '' : (document.getElementById('custom-phone') || {value:''}).value.trim();
+  const email = isAnon ? '' : (document.getElementById('custom-email') || {value:''}).value.trim();
   const comment = document.getElementById('custom-comment').value.trim();
+  const telegramContact = isAnon ? (document.getElementById('custom-telegram') || {value:''}).value.trim() : '';
 
-  if (!giftLink || !name || !country || !city || !address || !postal || !phone || !email) {
-    alert(t('custom_fill_fields'));
-    return;
+  if (!giftLink) { alert(t('custom_fill_fields')); return; }
+
+  if (isAnon) {
+    if (!country || !city || !telegramContact) {
+      alert('Пожалуйста, укажите страну, город и Telegram @username'); return;
+    }
+  } else {
+    if (!name || !country || !city || !address || !postal || !phone || !email) {
+      alert(t('custom_fill_fields')); return;
+    }
   }
 
- const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  const isRussia = country.toLowerCase().indexOf('росси') !== -1;
+  const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
   const orderId = 'OS-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+
+  const delivery = isAnon ? {
+    recipientName: 'Анонимный заказ',
+    deliveryCountry: country,
+    city: city,
+    address: 'Обсудить лично',
+    postalCode: '—',
+    recipientPhone: '—',
+    recipientEmail: telegramContact,
+    comment: 'Telegram: ' + telegramContact + (comment ? ' | ' + comment : ''),
+    anonymous: true
+  } : {
+    recipientName: name,
+    deliveryCountry: country,
+    city: city,
+    address: address,
+    postalCode: postal,
+    recipientPhone: phone,
+    recipientEmail: email,
+    comment: comment
+  };
 
   const orderData = {
     action: 'custom_order',
@@ -1053,7 +1106,7 @@ async function submitCustomOrder() {
     user_name: user ? ((user.first_name || '') + ' ' + (user.last_name || '')).trim() : name,
     gift_link: giftLink,
     order_id: orderId,
-    delivery: { name: name, country: country, city: city, address: address, postal: postal, phone: phone, email: email, comment: comment }
+    delivery: delivery
   };
 
   try {
@@ -1064,23 +1117,28 @@ async function submitCustomOrder() {
     });
     const result = await res.json();
     if (result.ok) {
-      const page = document.getElementById('page-detail');
-      page.innerHTML =
-        '<header>' +
-          '<button onclick="showPage(\'page-catalog\')">' + t('back_catalog') + '</button>' +
-          '<h1>' + t('custom_page_title') + '</h1>' +
-        '</header>' +
-        '<div class="detail-content">' +
-          '<div class="payment-success-icon">🎨</div>' +
-          '<div class="payment-success-title">' + t('custom_success') + '</div>' +
-          '<div class="payment-success-sub">Проверьте чат с @OilSoulBot — там реквизиты для оплаты.</div>' +
-        '</div>';
-      showPage('page-detail');
+      if (isAnon) {
+        showAnonConfirmation(orderId, country);
+      } else {
+        const page = document.getElementById('page-detail');
+        page.innerHTML =
+          '<header>' +
+            '<button onclick="showPage(\'page-catalog\')">' + t('back_catalog') + '</button>' +
+            '<h1>' + t('custom_page_title') + '</h1>' +
+          '</header>' +
+          '<div class="detail-content">' +
+            '<div class="payment-success-icon">🎨</div>' +
+            '<div class="payment-success-title">' + t('custom_success') + '</div>' +
+            '<div class="payment-success-sub">Проверьте чат с @OilSoulBot — там реквизиты для оплаты.</div>' +
+          '</div>';
+        showPage('page-detail');
+      }
     }
   } catch (e) {
     alert(t('connection_error'));
   }
 }
+
 
 document.getElementById('checkout-btn').addEventListener('click', function() {
   if (cart.length === 0) return;
