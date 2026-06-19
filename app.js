@@ -1029,7 +1029,6 @@ function showCustomPage() {
           '<div class="custom-condition-row"><span>' + t('custom_deadline') + '</span><span>21 день + доставка</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
         '</div>' +
-        '<div class="custom-disclaimer">Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram. Каждая работа — физическая художественная интерпретация цифрового подарка.</div>' +
         '<div class="consent-wrap" style="margin:12px 0;">' +
           '<label class="consent-label" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">' +
             '<input type="checkbox" id="custom-field-consent" onchange="updateCustomSubmitBtn()" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:#f0a500;">' +
