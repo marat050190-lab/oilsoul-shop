@@ -399,7 +399,7 @@ def custom_order():
     delivery = data.get('delivery', {})
     order_id = data.get('order_id', 'OS-' + str(int(time.time())))
 
-    save_order(order_id, chat_id, 149, user_name)
+    save_order(order_id, chat_id, 1, user_name)
 
     if chat_id:
         send_message(chat_id,
@@ -407,7 +407,7 @@ def custom_order():
             f'🔗 Подарок: {gift_link}\n'
             f'🖼 Размер: 30×30 см, масло на холсте\n'
             f'🔢 Уникальный номер на картине\n'
-            f'💎 Стоимость: <b>149 GRAM</b>\n'
+            f'💎 Стоимость: <b>1 GRAM</b>\n'
             f'⏱ Срок изготовления: 21 день + доставка\n\n'
             f'💳 Оплата:\n'
             f'Адрес: <code>{TON_WALLET}</code>\n'
@@ -422,7 +422,7 @@ def custom_order():
         f'🆔 ID: {chat_id}\n'
         f'🔑 Заказ: {order_id}\n\n'
         f'🔗 <b>Подарок:</b> {gift_link}\n\n'
-        f'🖼 30×30 см · 149 GRAM\n\n'
+        f'🖼 30×30 см · 1 GRAM\n\n'
         f'📦 <b>Доставка:</b>\n'
         f'Имя: {delivery.get("recipientName", delivery.get("name", "—"))}\n'
         f'Страна: {delivery.get("deliveryCountry", delivery.get("country", "—"))}\n'
