@@ -1012,17 +1012,17 @@ function showCustomPage() {
           '</label>' +
           '<input type="text" id="custom-name" class="custom-input" placeholder="' + t('field_name') + '">' +
           '<div class="autocomplete-wrap" style="position:relative;">' +
-            '<input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '" oninput="customCountrySearch(this.value)" autocomplete="off">' +
-            '<div id="custom-country-drop" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#1a2535;border:1px solid rgba(255,255,255,0.2);border-radius:10px;z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>' +
+            '<input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '" autocomplete="off">' +
           '</div>' +
           '<div class="autocomplete-wrap" style="position:relative;">' +
-            '<input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '" oninput="customCitySearch(this.value)" autocomplete="off">' +
-            '<div id="custom-city-drop" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#1a2535;border:1px solid rgba(255,255,255,0.2);border-radius:10px;z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>' +
+            '<input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '" autocomplete="off">' +
           '</div>' +
           '<div id="custom-full-fields">' +
-            '<div class="autocomplete-wrap" style="position:relative;">' +
-              '<input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '" oninput="customAddressSearch(this.value)" autocomplete="off">' +
-              '<div id="custom-address-drop" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#1a2535;border:1px solid rgba(255,255,255,0.2);border-radius:10px;z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>' +
+            '<div style="display:flex;gap:8px;">' +
+              '<div class="autocomplete-wrap" style="position:relative;flex:1;">' +
+                '<input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '" autocomplete="off">' +
+              '</div>' +
+              '<input type="text" id="custom-apt" class="custom-input apt-input" placeholder="Кв./офис" style="width:90px;">' +
             '</div>' +
             '<input type="text" id="custom-postal" class="custom-input" placeholder="' + t('field_postal') + '">' +
             '<input type="tel" id="custom-phone" class="custom-input" placeholder="' + t('field_phone') + '">' +
@@ -1267,12 +1267,12 @@ function toggleCustomAnon() {
 
 async function submitCustomOrder() {
   const giftLink = document.getElementById('custom-gift-link').value.trim();
-  const anonEl = document.getElementById('custom-field-anon');
-  const isAnon = anonEl && anonEl.checked;
+
   const name = (document.getElementById('custom-name') || {value:''}).value.trim();
   const country = document.getElementById('custom-country').value.trim();
   const city = document.getElementById('custom-city').value.trim();
   const address = isAnon ? '' : (document.getElementById('custom-address') || {value:''}).value.trim();
+  const apt = isAnon ? '' : (document.getElementById('custom-apt') || {value:''}).value.trim();
   const postal = isAnon ? '' : (document.getElementById('custom-postal') || {value:''}).value.trim();
   const phone = isAnon ? '' : (document.getElementById('custom-phone') || {value:''}).value.trim();
   const email = isAnon ? '' : (document.getElementById('custom-email') || {value:''}).value.trim();
@@ -1286,6 +1286,9 @@ async function submitCustomOrder() {
     alert(lang === 'en' ? 'Please accept the privacy policy' : 'Пожалуйста, примите политику конфиденциальности');
     return;
   }
+
+  var anonEl = document.getElementById('custom-field-anon');
+  var isAnon = anonEl && anonEl.checked;
 
   if (isAnon) {
     if (!country || !city || !telegramContact) {
@@ -1315,7 +1318,7 @@ async function submitCustomOrder() {
     recipientName: name,
     deliveryCountry: country,
     city: city,
-    address: address,
+    address: address + (apt ? ', кв. ' + apt : ''),
     postalCode: postal,
     recipientPhone: phone,
     recipientEmail: email,
