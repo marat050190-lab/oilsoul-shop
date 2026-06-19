@@ -1031,14 +1031,11 @@ function showCustomPage() {
         '</div>' +
         '<div class="custom-disclaimer">Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram. Каждая работа — физическая художественная интерпретация цифрового подарка.</div>' +
         '<div class="consent-wrap" style="margin:12px 0;">' +
-          '<label class="consent-label">' +
-            '<div class="consent-checkbox-wrap">' +
-              '<input type="checkbox" id="custom-field-consent" onchange="updateCustomSubmitBtn()">' +
-              '<span class="consent-checkmark" id="custom-consent-checkmark"></span>' +
-            '</div>' +
-            '<span class="consent-text">' + t('consent_text') + ' <a href="#" onclick="showPrivacyModal();return false;" class="consent-link">' + t('consent_link') + '</a>.</span>' +
+          '<label class="consent-label" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">' +
+            '<input type="checkbox" id="custom-field-consent" onchange="updateCustomSubmitBtn()" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:#f0a500;">' +
+            '<span style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;">Я согласен(на) на обработку моих персональных данных для оформления заказа, связи со мной и организации доставки. Я ознакомлен(а) с <span class="consent-link" onclick="openPrivacyModal(event)" style="color:#f0a500;text-decoration:underline;cursor:pointer;">Политикой конфиденциальности</span>.</span>' +
           '</label>' +
-          '<div class="consent-sub">' + t('consent_sub') + '</div>' +
+          '<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;">Мы используем ваши данные только для оформления заказа, связи с вами и организации доставки картины.</div>' +
         '</div>' +
         '<button class="submit-btn" id="custom-submit-btn" style="opacity:0.5;cursor:not-allowed;" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
         '<button class="faq-link-btn" onclick="showFaqPage()">FAQ</button>' +
