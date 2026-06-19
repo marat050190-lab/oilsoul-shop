@@ -1030,12 +1030,141 @@ function showCustomPage() {
           '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
         '</div>' +
         '<div class="custom-disclaimer">Oil&Soul создаёт независимые картины маслом по мотивам коллекционных подарков Telegram. Проект не является официальным сервисом Telegram. Каждая работа — физическая художественная интерпретация цифрового подарка.</div>' +
-        '<button class="submit-btn" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
+        '<div class="consent-wrap" style="margin:12px 0;">' +
+          '<label class="consent-label">' +
+            '<div class="consent-checkbox-wrap">' +
+              '<input type="checkbox" id="custom-field-consent" onchange="updateCustomSubmitBtn()">' +
+              '<span class="consent-checkmark" id="custom-consent-checkmark"></span>' +
+            '</div>' +
+            '<span class="consent-text">' + t('consent_text') + ' <a href="#" onclick="showPrivacyModal();return false;" class="consent-link">' + t('consent_link') + '</a>.</span>' +
+          '</label>' +
+          '<div class="consent-sub">' + t('consent_sub') + '</div>' +
+        '</div>' +
+        '<button class="submit-btn" id="custom-submit-btn" style="opacity:0.5;cursor:not-allowed;" onclick="submitCustomOrder()">' + t('custom_submit') + '</button>' +
         '<button class="faq-link-btn" onclick="showFaqPage()">FAQ</button>' +
       '</div>' +
     '</div>';
   showPage('page-detail');
   setTimeout(initCustomAutocomplete, 100);
+}
+
+
+function updateCustomSubmitBtn() {
+  var consent = document.getElementById('custom-field-consent');
+  var btn = document.getElementById('custom-submit-btn');
+  if (!btn) return;
+  var checked = consent && consent.checked;
+  btn.style.opacity = checked ? '1' : '0.5';
+  btn.style.cursor = checked ? 'pointer' : 'not-allowed';
+}
+
+function initCustomAutocomplete() {
+  // Country autocomplete
+  var countryEl = document.getElementById('custom-country');
+  if (countryEl) {
+    var countryList = document.createElement('div');
+    countryList.id = 'custom-country-list';
+    countryList.className = 'autocomplete-dropdown';
+    countryEl.parentNode.appendChild(countryList);
+    countryEl.addEventListener('input', function() {
+      var val = this.value.trim();
+      if (val.length < 2) { countryList.style.display = 'none'; return; }
+      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(val) + '&format=json&limit=7&addressdetails=1&accept-language=ru&featuretype=country')
+        .then(function(r) { return r.json(); })
+        .then(function(results) {
+          countryList.innerHTML = '';
+          var seen = {};
+          results.forEach(function(item) {
+            var country = item.address && item.address.country;
+            if (!country || seen[country]) return;
+            seen[country] = true;
+            var div = document.createElement('div');
+            div.className = 'autocomplete-item';
+            div.textContent = country;
+            div.onmousedown = function(e) {
+              e.preventDefault();
+              countryEl.value = country;
+              countryList.style.display = 'none';
+            };
+            countryList.appendChild(div);
+          });
+          countryList.style.display = countryList.children.length ? 'block' : 'none';
+        }).catch(function() { countryList.style.display = 'none'; });
+    });
+    countryEl.addEventListener('blur', function() { setTimeout(function() { countryList.style.display = 'none'; }, 200); });
+  }
+
+  // City autocomplete
+  var cityEl = document.getElementById('custom-city');
+  if (cityEl) {
+    var cityList = document.createElement('div');
+    cityList.id = 'custom-city-list';
+    cityList.className = 'autocomplete-dropdown';
+    cityEl.parentNode.appendChild(cityList);
+    cityEl.addEventListener('input', function() {
+      var val = this.value.trim();
+      var country = (document.getElementById('custom-country') || {value:''}).value.trim();
+      if (val.length < 2) { cityList.style.display = 'none'; return; }
+      var q = country ? val + ', ' + country : val;
+      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=5&addressdetails=1&accept-language=ru')
+        .then(function(r) { return r.json(); })
+        .then(function(results) {
+          cityList.innerHTML = '';
+          var seen = {};
+          results.forEach(function(item) {
+            var city = item.address && (item.address.city || item.address.town || item.address.village || item.address.county);
+            if (!city || seen[city]) return;
+            seen[city] = true;
+            var div = document.createElement('div');
+            div.className = 'autocomplete-item';
+            div.textContent = city;
+            div.onmousedown = function(e) {
+              e.preventDefault();
+              cityEl.value = city;
+              cityList.style.display = 'none';
+            };
+            cityList.appendChild(div);
+          });
+          cityList.style.display = cityList.children.length ? 'block' : 'none';
+        }).catch(function() { cityList.style.display = 'none'; });
+    });
+    cityEl.addEventListener('blur', function() { setTimeout(function() { cityList.style.display = 'none'; }, 200); });
+  }
+
+  // Address autocomplete
+  var addressEl = document.getElementById('custom-address');
+  if (addressEl) {
+    var addrList = document.createElement('div');
+    addrList.id = 'custom-address-list';
+    addrList.className = 'autocomplete-dropdown';
+    addressEl.parentNode.appendChild(addrList);
+    addressEl.addEventListener('input', function() {
+      var val = this.value.trim();
+      var city = (document.getElementById('custom-city') || {value:''}).value.trim();
+      if (val.length < 3) { addrList.style.display = 'none'; return; }
+      var q = city ? val + ', ' + city : val;
+      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=5&addressdetails=1&accept-language=ru')
+        .then(function(r) { return r.json(); })
+        .then(function(results) {
+          addrList.innerHTML = '';
+          results.slice(0, 5).forEach(function(item) {
+            var display = item.display_name;
+            if (!display) return;
+            var div = document.createElement('div');
+            div.className = 'autocomplete-item';
+            div.textContent = display.split(',').slice(0, 3).join(',');
+            div.onmousedown = function(e) {
+              e.preventDefault();
+              addressEl.value = div.textContent;
+              addrList.style.display = 'none';
+            };
+            addrList.appendChild(div);
+          });
+          addrList.style.display = addrList.children.length ? 'block' : 'none';
+        }).catch(function() { addrList.style.display = 'none'; });
+    });
+    addressEl.addEventListener('blur', function() { setTimeout(function() { addrList.style.display = 'none'; }, 200); });
+  }
 }
 
 function toggleCustomAnon() {
@@ -1064,6 +1193,12 @@ async function submitCustomOrder() {
   const telegramContact = isAnon ? (document.getElementById('custom-telegram') || {value:''}).value.trim() : '';
 
   if (!giftLink) { alert(t('custom_fill_fields')); return; }
+
+  var consentEl = document.getElementById('custom-field-consent');
+  if (!consentEl || !consentEl.checked) {
+    alert(lang === 'en' ? 'Please accept the privacy policy' : 'Пожалуйста, примите политику конфиденциальности');
+    return;
+  }
 
   if (isAnon) {
     if (!country || !city || !telegramContact) {
@@ -1120,18 +1255,7 @@ async function submitCustomOrder() {
       if (isAnon) {
         showAnonConfirmation(orderId, country);
       } else {
-        const page = document.getElementById('page-detail');
-        page.innerHTML =
-          '<header>' +
-            '<button onclick="showPage(\'page-catalog\')">' + t('back_catalog') + '</button>' +
-            '<h1>' + t('custom_page_title') + '</h1>' +
-          '</header>' +
-          '<div class="detail-content">' +
-            '<div class="payment-success-icon">🎨</div>' +
-            '<div class="payment-success-title">' + t('custom_success') + '</div>' +
-            '<div class="payment-success-sub">Проверьте чат с @OilSoulBot — там реквизиты для оплаты.</div>' +
-          '</div>';
-        showPage('page-detail');
+        showPayment(1, orderId);
       }
     }
   } catch (e) {
