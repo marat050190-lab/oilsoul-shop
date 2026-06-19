@@ -1315,7 +1315,7 @@ function showPayment(totalTon, orderId) {
   var page = document.getElementById('page-detail');
   page.innerHTML =
     '<header>' +
-      '<button onclick="showPage(\'page-checkout\')">← ' + t('back') + '</button>' +
+      '<button onclick="showPage(\'page-checkout\')"> ' + t('back') + '</button>' +
       '<h1>' + t('payment_page_title') + '</h1>' +
       '<a href="https://t.me/oilsoul_support" onclick="if(tg&&tg.openLink){tg.openLink(\'https://t.me/oilsoul_support\');return false;}" style="margin-left:auto;padding:5px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.5);font-size:11px;text-decoration:none;white-space:nowrap;">💬 Помощь</a>' +
     '</header>' +
