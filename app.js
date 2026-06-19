@@ -1011,10 +1011,19 @@ function showCustomPage() {
             '</div>' +
           '</label>' +
           '<input type="text" id="custom-name" class="custom-input" placeholder="' + t('field_name') + '">' +
-          '<div class="autocomplete-wrap"><input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '"></div>' +
-          '<div class="autocomplete-wrap"><input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '"></div>' +
+          '<div class="autocomplete-wrap" style="position:relative;">' +
+            '<input type="text" id="custom-country" class="custom-input" placeholder="' + t('field_country') + '" oninput="customCountrySearch(this.value)" autocomplete="off">' +
+            '<div id="custom-country-drop" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#1a2535;border:1px solid rgba(255,255,255,0.2);border-radius:10px;z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>' +
+          '</div>' +
+          '<div class="autocomplete-wrap" style="position:relative;">' +
+            '<input type="text" id="custom-city" class="custom-input" placeholder="' + t('field_city') + '" oninput="customCitySearch(this.value)" autocomplete="off">' +
+            '<div id="custom-city-drop" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#1a2535;border:1px solid rgba(255,255,255,0.2);border-radius:10px;z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>' +
+          '</div>' +
           '<div id="custom-full-fields">' +
-            '<div class="autocomplete-wrap"><input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '"></div>' +
+            '<div class="autocomplete-wrap" style="position:relative;">' +
+              '<input type="text" id="custom-address" class="custom-input" placeholder="' + t('field_address') + '" oninput="customAddressSearch(this.value)" autocomplete="off">' +
+              '<div id="custom-address-drop" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#1a2535;border:1px solid rgba(255,255,255,0.2);border-radius:10px;z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>' +
+            '</div>' +
             '<input type="text" id="custom-postal" class="custom-input" placeholder="' + t('field_postal') + '">' +
             '<input type="tel" id="custom-phone" class="custom-input" placeholder="' + t('field_phone') + '">' +
             '<input type="email" id="custom-email" class="custom-input" placeholder="' + t('field_email') + '">' +
@@ -1041,7 +1050,6 @@ function showCustomPage() {
       '</div>' +
     '</div>';
   showPage('page-detail');
-  setTimeout(initCustomAutocomplete, 100);
 }
 
 
@@ -1055,13 +1063,16 @@ function updateCustomSubmitBtn() {
 }
 
 function makeCustomDropdown(inputEl, fetchFn) {
-  if (!inputEl) return;
-  // Remove existing dropdown if any
-  var existingDrop = inputEl.parentNode.querySelector('.autocomplete-dropdown');
+  if (!inputEl) { console.log('makeCustomDropdown: no element'); return; }
+  console.log('makeCustomDropdown: attaching to', inputEl.id);
+
+  // Remove existing dropdown
+  var existingDrop = inputEl.parentNode.querySelector('.custom-ac-drop');
   if (existingDrop) existingDrop.remove();
+
   var drop = document.createElement('div');
-  drop.className = 'autocomplete-dropdown';
-  drop.style.cssText = 'position:absolute;left:0;right:0;top:100%;background:#1e2a3a;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;';
+  drop.className = 'custom-ac-drop';
+  drop.style.cssText = 'display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#1a2535;border:1px solid rgba(255,255,255,0.2);border-radius:10px;z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);';
   inputEl.parentNode.style.position = 'relative';
   inputEl.parentNode.appendChild(drop);
 
@@ -1070,15 +1081,17 @@ function makeCustomDropdown(inputEl, fetchFn) {
     clearTimeout(timer);
     var val = this.value.trim();
     if (val.length < 2) { drop.style.display = 'none'; return; }
-    timer = setTimeout(function() { fetchFn(val, drop, inputEl); }, 300);
+    timer = setTimeout(function() { fetchFn(val, drop, inputEl); }, 400);
   });
-  inputEl.addEventListener('blur', function() {
-    setTimeout(function() { drop.style.display = 'none'; }, 200);
+  document.addEventListener('click', function(e) {
+    if (!inputEl.contains(e.target) && !drop.contains(e.target)) {
+      drop.style.display = 'none';
+    }
   });
 }
 
 function nominatimFetch(url, drop, inputEl, extractFn) {
-  fetch(url)
+  fetch(url, { headers: { 'Accept-Language': 'ru' } })
     .then(function(r) { return r.json(); })
     .then(function(results) {
       drop.innerHTML = '';
@@ -1088,41 +1101,45 @@ function nominatimFetch(url, drop, inputEl, extractFn) {
         if (!text || seen[text]) return;
         seen[text] = true;
         var div = document.createElement('div');
-        div.className = 'autocomplete-item';
-        div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:14px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.06);';
+        div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:14px;color:rgba(255,255,255,0.9);border-bottom:1px solid rgba(255,255,255,0.06);';
         div.textContent = text;
-        div.addEventListener('mouseover', function() { this.style.background = 'rgba(255,255,255,0.08)'; });
-        div.addEventListener('mouseout', function() { this.style.background = ''; });
-        div.onmousedown = function(e) {
+        div.addEventListener('mouseenter', function() { this.style.background = 'rgba(255,255,255,0.1)'; });
+        div.addEventListener('mouseleave', function() { this.style.background = ''; });
+        div.addEventListener('mousedown', function(e) {
           e.preventDefault();
           inputEl.value = text;
           drop.style.display = 'none';
-        };
+          inputEl.dispatchEvent(new Event('change'));
+        });
         drop.appendChild(div);
       });
       drop.style.display = drop.children.length ? 'block' : 'none';
-    }).catch(function() { drop.style.display = 'none'; });
+    }).catch(function(e) { console.log('Nominatim error:', e); drop.style.display = 'none'; });
 }
 
 function initCustomAutocomplete() {
+  console.log('initCustomAutocomplete called');
+
   var countryEl = document.getElementById('custom-country');
+  console.log('custom-country el:', countryEl);
   makeCustomDropdown(countryEl, function(val, drop, el) {
     nominatimFetch(
-      'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(val) + '&format=json&limit=7&addressdetails=1&accept-language=ru',
+      'https://nominatim.openstreetmap.org/search?format=json&limit=7&addressdetails=1&q=' + encodeURIComponent(val),
       drop, el,
-      function(item) { return item.address && item.address.country; }
+      function(item) { return item.address && item.address.country || null; }
     );
   });
 
   var cityEl = document.getElementById('custom-city');
+  console.log('custom-city el:', cityEl);
   makeCustomDropdown(cityEl, function(val, drop, el) {
     var country = (document.getElementById('custom-country') || {value:''}).value.trim();
     var q = country ? val + ' ' + country : val;
     nominatimFetch(
-      'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=7&addressdetails=1&accept-language=ru',
+      'https://nominatim.openstreetmap.org/search?format=json&limit=7&addressdetails=1&q=' + encodeURIComponent(q),
       drop, el,
       function(item) {
-        return item.address && (item.address.city || item.address.town || item.address.village || item.address.municipality);
+        return item.address && (item.address.city || item.address.town || item.address.village || item.address.municipality) || null;
       }
     );
   });
@@ -1132,12 +1149,110 @@ function initCustomAutocomplete() {
     var city = (document.getElementById('custom-city') || {value:''}).value.trim();
     var q = city ? val + ' ' + city : val;
     nominatimFetch(
-      'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=5&addressdetails=1&accept-language=ru',
+      'https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q=' + encodeURIComponent(q),
       drop, el,
       function(item) { return item.display_name ? item.display_name.split(',').slice(0,3).join(',').trim() : null; }
     );
   });
 }
+
+
+function customDropdownSelect(dropId, inputId, value) {
+  var drop = document.getElementById(dropId);
+  var input = document.getElementById(inputId);
+  if (drop) drop.style.display = 'none';
+  if (input) input.value = value;
+}
+
+function customDropdownFill(dropId, inputId, items) {
+  var drop = document.getElementById(dropId);
+  if (!drop) return;
+  drop.innerHTML = '';
+  items.forEach(function(text) {
+    var div = document.createElement('div');
+    div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:14px;color:rgba(255,255,255,0.9);border-bottom:1px solid rgba(255,255,255,0.06);';
+    div.textContent = text;
+    div.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.1)'; };
+    div.onmouseout = function() { this.style.background = ''; };
+    div.onmousedown = function(e) {
+      e.preventDefault();
+      customDropdownSelect(dropId, inputId, text);
+    };
+    drop.appendChild(div);
+  });
+  drop.style.display = drop.children.length ? 'block' : 'none';
+}
+
+var _customCountryTimer;
+function customCountrySearch(val) {
+  clearTimeout(_customCountryTimer);
+  var drop = document.getElementById('custom-country-drop');
+  if (!val || val.length < 2) { if (drop) drop.style.display = 'none'; return; }
+  _customCountryTimer = setTimeout(function() {
+    fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(val) + '&format=json&limit=7&addressdetails=1&accept-language=ru')
+      .then(function(r) { return r.json(); })
+      .then(function(results) {
+        var seen = {}, items = [];
+        results.forEach(function(item) {
+          var c = item.address && item.address.country;
+          if (c && !seen[c]) { seen[c] = true; items.push(c); }
+        });
+        customDropdownFill('custom-country-drop', 'custom-country', items);
+      }).catch(function() {});
+  }, 350);
+}
+
+var _customCityTimer;
+function customCitySearch(val) {
+  clearTimeout(_customCityTimer);
+  var drop = document.getElementById('custom-city-drop');
+  if (!val || val.length < 2) { if (drop) drop.style.display = 'none'; return; }
+  _customCityTimer = setTimeout(function() {
+    var country = (document.getElementById('custom-country') || {value:''}).value.trim();
+    var q = country ? val + ' ' + country : val;
+    fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=7&addressdetails=1&accept-language=ru')
+      .then(function(r) { return r.json(); })
+      .then(function(results) {
+        var seen = {}, items = [];
+        results.forEach(function(item) {
+          var c = item.address && (item.address.city || item.address.town || item.address.village || item.address.municipality);
+          if (c && !seen[c]) { seen[c] = true; items.push(c); }
+        });
+        customDropdownFill('custom-city-drop', 'custom-city', items);
+      }).catch(function() {});
+  }, 350);
+}
+
+var _customAddrTimer;
+function customAddressSearch(val) {
+  clearTimeout(_customAddrTimer);
+  var drop = document.getElementById('custom-address-drop');
+  if (!val || val.length < 3) { if (drop) drop.style.display = 'none'; return; }
+  _customAddrTimer = setTimeout(function() {
+    var city = (document.getElementById('custom-city') || {value:''}).value.trim();
+    var q = city ? val + ' ' + city : val;
+    fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=5&addressdetails=1&accept-language=ru')
+      .then(function(r) { return r.json(); })
+      .then(function(results) {
+        var items = results.map(function(item) {
+          return item.display_name ? item.display_name.split(',').slice(0,3).join(',').trim() : null;
+        }).filter(Boolean);
+        customDropdownFill('custom-address-drop', 'custom-address', items);
+      }).catch(function() {});
+  }, 350);
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', function(e) {
+  ['custom-country-drop','custom-city-drop','custom-address-drop'].forEach(function(id) {
+    var drop = document.getElementById(id);
+    var inputId = id.replace('-drop', '');
+    var input = document.getElementById(inputId);
+    if (drop && input && !input.contains(e.target) && !drop.contains(e.target)) {
+      drop.style.display = 'none';
+    }
+  });
+});
 
 function toggleCustomAnon() {
   var anon = document.getElementById('custom-field-anon');
