@@ -419,6 +419,85 @@
 
     // Кастомная форма
     function initCustomAutocomplete() {
+      // Country
+      var countryEl = document.getElementById('custom-country');
+      if (countryEl) {
+        var cWrap = countryEl.parentNode;
+        cWrap.style.position = 'relative';
+        var cDrop = document.createElement('div');
+        cDrop.style.cssText = 'display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:9999;max-height:200px;overflow-y:auto;';
+        cWrap.appendChild(cDrop);
+        countryEl.addEventListener('input', function() {
+          var val = this.value.trim();
+          clearTimeout(acTimer);
+          if (val.length < 2) { cDrop.style.display = 'none'; return; }
+          acTimer = setTimeout(function() {
+            nominatimSearch(val, function(results) {
+              cDrop.innerHTML = '';
+              var seen = {};
+              results.forEach(function(r) {
+                var c = r.address && r.address.country;
+                if (!c || seen[c]) return;
+                seen[c] = true;
+                var div = document.createElement('div');
+                div.style.cssText = DD_STYLE;
+                div.textContent = c;
+                div.addEventListener('mousedown', function(e) {
+                  e.preventDefault();
+                  countryEl.value = c;
+                  cDrop.style.display = 'none';
+                });
+                cDrop.appendChild(div);
+              });
+              cDrop.style.display = cDrop.children.length ? 'block' : 'none';
+            });
+          }, 400);
+        });
+        countryEl.addEventListener('blur', function() { setTimeout(function(){ cDrop.style.display='none'; }, 200); });
+      }
+
+      // City
+      var cityEl = document.getElementById('custom-city');
+      if (cityEl) {
+        var cityWrap = cityEl.parentNode;
+        cityWrap.style.position = 'relative';
+        var cityDrop = document.createElement('div');
+        cityDrop.style.cssText = 'display:none;position:absolute;left:0;right:0;top:100%;background:#1e2d42;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:9999;max-height:200px;overflow-y:auto;';
+        cityWrap.appendChild(cityDrop);
+        cityEl.addEventListener('input', function() {
+          var val = this.value.trim();
+          clearTimeout(acTimer);
+          if (val.length < 2) { cityDrop.style.display = 'none'; return; }
+          var country = (document.getElementById('custom-country') || {value:''}).value.trim();
+          acTimer = setTimeout(function() {
+            nominatimSearch(val + (country ? ', ' + country : ''), function(results) {
+              cityDrop.innerHTML = '';
+              var seen = {};
+              results.forEach(function(r) {
+                var addr = r.address || {};
+                var city = addr.city || addr.town || addr.village;
+                if (!city || seen[city]) return;
+                seen[city] = true;
+                var div = document.createElement('div');
+                div.style.cssText = DD_STYLE;
+                div.textContent = city;
+                div.addEventListener('mousedown', function(e) {
+                  e.preventDefault();
+                  cityEl.value = city;
+                  if (addr.country && countryEl) countryEl.value = addr.country;
+                  if (addr.postcode) { var p = document.getElementById('custom-postal'); if(p) p.value = addr.postcode; }
+                  cityDrop.style.display = 'none';
+                });
+                cityDrop.appendChild(div);
+              });
+              cityDrop.style.display = cityDrop.children.length ? 'block' : 'none';
+            });
+          }, 400);
+        });
+        cityEl.addEventListener('blur', function() { setTimeout(function(){ cityDrop.style.display='none'; }, 200); });
+      }
+
+      // Address
       var addressEl = document.getElementById('custom-address');
       if (!addressEl) return;
       var wrap = addressEl.parentNode;
@@ -444,11 +523,11 @@
                 e.preventDefault();
                 var addr = item.address || {};
                 addressEl.value = (addr.road || '') + (addr.house_number ? ', ' + addr.house_number : '');
-                var cityEl = document.getElementById('custom-city');
-                var countryEl = document.getElementById('custom-country');
+                var cityEl2 = document.getElementById('custom-city');
+                var countryEl2 = document.getElementById('custom-country');
                 var postalEl = document.getElementById('custom-postal');
-                if (cityEl && (addr.city || addr.town)) cityEl.value = addr.city || addr.town;
-                if (countryEl && addr.country) countryEl.value = addr.country;
+                if (cityEl2 && (addr.city || addr.town)) cityEl2.value = addr.city || addr.town;
+                if (countryEl2 && addr.country) countryEl2.value = addr.country;
                 if (postalEl && addr.postcode) postalEl.value = addr.postcode;
                 dropdown.style.display = 'none';
               });
