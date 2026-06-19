@@ -1050,6 +1050,7 @@ function showCustomPage() {
       '</div>' +
     '</div>';
   showPage('page-detail');
+  setTimeout(initCustomAutocomplete, 300);
 }
 
 
