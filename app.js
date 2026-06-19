@@ -257,7 +257,7 @@ function setLang(l) {
   var feat2 = document.getElementById('feat-2');
   if (feat2) feat2.textContent = l === 'ru' ? 'Доставка по всему миру' : l === 'ar' ? 'شحن دولي' : 'Worldwide shipping';
   var feat3 = document.getElementById('feat-3');
-  if (feat3) feat3.textContent = l === 'ru' ? 'Оплата в TON' : l === 'ar' ? 'الدفع بـ TON' : 'Pay in TON';
+  if (feat3) feat3.textContent = l === 'ru' ? 'Оплата в GRAM' : l === 'ar' ? 'الدفع بـ GRAM' : 'Pay in GRAM';
   var customBtn = document.getElementById('custom-bar-btn');
   if (customBtn) customBtn.textContent = l === 'ar' ? '✍️ طلب خاص' : l === 'en' ? '✍️ Custom order' : '✍️ Под заказ';
 
@@ -287,9 +287,9 @@ async function fetchTonPrice() {
 }
 
 function formatPrice(ton) {
-  if (!tonPrice) return ton + ' TON';
+  if (!tonPrice) return ton + ' GRAM';
   const usd = (ton * tonPrice.usd).toFixed(0);
-  return ton + ' TON (~$' + Number(usd).toLocaleString('en-US') + ')';
+  return ton + ' GRAM (~$' + Number(usd).toLocaleString('en-US') + ')';
 }
 
 const descriptions = {
@@ -314,7 +314,7 @@ const faqItems = {
     { q: 'Какие материалы используются?', a: 'Холст на подрамнике, масляные краски, художественные кисти и мастихины, защитный лак после высыхания, упаковка для безопасной доставки.' },
     { q: 'Доставляете ли вы по всему миру?', a: 'Да, мы отправляем картины по всему миру. Стоимость и срок доставки зависят от страны получателя и рассчитываются индивидуально после оформления заказа.' },
     { q: 'Как упаковывается картина?', a: 'Картина упаковывается в защитную упаковку. Мы используем плотную упаковку, защитные слои и коробку, подходящую под формат холста.' },
-    { q: 'Как происходит оплата?', a: 'Оплата принимается в TON. После оформления заказа вы получите данные для оплаты. После подтверждения оплаты заказ передаётся в работу.' },
+    { q: 'Как происходит оплата?', a: 'Оплата принимается в GRAM. После оформления заказа вы получите данные для оплаты. После подтверждения оплаты заказ передаётся в работу.' },
     { q: 'Можно ли вернуть картину?', a: 'Готовые работы обсуждаются индивидуально. Кастомные картины создаются специально под ваш Telegram-подарок, поэтому возврат таких работ обычно невозможен после начала написания. Если возникнет проблема — рассмотрим ситуацию отдельно.' },
     { q: 'Что входит в заказ?', a: 'Картина маслом на холсте, прокрашенные боковые стороны, Номер подарка на холсте (если предусмотрен), сертификат уникальности, защитная упаковка.' },
     { q: 'Что такое сертификат уникальности?', a: 'Сертификат подтверждает данные физической картины: название работы, номер подарка, техника (масло на холсте), размер, год создания и данные проекта Oil&Soul.' },
@@ -332,7 +332,7 @@ const faqItems = {
     { q: 'What materials are used?', a: 'Stretched canvas, oil paints, artist brushes and palette knives, protective varnish after drying, packaging for safe delivery.' },
     { q: 'Do you ship worldwide?', a: 'Yes, we ship paintings worldwide. The cost and time of delivery depend on the recipient\'s country and are calculated individually after placing an order.' },
     { q: 'How is the painting packaged?', a: 'The painting is packed in protective packaging. We use dense packing, protective layers and a box suitable for the canvas format.' },
-    { q: 'How does payment work?', a: 'Payment is accepted in TON. After placing an order you will receive payment details. After payment confirmation the order goes into production.' },
+    { q: 'How does payment work?', a: 'Payment is accepted in GRAM. After placing an order you will receive payment details. After payment confirmation the order goes into production.' },
     { q: 'Can I return a painting?', a: 'Ready-made works are discussed individually. Custom paintings are created specifically for your Telegram gift, so returns are usually not possible after painting has started. If a problem arises we will consider the situation separately.' },
     { q: 'What is included in the order?', a: 'Oil painting on canvas, painted sides, Unique number on canvas (if applicable), certificate of uniqueness, protective packaging.' },
     { q: 'What is the certificate of uniqueness?', a: 'The certificate confirms the physical painting data: title, unique number, technique (oil on canvas), size, year of creation and Oil&Soul project details.' },
@@ -452,7 +452,7 @@ function renderCatalog() {
       '<div class="custom-order-card-body">' +
         '<div class="custom-order-card-title">' + t('custom_card_title') + '</div>' +
         '<div class="custom-order-card-desc">' + t('custom_card_desc') + '</div>' +
-        '<div class="custom-order-card-price">99 TON' + (tonPrice ? ' (~$' + (99 * tonPrice.usd).toFixed(0) + ')' : '') + '</div>' +
+        '<div class="custom-order-card-price">1 GRAM' + (tonPrice ? ' (~$' + (1 * tonPrice.usd).toFixed(2) + ')' : '') + '</div>' +
         '<button class="custom-order-card-btn" onclick="showCustomPage()">' + t('custom_card_btn') + '</button>' +
       '</div>';
     catalog.appendChild(customCard);
@@ -669,7 +669,7 @@ function updateCartBar() {
     bar.classList.remove('hidden');
     const totalTon = cart.reduce(function(sum, i) { return sum + i.ton; }, 0);
     const totalUsd = tonPrice ? '$' + (totalTon * tonPrice.usd).toFixed(0) : '';
-    info.textContent = cart.length + ' — ' + totalTon + ' TON ' + (totalUsd ? '(~' + totalUsd + ')' : '');
+    info.textContent = cart.length + ' — ' + totalTon + ' GRAM ' + (totalUsd ? '(~' + totalUsd + ')' : '');
   }
 }
 
@@ -724,7 +724,7 @@ function renderCheckout() {
     }).join('') +
     '<div class="order-total">' +
       '<span>' + t('order_total') + '</span>' +
-      '<span id="checkout-total-display">' + totalTon + ' TON' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '') + '</span>' +
+      '<span id="checkout-total-display">' + totalTon + ' GRAM' + (tonPrice ? ' (~$' + (totalTon * tonPrice.usd).toFixed(0) + ')' : '') + '</span>' +
     '</div>';
   document.getElementById('ton-amount').textContent = totalTon;
   document.getElementById('ton-address-display').textContent = TON_WALLET;
