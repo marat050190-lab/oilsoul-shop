@@ -452,7 +452,7 @@ function renderCatalog() {
       '<div class="custom-order-card-body">' +
         '<div class="custom-order-card-title">' + t('custom_card_title') + '</div>' +
         '<div class="custom-order-card-desc">' + t('custom_card_desc') + '</div>' +
-        '<div class="custom-order-card-price">1 GRAM' + (tonPrice ? ' (~$' + (1 * tonPrice.usd).toFixed(2) + ')' : '') + '</div>' +
+        '<div class="custom-order-card-price">1 GRAM' + (tonPrice ? ' (~$' + (1 * tonPrice.usd).toFixed(0) + ')' : '') + '</div>' +
         '<button class="custom-order-card-btn" onclick="showCustomPage()">' + t('custom_card_btn') + '</button>' +
       '</div>';
     catalog.appendChild(customCard);
@@ -1054,113 +1054,89 @@ function updateCustomSubmitBtn() {
   btn.style.cursor = checked ? 'pointer' : 'not-allowed';
 }
 
+function makeCustomDropdown(inputEl, fetchFn) {
+  if (!inputEl) return;
+  // Remove existing dropdown if any
+  var existingDrop = inputEl.parentNode.querySelector('.autocomplete-dropdown');
+  if (existingDrop) existingDrop.remove();
+  var drop = document.createElement('div');
+  drop.className = 'autocomplete-dropdown';
+  drop.style.cssText = 'position:absolute;left:0;right:0;top:100%;background:#1e2a3a;border:1px solid rgba(255,255,255,0.15);border-radius:10px;z-index:999;max-height:200px;overflow-y:auto;';
+  inputEl.parentNode.style.position = 'relative';
+  inputEl.parentNode.appendChild(drop);
+
+  var timer;
+  inputEl.addEventListener('input', function() {
+    clearTimeout(timer);
+    var val = this.value.trim();
+    if (val.length < 2) { drop.style.display = 'none'; return; }
+    timer = setTimeout(function() { fetchFn(val, drop, inputEl); }, 300);
+  });
+  inputEl.addEventListener('blur', function() {
+    setTimeout(function() { drop.style.display = 'none'; }, 200);
+  });
+}
+
+function nominatimFetch(url, drop, inputEl, extractFn) {
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(results) {
+      drop.innerHTML = '';
+      var seen = {};
+      results.forEach(function(item) {
+        var text = extractFn(item);
+        if (!text || seen[text]) return;
+        seen[text] = true;
+        var div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:14px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.06);';
+        div.textContent = text;
+        div.addEventListener('mouseover', function() { this.style.background = 'rgba(255,255,255,0.08)'; });
+        div.addEventListener('mouseout', function() { this.style.background = ''; });
+        div.onmousedown = function(e) {
+          e.preventDefault();
+          inputEl.value = text;
+          drop.style.display = 'none';
+        };
+        drop.appendChild(div);
+      });
+      drop.style.display = drop.children.length ? 'block' : 'none';
+    }).catch(function() { drop.style.display = 'none'; });
+}
+
 function initCustomAutocomplete() {
-  // Country autocomplete
   var countryEl = document.getElementById('custom-country');
-  if (countryEl) {
-    var countryList = document.createElement('div');
-    countryList.id = 'custom-country-list';
-    countryList.className = 'autocomplete-dropdown';
-    countryEl.parentNode.appendChild(countryList);
-    countryEl.addEventListener('input', function() {
-      var val = this.value.trim();
-      if (val.length < 2) { countryList.style.display = 'none'; return; }
-      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(val) + '&format=json&limit=7&addressdetails=1&accept-language=ru&featuretype=country')
-        .then(function(r) { return r.json(); })
-        .then(function(results) {
-          countryList.innerHTML = '';
-          var seen = {};
-          results.forEach(function(item) {
-            var country = item.address && item.address.country;
-            if (!country || seen[country]) return;
-            seen[country] = true;
-            var div = document.createElement('div');
-            div.className = 'autocomplete-item';
-            div.textContent = country;
-            div.onmousedown = function(e) {
-              e.preventDefault();
-              countryEl.value = country;
-              countryList.style.display = 'none';
-            };
-            countryList.appendChild(div);
-          });
-          countryList.style.display = countryList.children.length ? 'block' : 'none';
-        }).catch(function() { countryList.style.display = 'none'; });
-    });
-    countryEl.addEventListener('blur', function() { setTimeout(function() { countryList.style.display = 'none'; }, 200); });
-  }
+  makeCustomDropdown(countryEl, function(val, drop, el) {
+    nominatimFetch(
+      'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(val) + '&format=json&limit=7&addressdetails=1&accept-language=ru',
+      drop, el,
+      function(item) { return item.address && item.address.country; }
+    );
+  });
 
-  // City autocomplete
   var cityEl = document.getElementById('custom-city');
-  if (cityEl) {
-    var cityList = document.createElement('div');
-    cityList.id = 'custom-city-list';
-    cityList.className = 'autocomplete-dropdown';
-    cityEl.parentNode.appendChild(cityList);
-    cityEl.addEventListener('input', function() {
-      var val = this.value.trim();
-      var country = (document.getElementById('custom-country') || {value:''}).value.trim();
-      if (val.length < 2) { cityList.style.display = 'none'; return; }
-      var q = country ? val + ', ' + country : val;
-      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=5&addressdetails=1&accept-language=ru')
-        .then(function(r) { return r.json(); })
-        .then(function(results) {
-          cityList.innerHTML = '';
-          var seen = {};
-          results.forEach(function(item) {
-            var city = item.address && (item.address.city || item.address.town || item.address.village || item.address.county);
-            if (!city || seen[city]) return;
-            seen[city] = true;
-            var div = document.createElement('div');
-            div.className = 'autocomplete-item';
-            div.textContent = city;
-            div.onmousedown = function(e) {
-              e.preventDefault();
-              cityEl.value = city;
-              cityList.style.display = 'none';
-            };
-            cityList.appendChild(div);
-          });
-          cityList.style.display = cityList.children.length ? 'block' : 'none';
-        }).catch(function() { cityList.style.display = 'none'; });
-    });
-    cityEl.addEventListener('blur', function() { setTimeout(function() { cityList.style.display = 'none'; }, 200); });
-  }
+  makeCustomDropdown(cityEl, function(val, drop, el) {
+    var country = (document.getElementById('custom-country') || {value:''}).value.trim();
+    var q = country ? val + ' ' + country : val;
+    nominatimFetch(
+      'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=7&addressdetails=1&accept-language=ru',
+      drop, el,
+      function(item) {
+        return item.address && (item.address.city || item.address.town || item.address.village || item.address.municipality);
+      }
+    );
+  });
 
-  // Address autocomplete
-  var addressEl = document.getElementById('custom-address');
-  if (addressEl) {
-    var addrList = document.createElement('div');
-    addrList.id = 'custom-address-list';
-    addrList.className = 'autocomplete-dropdown';
-    addressEl.parentNode.appendChild(addrList);
-    addressEl.addEventListener('input', function() {
-      var val = this.value.trim();
-      var city = (document.getElementById('custom-city') || {value:''}).value.trim();
-      if (val.length < 3) { addrList.style.display = 'none'; return; }
-      var q = city ? val + ', ' + city : val;
-      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=5&addressdetails=1&accept-language=ru')
-        .then(function(r) { return r.json(); })
-        .then(function(results) {
-          addrList.innerHTML = '';
-          results.slice(0, 5).forEach(function(item) {
-            var display = item.display_name;
-            if (!display) return;
-            var div = document.createElement('div');
-            div.className = 'autocomplete-item';
-            div.textContent = display.split(',').slice(0, 3).join(',');
-            div.onmousedown = function(e) {
-              e.preventDefault();
-              addressEl.value = div.textContent;
-              addrList.style.display = 'none';
-            };
-            addrList.appendChild(div);
-          });
-          addrList.style.display = addrList.children.length ? 'block' : 'none';
-        }).catch(function() { addrList.style.display = 'none'; });
-    });
-    addressEl.addEventListener('blur', function() { setTimeout(function() { addrList.style.display = 'none'; }, 200); });
-  }
+  var addrEl = document.getElementById('custom-address');
+  makeCustomDropdown(addrEl, function(val, drop, el) {
+    var city = (document.getElementById('custom-city') || {value:''}).value.trim();
+    var q = city ? val + ' ' + city : val;
+    nominatimFetch(
+      'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=5&addressdetails=1&accept-language=ru',
+      drop, el,
+      function(item) { return item.display_name ? item.display_name.split(',').slice(0,3).join(',').trim() : null; }
+    );
+  });
 }
 
 function toggleCustomAnon() {
