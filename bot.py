@@ -56,13 +56,13 @@ def init_db():
             time.sleep(3)
     print('DB init FAILED after 5 attempts')
 
-def save_order(order_id, chat_id, total_ton, user_name):
+def save_order(order_id, chat_id, total_ton, user_name, order_type='catalog'):
     try:
         conn = get_db()
         cur = conn.cursor()
         cur.execute(
-            'INSERT INTO pending_orders (order_id, chat_id, total_ton, user_name) VALUES (%s, %s, %s, %s) ON CONFLICT (order_id) DO NOTHING',
-            (order_id, chat_id, total_ton, user_name)
+            'INSERT INTO pending_orders (order_id, chat_id, total_ton, user_name, order_type) VALUES (%s, %s, %s, %s, %s) ON CONFLICT (order_id) DO NOTHING',
+            (order_id, chat_id, total_ton, user_name, order_type)
         )
         conn.commit()
         cur.close()
@@ -169,15 +169,16 @@ def check_ton_transactions():
                                         f'✅ <b>Оплата по заказу {comment} получена!</b>\n\n'
                                         f'💎 {order["total_ton"]} GRAM — подтверждено\n\n'
                                         '🖼 Мы приступаем к работе.\n'
-                                        'Срок изготовления: 21 день.\n\n'
-                                        'Мы свяжемся с вами когда картина будет готова к отправке.'
+                                        + ('Срок изготовления: 21 день.\n\n' if order.get('order_type') == 'custom' else '\n')
+                                        + 'Мы свяжемся с вами когда картина будет готова к отправке.'
                                     )
                                 send_message(ADMIN_ID,
-                                    f'💰 <b>ОПЛАТА ПОЛУЧЕНА! (GRAM)</b>\n\n'
+                                    f'💰 <b>ОПЛАТА ПОЛУЧЕНА!</b>\n\n'
                                     f'👤 {order.get("user_name", "—")}\n'
                                     f'🆔 ID: {chat_id}\n'
                                     f'💎 {order["total_ton"]} GRAM\n'
-                                    f'🔑 Заказ: {comment}'
+                                    f'🔑 Заказ: {comment}\n'
+                                    f'📦 Тип: {"Под заказ" if order.get("order_type") == "custom" else "Из каталога"}'
                                 )
                                 print(f'GRAM order confirmed: {comment}')
 
@@ -399,7 +400,7 @@ def custom_order():
     delivery = data.get('delivery', {})
     order_id = data.get('order_id', 'OS-' + str(int(time.time())))
 
-    save_order(order_id, chat_id, 1, user_name)
+    save_order(order_id, chat_id, 1, user_name, 'custom')
 
     if chat_id:
         send_message(chat_id,
