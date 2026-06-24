@@ -452,7 +452,7 @@ function renderCatalog() {
       '<div class="custom-order-card-body">' +
         '<div class="custom-order-card-title">' + t('custom_card_title') + '</div>' +
         '<div class="custom-order-card-desc">' + t('custom_card_desc') + '</div>' +
-        '<div class="custom-order-card-price">1 GRAM' + (tonPrice ? ' (~$' + (1 * tonPrice.usd).toFixed(0) + ')' : '') + '</div>' +
+        '<div class="custom-order-card-price">99 GRAM' + (tonPrice ? ' (~$' + (99 * tonPrice.usd).toFixed(0) + ')' : '') + '</div>' +
         '<button class="custom-order-card-btn" onclick="showCustomPage()">' + t('custom_card_btn') + '</button>' +
       '</div>';
     catalog.appendChild(customCard);
@@ -1034,7 +1034,7 @@ function showCustomPage() {
         '<div class="custom-section custom-conditions">' +
           '<div class="custom-section-title">' + t('custom_conditions_label') + '</div>' +
           '<div class="custom-condition-row"><span>' + t('custom_size') + '</span><span>30×30 см</span></div>' +
-          '<div class="custom-condition-row"><span>' + t('custom_price') + '</span><span class="custom-condition-value">1 GRAM' + (tonPrice ? ' (~$' + (1 * tonPrice.usd).toFixed(2) + ')' : '') + '</span></div>' +
+          '<div class="custom-condition-row"><span>' + t('custom_price') + '</span><span class="custom-condition-value">99 GRAM' + (tonPrice ? ' (~$' + (99 * tonPrice.usd).toFixed(0) + ')' : '') + '</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_deadline') + '</span><span>21 день + доставка</span></div>' +
           '<div class="custom-condition-row"><span>' + t('custom_nft') + '</span><span>✓</span></div>' +
         '</div>' +
@@ -1152,7 +1152,7 @@ async function submitCustomOrder() {
       if (isAnon) {
         showAnonConfirmation(orderId, country);
       } else {
-        showPayment(1, orderId);
+        showPayment(99, orderId);
       }
     }
   } catch (e) {
